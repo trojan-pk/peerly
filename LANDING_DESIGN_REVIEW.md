@@ -1,6 +1,6 @@
 # Peerly landing design review — 23 October 2026
 
-## Assessment
+## Original assessment
 
 The page has a coherent colour direction, a working single-page navigation and a
 real sign-in entry point. It is still closer to a polished landing template than
@@ -49,7 +49,7 @@ This is a visual/interaction critique, not a determination of authorship.
 - Updated the browser regression to check that a feature icon stays in the same
   position relative to its card, and that the pause button is absent.
 
-## Next art-direction pass
+## Art-direction scope approved after the audit
 
 1. Rewrite the product story and choose the actual UI scenes before adding effects.
 2. Recompose the hero and feature section around those scenes; remove redundant tiles.
@@ -57,5 +57,25 @@ This is a visual/interaction critique, not a determination of authorship.
 4. Establish the type scale, contrast, illustration and icon rules across every section.
 5. Choreograph one signature animation and purposeful state transitions within that system.
 
-The full recomposition above is a recommendation, not a claim that this pass has
-already completed it. The landing → login → workspace flow stays intact.
+The initial audit only completed the hover/control corrections. The subsequent
+implementation below carries out the approved recomposition.
+
+## Implemented recomposition
+
+| Finding | Implemented treatment |
+| --- | --- |
+| Abstract hero | Concrete peer study-help headline, university context and a readable request/acceptance explanation. |
+| Slogan in browser chrome | Dark discovery scene with a topic, matching criteria, availability and sign-in action; all records clearly marked illustrative. |
+| Repeated cards and clipped labels | One wide request/privacy story, followed by two supporting sections with distinct layouts. The clipped orbit artwork is removed. |
+| Detached hover effects | Feature content and icons stay fixed; a low-opacity surface highlight provides feedback without moving them. |
+| Tiny supporting copy | Main paragraphs 16–17px, secondary paragraphs 14–15px, short labels generally 11–13px. Dark scenes use workspace colours with explicit text contrast. |
+| Remote subject result | Six accessible subject tabs share the same panel directly below them. No dock or result above the controls. |
+| Occluded resource slogans | One selected resource, a specific title/topic/link type, description, outline and worked notation; explicit Notes/Practice/Guides buttons. |
+| Competing loops | Removed continuous aurora, gradient, orbit, dock and workflow loops. Connection lines draw once; selection changes and section entrances settle. Reduced motion suppresses animation. |
+| Miniature white workflow | Enlarged dark workspace-style state panel, with separate sending, helper acceptance and both-party completion stages. |
+| Repetitive FAQ and ending | Direct FAQ introduction, no question-mark decoration, and one final Google sign-in action. |
+| Disconnected visual language | Repeated paired-circle connection mark, a shared connection-line construction and fixed icon containers. |
+
+The landing → login → workspace flow stays intact. Landing examples never query
+or reveal real member/contact data. The request and resource controls explain
+product behaviour; they do not send requests or create resources.

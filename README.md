@@ -86,13 +86,20 @@ returns to `/dashboard`. Existing members can open their workspace directly.
 Peer discovery, peer details, resources, profile editing and requests require login.
 The landing page does not query or expose member profiles or resource collections.
 
-The landing uses purple/blue/sky gradients, floating visuals, pointer-responsive
-product artwork, a keyboard-controlled subject dock, selectable resource cards,
-workflow tabs and native FAQs. System reduced-motion preferences stop decorative motion. The floating pause
-control was removed at the owner’s request. The workspace retains a dark navy theme.
+The landing uses a purple/blue/sky palette with dark product scenes. Subject
+selection sits directly above its illustrative discovery result. A request scene
+explains pending versus accepted contact access; study preferences, resource
+categories and the keyboard-controlled workflow have explicit state controls.
+The feature layout combines one main story with two supporting sections.
+
+Icons and copy stay anchored on hover. Motion is limited to one-time connection
+lines, section entrances, state transitions and button feedback; there are no
+continuous decorative loops or floating pause control. System reduced-motion
+preferences are respected. The workspace retains its dark navy theme.
 Manrope and its OFL license are served locally from `src/app/fonts/`.
 
-Illustrative topic/resource cards are examples, not real activity or testimonials.
+Illustrative profiles and resources are labelled examples, not real activity,
+testimonials or fabricated ratings. Resource examples show link types, not uploads.
 No third-party animation runtime or external font request is needed.
 
 ## Important rules

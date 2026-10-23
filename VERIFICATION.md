@@ -139,3 +139,31 @@ section-specific findings and the recommended art-direction pass. The latest
 revision removes the pause UI/state and independent icon wobble, anchors feature
 card content and lowers the spotlight intensity. System reduced-motion remains.
 The browser regression now verifies stable icon positioning and absence of that UI.
+
+
+## Completed landing recomposition
+
+The owner approved the full art-direction scope from `LANDING_DESIGN_REVIEW.md`.
+The landing now leads with university peer study help and a topic-based discovery
+scene. Subject controls and the resulting example share one panel. The repetitive
+four-card feature grid is replaced with an interactive pending/accepted request
+story and two distinct supporting sections. Resource examples have specific titles,
+topics, link types and readable outlines, with one visible selection at a time.
+The workflow uses the member workspace's dark visual language. FAQ and final action
+copy are direct; the oversized question-mark decoration is removed.
+
+Feature icons remain anchored, independent of hover. Pointer handling now only
+updates the feature surface highlight; there is no dormant card-tilt machinery.
+There are no infinite decorative loops. A single connection-line drawing, one-time
+section entrances and explicit state changes provide motion, with system reduced
+motion respected. Preview content is illustrative and labelled; no real member
+records or contacts are loaded by the landing page.
+
+The production build and all six browser tests passed after the recomposition,
+including the private request/review flow, resource moderation and missing-config
+behaviour. The landing regression additionally exercises privacy states, campus
+preference, concrete resource content, subject/result adjacency, fixed hover icons,
+absence of the pause control, no infinite animations, reduced motion, responsive
+widths 320/390/768/1024/1440 and login entry. Visual QA found and corrected a
+preview-logo sizing defect, a wrapping workflow number and uneven privacy-control
+labels on narrow screens. A final focused landing rerun covers the corrections.

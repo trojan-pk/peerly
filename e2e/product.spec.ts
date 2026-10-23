@@ -166,6 +166,14 @@ test("one-page landing keeps sections together and gates the workspace behind lo
   await expect(page.locator("#resources")).toBeVisible();
   await page.locator(".deck-switcher").getByRole("button", { name: "Practice", exact: true }).click();
   await expect(page.locator(".deck-practice")).toHaveClass(/is-front/);
+  await expect(page.locator(".resource-sample")).toContainText("Binary tree traversal exercises");
+  await expect(page.locator(".resource-sample")).toHaveCount(1);
+  await page.getByRole("button", { name: "After acceptance", exact: true }).click();
+  await expect(page.locator(".contact-boundary")).toContainText("Contact unlocks privately");
+  await page.getByRole("button", { name: "Before acceptance", exact: true }).click();
+  await expect(page.locator(".contact-boundary")).toContainText("Contact stays private");
+  await page.getByRole("button", { name: "On campus", exact: true }).click();
+  await expect(page.locator(".mode-description")).toContainText("public campus space");
   await page.getByRole("tab", { name: "Mathematics", exact: true }).click();
   await expect(page.locator("#subject-panel")).toContainText("Linear algebra");
   const connect = page.getByRole("tab", { name: /03 Connect on your terms/ });
@@ -196,12 +204,26 @@ test("one-page landing keeps sections together and gates the workspace behind lo
   expect(await icon.evaluate(el => getComputedStyle(el).transform)).toBe("none");
   await expect(page.getByRole("button", { name: /Pause animations|Resume animations/ })).toHaveCount(0);
   await expect(page.locator('main a[href="/peers"], main a[href="/resources"]')).toHaveCount(0);
+  // Default motion has no decorative infinite loops, including offscreen sections.
+  expect(await page.evaluate(() => document.getAnimations().filter(animation => animation.effect?.getTiming().iterations === Infinity).length)).toBe(0);
   await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
   expect(await page.locator(".aurora-field > i").first().evaluate(el => getComputedStyle(el).animationName)).toBe("none");
   for (const width of [320, 390, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    // The preview logo must not force the adjacent title into a narrow column.
+    const toolbar = await page.locator(".studio-toolbar").boundingBox();
+    expect(toolbar!.height).toBeLessThan(80);
+    const stepNumber = await page.locator(".step-number").first().boundingBox();
+    expect(stepNumber!.height).toBeLessThanOrEqual(24);
   }
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("tab", { name: "Physics", exact: true }).click();
+  const selectorBox = await page.locator(".studio-subjects").boundingBox();
+  const resultBox = await page.locator(".studio-search").boundingBox();
+  expect(selectorBox).not.toBeNull(); expect(resultBox).not.toBeNull();
+  expect(resultBox!.y - (selectorBox!.y + selectorBox!.height)).toBeLessThan(30);
+  await expect(page.locator("#subject-panel")).toContainText("Mechanics");
   await page.getByRole("link", { name: "Find your study circle", exact: true }).first().click();
   await expect(page).toHaveURL(/\/login$/);
 });

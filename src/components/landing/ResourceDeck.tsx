@@ -1,23 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { BookOpen, Code2, Sigma, ArrowUpRight, Sparkle, Sparkles } from "lucide-react";
+import { BookOpen, Code2, Sigma, Link2, ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 
 const resources = [
-  { type: "Notes", tag: "CLEARER CONCEPTS", title: "That explanation\nthat makes it click.", detail: "Student-shared notes and useful reference links.", Icon: BookOpen, className: "deck-notes" },
-  { type: "Practice", tag: "ONE MORE ‘AHA!’", title: "A fresh problem.\nA new perspective.", detail: "Practice material to work through at your own pace.", Icon: Sigma, className: "deck-practice" },
-  { type: "Guides", tag: "FIND YOUR WAY", title: "Big subjects.\nA clearer path.", detail: "Study guides and references, shared by your peers.", Icon: Code2, className: "deck-guides" },
+  { type: "Notes", topic: "Calculus", title: "The chain rule, step by step", detail: "A concise explanation of composite functions, with two worked examples and common mistakes to check.", Icon: BookOpen, className: "deck-notes", lines: ["Start with the outside function.", "Differentiate the inside function.", "Multiply the two derivatives."], formula: "d/dx f(g(x)) = f′(g(x)) · g′(x)", linkType: "Document link" },
+  { type: "Practice", topic: "Data structures", title: "Binary tree traversal exercises", detail: "Trace in-order, pre-order and post-order traversal, then compare your reasoning with the worked solution.", Icon: Sigma, className: "deck-practice", lines: ["Identify the root and its children.", "Write the traversal order.", "Explain why each node comes next."], formula: "In-order: left → root → right", linkType: "Practice worksheet link" },
+  { type: "Guides", topic: "Programming", title: "A guide to Python dictionaries", detail: "Learn when to use a dictionary, how to look up values and how to iterate through keys and items.", Icon: Code2, className: "deck-guides", lines: ["Create and update a dictionary.", "Look up a value safely.", "Loop through keys and values."], formula: 'student.get("subject", "Not set")', linkType: "Reference guide link" },
 ];
-
-export function ResourceDeck() {
+export function ResourceDeck({ startHref = "/login" }: { startHref?: string }) {
   const [active, setActive] = useState(0);
+  const resource = resources[active];
   return (
-    <div className="resource-deck-showcase">
-      <div className="resource-deck" aria-label="Examples of resources students can share">
-        <span className="deck-spark spark-a" aria-hidden="true"><Sparkle strokeWidth={1} /></span><span className="deck-spark spark-b" aria-hidden="true"><Sparkles strokeWidth={1} /></span>
-        {resources.map(({ type, tag, title, detail, Icon, className }, index) => <button key={type} type="button" aria-pressed={active === index} aria-label={`Show ${type.toLowerCase()} examples`} onClick={() => setActive(index)} className={`deck-card ${className} ${active === index ? "is-front" : ""}`} style={{ zIndex: active === index ? 4 : index + 1 }}><span className="deck-card-top"><Icon size={24} /><span>{type}</span><ArrowUpRight size={19} /></span><span className="deck-tag">{tag}</span><strong>{title}</strong><span className="deck-description">{detail}</span><span className="deck-card-bottom">An example of what’s worth sharing <Icon size={17} /></span></button>)}
-      </div>
+    <div className="resource-library-preview">
+      <div className="library-preview-header"><span><BookOpen size={18} /> Resource hub</span><span>Illustrative preview</span></div>
       <div className="deck-switcher" aria-label="Choose a resource example">{resources.map(({ type }, index) => <button key={type} type="button" aria-pressed={active === index} onClick={() => setActive(index)}>{type}</button>)}</div>
+      <div className={`resource-sample ${resource.className} is-front`} key={active} aria-live="polite"><div className="resource-sample-meta"><span>{resource.topic}</span><span><Link2 size={13} /> {resource.linkType}</span></div><h3>{resource.title}</h3><p>{resource.detail}</p><div className="resource-paper"><span><resource.Icon size={18} /> Inside this example</span><ol>{resource.lines.map(line => <li key={line}>{line}</li>)}</ol><code>{resource.formula}</code></div><div className="resource-example-footer"><span>Example content · links, not file uploads</span><Link href={startHref}>Explore resources <ArrowUpRight size={15} /></Link></div></div>
     </div>
   );
 }

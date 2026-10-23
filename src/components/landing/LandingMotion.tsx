@@ -16,14 +16,12 @@ export function LandingMotion({ children }: { children: ReactNode }) {
     const reset = () => {
       if (surface) {
         delete surface.dataset.pointer;
-        surface.style.setProperty("--hover-rx", "0deg");
-        surface.style.setProperty("--hover-ry", "0deg");
       }
       surface = null;
     };
     const move = (event: PointerEvent) => {
       if (event.pointerType !== "mouse" || preference.matches) return;
-      const next = (event.target as Element).closest<HTMLElement>(".m-feature, .deck-card, .m-button");
+      const next = (event.target as Element).closest<HTMLElement>(".m-feature");
       if (surface !== next) { reset(); surface = next; }
       if (!surface) return;
       const bounds = surface.getBoundingClientRect();
@@ -36,8 +34,6 @@ export function LandingMotion({ children }: { children: ReactNode }) {
         surface.dataset.pointer = "active";
         surface.style.setProperty("--pointer-x", `${x * 100}%`);
         surface.style.setProperty("--pointer-y", `${y * 100}%`);
-        surface.style.setProperty("--hover-rx", `${(0.5 - y) * 5}deg`);
-        surface.style.setProperty("--hover-ry", `${(x - 0.5) * 5}deg`);
       });
     };
     const out = (event: PointerEvent) => {
@@ -88,5 +84,5 @@ export function LandingMotion({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  return <div ref={root} className="landing landing-v2">{children}</div>;
+  return <div ref={root} className="landing landing-v2 landing-v3">{children}</div>;
 }
