@@ -117,3 +117,16 @@ keyboard workflow navigation, FAQs, pausing, reduced motion, responsive widths a
 the login entry point, alongside existing request/review and moderation flows.
 The resource interaction check uses the visible category switcher, rather than
 clicking through the overlapping illustration cards.
+
+## Motion and hover polish
+
+Added frame-batched pointer lighting and shallow 3D tilt to feature cards, a
+proximity-responsive subject dock, resource-card highlights, button light sweeps,
+Lucide stroke/hover treatments, hero connection trails and staggered card entrances.
+Decorative symbol glyphs were replaced with consistent Lucide artwork.
+
+Pointer lighting ignores touch and reduced-motion users. Pause disables feature
+rotation, dock magnification and decorative pseudo-element animations. The browser
+regression checks that pointer coordinates update the hovered feature, and continues
+to check section links, cards, workflow controls, pause, reduced motion and login.
+Desktop hover and mobile screenshots were reviewed against the production build.

@@ -16,6 +16,7 @@ const subjects = [
 
 export function ProductStage({ startHref }: { startHref: string }) {
   const [active, setActive] = useState(1);
+  const [hovered, setHovered] = useState<number | null>(null);
   const stage = useRef<HTMLDivElement>(null);
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
   const subject = subjects[active];
@@ -53,8 +54,8 @@ export function ProductStage({ startHref }: { startHref: string }) {
       </div>
       <div className="subject-showcase">
         <div className="dock-heading"><span className="handwritten">Find your thing ↘</span><p>Different subjects.<br /><strong>Same lightbulb moment.</strong></p><span className="handwritten">Give one a click ↙</span></div>
-        <div role="tablist" aria-label="Explore study subjects" className="subject-dock">
-          {subjects.map(({ name, Icon, color }, index) => <button type="button" role="tab" key={name} ref={el => { buttons.current[index] = el; }} id={`subject-tab-${index}`} aria-controls="subject-panel" aria-selected={active === index} tabIndex={active === index ? 0 : -1} onClick={() => setActive(index)} onKeyDown={event => navigate(event, index)} className={active === index ? "is-active" : ""} style={{ "--subject-color": color } as CSSProperties}><span className="dock-icon"><Icon strokeWidth={1.6} /></span><span>{name}</span><i /></button>)}
+        <div role="tablist" aria-label="Explore study subjects" className="subject-dock" data-hovering={hovered !== null} onPointerLeave={() => setHovered(null)}>
+          {subjects.map(({ name, Icon, color }, index) => <button type="button" role="tab" key={name} ref={el => { buttons.current[index] = el; }} id={`subject-tab-${index}`} aria-controls="subject-panel" aria-selected={active === index} tabIndex={active === index ? 0 : -1} onPointerEnter={event => { if (event.pointerType === "mouse") setHovered(index); }} onClick={() => setActive(index)} onKeyDown={event => navigate(event, index)} className={active === index ? "is-active" : ""} style={{ "--subject-color": color, "--dock-scale": hovered === null ? 1 : Math.max(1, 1.18 - Math.abs(hovered - index) * .1), "--dock-lift": hovered === null ? "0px" : `${Math.min(0, -12 + Math.abs(hovered - index) * 7)}px` } as CSSProperties}><span className="dock-icon"><Icon strokeWidth={1.6} /></span><span>{name}</span><i /></button>)}
         </div>
         <p className="dock-caption"><span /> Pick a subject to explore how Peerly can help. Your actual study circle starts after sign-in.</p>
       </div>

@@ -177,6 +177,10 @@ test("one-page landing keeps sections together and gates the workspace behind lo
   const question = page.locator("summary", { hasText: "When are contact details shared?" });
   await question.click();
   await expect(question.locator("..")).toHaveAttribute("open", "");
+  const feature = page.locator(".m-feature").first();
+  await feature.hover({ position: { x: 45, y: 45 } });
+  await expect(feature).toHaveAttribute("data-pointer", "active");
+  await expect.poll(() => feature.evaluate(el => el.style.getPropertyValue("--hover-ry"))).not.toBe("");
   await page.getByRole("button", { name: "Pause animations", exact: true }).click();
   await expect(page.locator(".landing-v2")).toHaveAttribute("data-motion", "paused");
   expect(await page.locator(".aurora-field > i").first().evaluate(el => getComputedStyle(el).animationPlayState)).toBe("paused");

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { auth } from "@/auth";
-import { ArrowRight, ArrowUpRight, LockKeyhole, BookOpen, Sparkles, Check, Plus, Globe2, MapPin, Search, UsersRound, Zap, MoveUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight, LockKeyhole, BookOpen, Sparkles, Check, Plus, Globe2, MapPin, Search, UsersRound, Zap, MoveUpRight, Sparkle, ArrowDownLeft } from "lucide-react";
 import { Workflow } from "@/components/landing/Workflow";
 import { LandingMotion } from "@/components/landing/LandingMotion";
 import { ProductStage } from "@/components/landing/ProductStage";
@@ -23,10 +23,10 @@ export default async function HomePage() {
   return (
     <LandingMotion>
       <section className="m-hero" aria-labelledby="hero-title">
-        <div className="aurora-field" aria-hidden="true"><i /><i /><i /><span className="star-field" /><span className="hero-orbit orbit-a" /><span className="hero-orbit orbit-b" /></div>
+        <div className="aurora-field" aria-hidden="true"><i /><i /><i /><span className="star-field" /><span className="hero-orbit orbit-a" /><span className="hero-orbit orbit-b" /><svg className="hero-trails" viewBox="0 0 1440 900" preserveAspectRatio="none" fill="none"><defs><linearGradient id="trail-colour"><stop stopColor="#95dfff" stopOpacity="0"/><stop offset=".5" stopColor="#c8b8ff"/><stop offset="1" stopColor="#ffb5da" stopOpacity="0"/></linearGradient></defs>{["M-100 700C200 700 180 100 650 180S1000 650 1550 300", "M-100 350C250 50 330 850 850 680S1300 200 1550 250"].map((d,i)=><g key={d}><path d={d} stroke="url(#trail-colour)" opacity=".12"/><path d={d} stroke="url(#trail-colour)" strokeWidth="2" strokeDasharray="40 1800" className={`hero-trail trail-${i}`} /></g>)}</svg></div>
         <div className="m-hero-copy">
           <span className="m-eyebrow"><Sparkles size={14} /> Your next breakthrough is a conversation away</span>
-          <h1 id="hero-title">Big questions.<br /><span>Brighter together.</span><span className="title-spark" aria-hidden="true">✳</span></h1>
+          <h1 id="hero-title"><span className="hero-line">Big questions.</span><br /><span className="hero-line hero-gradient">Brighter together.</span><span className="title-spark" aria-hidden="true"><Sparkle strokeWidth={1.2} /></span></h1>
           <p>The thing that has you stuck is someone else’s strong suit.<br className="hidden sm:block" /> Meet your university peers. Share a little clarity. Go a lot further.</p>
           <div className="m-hero-actions"><Link href={startHref} className="m-button">{session?.user ? "Open your workspace" : "Find your study circle"}<ArrowUpRight size={18} /></Link><Link href="#how-it-works" className="m-button ghost">See how it works <ArrowRight size={16} /></Link></div>
           <span className="hero-assurance"><Check size={12} /> One account. A learner and a helper.</span>
@@ -40,7 +40,7 @@ export default async function HomePage() {
           <div className="m-feature feature-discovery"><div><span className="m-feature-icon"><Search size={21} /></span><h3>Skip the spiral.<br />Find your person.</h3><p>Search specific topics, compare study preferences and find a peer whose strengths match your question.</p></div><div className="discovery-orbit" aria-hidden="true"><span className="discovery-ring ring-a" /><span className="discovery-ring ring-b" /><span className="orbit-center"><UsersRound size={32} /></span><span className="orbit-label label-a">Your question</span><span className="orbit-label label-b">Their strength</span><span className="orbit-dot dot-a" /><span className="orbit-dot dot-b" /></div><Link href={startHref} className="m-inline-link">Meet your study circle <ArrowUpRight size={15} /></Link></div>
           <div className="m-feature feature-privacy"><div className="privacy-lock-art" aria-hidden="true"><span /><i /><i /><div><LockKeyhole size={40} strokeWidth={1.2} /></div></div><div><span className="m-small-label">GOOD CONNECTIONS. CLEAR BOUNDARIES.</span><h3>Your details.<br />Your decision.</h3><p>Contact stays private until a helper accepts. No personal contact details in discovery.</p></div></div>
           <div className="m-feature feature-modes"><div><span className="m-small-label">A PLACE THAT WORKS FOR YOU</span><h3>Across campus.<br />Or across a screen.</h3></div><div className="mode-bridge" aria-hidden="true"><span><MapPin size={24} /></span><i /><span><Globe2 size={24} /></span></div><p>Choose online or on-campus study preferences. Arrange the details together after acceptance.</p></div>
-          <div className="m-feature feature-give"><div><span className="m-feature-icon"><Sparkles size={21} /></span><h3>You have something<br />to share, too.</h3><p>You don’t need to know everything. Just be the person who makes one thing a little clearer.</p></div><div className="exchange-art" aria-hidden="true"><span>LEARN</span><span className="exchange-arrow">↗</span><span>SHARE</span><span className="exchange-arrow">↙</span></div><Link href={startHref} className="m-inline-link">Share your strengths <ArrowUpRight size={15} /></Link></div>
+          <div className="m-feature feature-give"><div><span className="m-feature-icon"><Sparkles size={21} /></span><h3>You have something<br />to share, too.</h3><p>You don’t need to know everything. Just be the person who makes one thing a little clearer.</p></div><div className="exchange-art" aria-hidden="true"><span>LEARN</span><span className="exchange-arrow"><ArrowUpRight /></span><span>SHARE</span><span className="exchange-arrow"><ArrowDownLeft /></span></div><Link href={startHref} className="m-inline-link">Share your strengths <ArrowUpRight size={15} /></Link></div>
         </div>
       </div></section>
 
