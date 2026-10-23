@@ -44,6 +44,18 @@ export function _resetAuthInstanceForTesting(): void {
   cachedInstance = null;
 }
 
+function toAuthRequest(req: NextRequest | Request): NextRequest {
+  // App Router wraps requests in a Proxy. Passing that object to the Request
+  // constructor can fail native private-field checks. Rebuild from public fields
+  // so Auth.js receives a real, unproxied NextRequest (including POST bodies).
+  return new NextRequest(req.url, {
+    method: req.method,
+    headers: new Headers(req.headers),
+    body: req.method === "GET" || req.method === "HEAD" ? undefined : req.body,
+    signal: req.signal,
+  });
+}
+
 /**
  * Guarded route handlers.
  * Fail closed with HTTP 503 if configuration is invalid or unconfigured,
@@ -60,8 +72,7 @@ export const handlers = {
         { status: 503, headers: { "Content-Type": "application/json" } }
       );
     }
-    const nextReq = req instanceof NextRequest ? req : new NextRequest(req);
-    return instance.handlers.GET(nextReq);
+    return instance.handlers.GET(toAuthRequest(req));
   },
   POST: async (req: NextRequest | Request): Promise<Response> => {
     const instance = getAuthInstance();
@@ -73,8 +84,7 @@ export const handlers = {
         { status: 503, headers: { "Content-Type": "application/json" } }
       );
     }
-    const nextReq = req instanceof NextRequest ? req : new NextRequest(req);
-    return instance.handlers.POST(nextReq);
+    return instance.handlers.POST(toAuthRequest(req));
   },
 };
 

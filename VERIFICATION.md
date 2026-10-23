@@ -8,7 +8,7 @@
 | ESLint | Passed |
 | Production build | Passed |
 | Vitest integration/unit suite | 181 tests passed across 15 files |
-| Browser suite, isolated local MongoDB | 4 tests passed |
+| Browser suite, isolated local MongoDB | 4 workflow/configuration tests passed; additional auth HTTP regression passed |
 | Browser workflows, configured Atlas cluster | 3 tests passed; temporary databases removed |
 | Runtime dependency audit | Zero reported vulnerabilities |
 | Configured credentials in repository candidate files | None found |
@@ -47,6 +47,20 @@ fully verified by reaching that screen alone.
 The running URL is local to this computer. Public hosting and an HTTPS domain have
 not been configured. Search candidate ranking, free-tier capacity and the known
 development-tool dependency advisory remain documented in the README.
+
+## Google callback correction
+
+The owner's first real Google callback exposed an HTTP 500 caused by constructing
+a native request from the App Router's proxied request. The auth boundary now
+rebuilds an unproxied `NextRequest` from its URL, method, headers, body and signal.
+No authentication checks or OAuth protections were relaxed.
+
+After rebuilding and restarting, live session/providers/CSRF endpoints returned
+HTTP 200 and an invalid callback redirected safely instead of crashing. A new
+production-server regression verifies those GET routes, a CSRF-protected sign-out
+POST (including its body), and callback redirection. It passed, alongside the four
+existing browser workflows and 33 focused auth tests. Completing a fresh Google
+sign-in with the owner's account still needs confirmation.
 
 ## Reproduce
 

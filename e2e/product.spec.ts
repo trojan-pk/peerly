@@ -1,5 +1,32 @@
 import { test, expect } from "./fixtures";
 
+test("configured auth HTTP routes handle proxied requests and POST bodies", async ({ request }) => {
+  const session = await request.get("/api/auth/session");
+  expect(session.status()).toBe(200);
+  expect(await session.json()).toBeNull();
+
+  const providers = await request.get("/api/auth/providers");
+  expect(providers.status()).toBe(200);
+  expect((await providers.json()).google.id).toBe("google");
+
+  const csrf = await request.get("/api/auth/csrf");
+  expect(csrf.status()).toBe(200);
+  const { csrfToken } = await csrf.json();
+  expect(csrfToken).toEqual(expect.any(String));
+  expect(csrfToken.length).toBeGreaterThan(20);
+  const signOut = await request.post("/api/auth/signout", {
+    form: { csrfToken, callbackUrl: "/login" },
+    headers: { "X-Auth-Return-Redirect": "1" },
+    maxRedirects: 0,
+  });
+  expect(signOut.status()).toBe(200);
+  expect(new URL((await signOut.json()).url).pathname).toBe("/login");
+
+  const canceled = await request.get("/api/auth/callback/google?error=access_denied", { maxRedirects: 0 });
+  expect(canceled.status()).toBe(302);
+  expect(new URL(canceled.headers().location).pathname).toBe("/login");
+});
+
 test("learner and helper complete a private request and publish one review", async ({ browser, app }) => {
   const learner = await browser.newContext();
   const helper = await browser.newContext();
