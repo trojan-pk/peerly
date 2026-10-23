@@ -1,11 +1,9 @@
 "use client";
 
-import { Pause, Play } from "lucide-react";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 export function LandingMotion({ children }: { children: ReactNode }) {
   const root = useRef<HTMLDivElement>(null);
-  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
     const element = root.current;
@@ -24,7 +22,7 @@ export function LandingMotion({ children }: { children: ReactNode }) {
       surface = null;
     };
     const move = (event: PointerEvent) => {
-      if (event.pointerType !== "mouse" || preference.matches || element.dataset.motion === "paused") return;
+      if (event.pointerType !== "mouse" || preference.matches) return;
       const next = (event.target as Element).closest<HTMLElement>(".m-feature, .deck-card, .m-button");
       if (surface !== next) { reset(); surface = next; }
       if (!surface) return;
@@ -90,5 +88,5 @@ export function LandingMotion({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  return <div ref={root} className="landing landing-v2" data-motion={paused ? "paused" : "playing"}>{children}<button type="button" className="motion-control" aria-pressed={paused} onClick={() => setPaused(value => !value)}>{paused ? <Play size={12} /> : <Pause size={12} />}{paused ? "Resume animations" : "Pause animations"}</button></div>;
+  return <div ref={root} className="landing landing-v2">{children}</div>;
 }

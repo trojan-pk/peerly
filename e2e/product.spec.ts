@@ -178,12 +178,23 @@ test("one-page landing keeps sections together and gates the workspace behind lo
   await question.click();
   await expect(question.locator("..")).toHaveAttribute("open", "");
   const feature = page.locator(".m-feature").first();
+  await feature.scrollIntoViewIfNeeded();
+  const icon = feature.locator(".m-feature-icon");
+  await page.mouse.move(5, 100);
+  const relativePosition = () => icon.evaluate(el => {
+    const iconBox = el.getBoundingClientRect();
+    const cardBox = el.closest(".m-feature")!.getBoundingClientRect();
+    return { x: iconBox.x - cardBox.x, y: iconBox.y - cardBox.y };
+  });
+  const before = await relativePosition();
   await feature.hover({ position: { x: 45, y: 45 } });
   await expect(feature).toHaveAttribute("data-pointer", "active");
-  await expect.poll(() => feature.evaluate(el => el.style.getPropertyValue("--hover-ry"))).not.toBe("");
-  await page.getByRole("button", { name: "Pause animations", exact: true }).click();
-  await expect(page.locator(".landing-v2")).toHaveAttribute("data-motion", "paused");
-  expect(await page.locator(".aurora-field > i").first().evaluate(el => getComputedStyle(el).animationPlayState)).toBe("paused");
+  await expect.poll(async () => {
+    const after = await relativePosition();
+    return Math.max(Math.abs(after.x - before.x), Math.abs(after.y - before.y));
+  }).toBeLessThan(1);
+  expect(await icon.evaluate(el => getComputedStyle(el).transform)).toBe("none");
+  await expect(page.getByRole("button", { name: /Pause animations|Resume animations/ })).toHaveCount(0);
   await expect(page.locator('main a[href="/peers"], main a[href="/resources"]')).toHaveCount(0);
   await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
   expect(await page.locator(".aurora-field > i").first().evaluate(el => getComputedStyle(el).animationName)).toBe("none");

@@ -34,7 +34,7 @@ Include basic reporting of a peer/resource by signed-in users; store reports for
 - Manage own resources and profile.
 - Minimal moderation page for configured admin emails if implemented.
 
-Design: colourful animated marketing page with purple, electric blue and sky gradients, a floating navigation capsule, interactive subject dock, resource deck and workflow sections. All marketing navigation stays on the same page. Use a dark navy workspace after login. Provide reduced-motion and an animation pause control. Strong typography and spacing, rounded cards, clear useful information, desktop sidebar and mobile navigation. Accessible form labels, keyboard navigation, loading/error/pending states, mobile layouts. English UI. No decorative fake users, fake counts, fake reviews, fabricated successful actions or pretend functionality. Empty database should show honest onboarding/empty states.
+Design: colourful animated marketing page with purple, electric blue and sky gradients, a floating navigation capsule, interactive subject dock, resource deck and workflow sections. All marketing navigation stays on the same page. Use a dark navy workspace after login. Respect reduced-motion preferences; do not show a floating pause control. Strong typography and spacing, rounded cards, clear useful information, desktop sidebar and mobile navigation. Accessible form labels, keyboard navigation, loading/error/pending states, mobile layouts. English UI. No decorative fake users, fake counts, fake reviews, fabricated successful actions or pretend functionality. Empty database should show honest onboarding/empty states.
 
 ## Configuration and security
 

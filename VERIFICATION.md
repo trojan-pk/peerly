@@ -130,3 +130,12 @@ rotation, dock magnification and decorative pseudo-element animations. The brows
 regression checks that pointer coordinates update the hovered feature, and continues
 to check section links, cards, workflow controls, pause, reduced motion and login.
 Desktop hover and mobile screenshots were reviewed against the production build.
+
+## Design audit correction
+
+The owner requested a whole-page critique and removal of the floating animation
+control. See `LANDING_DESIGN_REVIEW.md` for measured typography, hover behaviour,
+section-specific findings and the recommended art-direction pass. The latest
+revision removes the pause UI/state and independent icon wobble, anchors feature
+card content and lowers the spotlight intensity. System reduced-motion remains.
+The browser regression now verifies stable icon positioning and absence of that UI.

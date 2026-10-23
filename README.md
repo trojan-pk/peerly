@@ -88,8 +88,8 @@ The landing page does not query or expose member profiles or resource collection
 
 The landing uses purple/blue/sky gradients, floating visuals, pointer-responsive
 product artwork, a keyboard-controlled subject dock, selectable resource cards,
-workflow tabs and native FAQs. An explicit pause control and system reduced-motion
-preferences stop decorative motion. The workspace retains a dark navy theme.
+workflow tabs and native FAQs. System reduced-motion preferences stop decorative motion. The floating pause
+control was removed at the owner’s request. The workspace retains a dark navy theme.
 Manrope and its OFL license are served locally from `src/app/fonts/`.
 
 Illustrative topic/resource cards are examples, not real activity or testimonials.
