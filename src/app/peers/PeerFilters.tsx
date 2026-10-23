@@ -33,18 +33,18 @@ export default function PeerFilters({
     <form
       method="GET"
       action="/peers"
-      className="rounded-2xl border border-stone-200/90 bg-white p-5 sm:p-6 space-y-4 shadow-xs"
+      className="rounded-2xl border border-line/90 bg-surface p-5 sm:p-6 space-y-4 shadow-xs"
     >
       <div className="flex items-center justify-between pb-1">
-        <div className="flex items-center gap-2 text-stone-900 font-bold text-sm">
-          <Filter className="w-4 h-4 text-emerald-600" aria-hidden="true" />
+        <div className="flex items-center gap-2 text-ink font-bold text-sm">
+          <Filter className="w-4 h-4 text-accent" aria-hidden="true" />
           <span>Filter Peer Helpers</span>
         </div>
         {hasActiveFilters && (
           <button
             type="button"
             onClick={handleClearFilters}
-            className="inline-flex items-center gap-1.5 text-xs text-stone-500 hover:text-stone-900 transition-colors focus-visible:outline-none focus-visible:underline"
+            className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-ink transition-colors focus-visible:outline-none focus-visible:underline"
           >
             <X className="w-3.5 h-3.5" aria-hidden="true" />
             Clear all filters
@@ -57,7 +57,7 @@ export default function PeerFilters({
         <label htmlFor="peer-search-input" className="sr-only">
           Search peers by topic, course, or university
         </label>
-        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-faint">
           <Search className="w-4 h-4" aria-hidden="true" />
         </div>
         <input
@@ -66,11 +66,11 @@ export default function PeerFilters({
           name="q"
           defaultValue={currentQ}
           placeholder="Search by topic, university, subject, or student name..."
-          className="w-full pl-10 pr-24 py-2.5 rounded-xl border border-stone-300 text-sm text-stone-900 bg-stone-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-colors"
+          className="w-full pl-10 pr-24 py-2.5 rounded-xl border border-edge text-sm text-ink bg-panel/50 focus:bg-surface focus:outline-none focus:ring-2 focus:ring-accent transition-colors"
         />
         <button
           type="submit"
-          className="absolute right-1.5 top-1.5 bottom-1.5 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600"
+          className="absolute right-1.5 top-1.5 bottom-1.5 px-4 rounded-lg bg-action hover:bg-action-hover text-white text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           Search
         </button>
@@ -80,7 +80,7 @@ export default function PeerFilters({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
         {/* Topic filter */}
         <div className="space-y-1">
-          <label htmlFor="filter-topic" className="block text-[11px] font-semibold text-stone-700">
+          <label htmlFor="filter-topic" className="block text-[11px] font-semibold text-body">
             Topic
           </label>
           <select
@@ -90,7 +90,7 @@ export default function PeerFilters({
             onChange={(e) => {
               e.currentTarget.form?.requestSubmit();
             }}
-            className="w-full px-3 py-2 rounded-lg border border-stone-300 text-xs text-stone-900 bg-stone-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-colors"
+            className="w-full px-3 py-2 rounded-lg border border-edge text-xs text-ink bg-panel/50 focus:bg-surface focus:outline-none focus:ring-2 focus:ring-accent transition-colors"
           >
             <option value="">All Topics</option>
             {availableTopics.map((topic) => (
@@ -103,7 +103,7 @@ export default function PeerFilters({
 
         {/* Subject filter */}
         <div className="space-y-1">
-          <label htmlFor="filter-subject" className="block text-[11px] font-semibold text-stone-700">
+          <label htmlFor="filter-subject" className="block text-[11px] font-semibold text-body">
             Subject
           </label>
           <select
@@ -113,7 +113,7 @@ export default function PeerFilters({
             onChange={(e) => {
               e.currentTarget.form?.requestSubmit();
             }}
-            className="w-full px-3 py-2 rounded-lg border border-stone-300 text-xs text-stone-900 bg-stone-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-colors"
+            className="w-full px-3 py-2 rounded-lg border border-edge text-xs text-ink bg-panel/50 focus:bg-surface focus:outline-none focus:ring-2 focus:ring-accent transition-colors"
           >
             <option value="">All Subjects</option>
             {availableSubjects.map((sub) => (
@@ -126,7 +126,7 @@ export default function PeerFilters({
 
         {/* Learning Mode filter */}
         <div className="space-y-1">
-          <label htmlFor="filter-mode" className="block text-[11px] font-semibold text-stone-700">
+          <label htmlFor="filter-mode" className="block text-[11px] font-semibold text-body">
             Learning Mode
           </label>
           <select
@@ -136,7 +136,7 @@ export default function PeerFilters({
             onChange={(e) => {
               e.currentTarget.form?.requestSubmit();
             }}
-            className="w-full px-3 py-2 rounded-lg border border-stone-300 text-xs text-stone-900 bg-stone-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-colors"
+            className="w-full px-3 py-2 rounded-lg border border-edge text-xs text-ink bg-panel/50 focus:bg-surface focus:outline-none focus:ring-2 focus:ring-accent transition-colors"
           >
             <option value="">Any Mode</option>
             <option value="online">Online (or Both)</option>
@@ -147,7 +147,7 @@ export default function PeerFilters({
 
         {/* Pricing Preference filter */}
         <div className="space-y-1">
-          <label htmlFor="filter-pricing" className="block text-[11px] font-semibold text-stone-700">
+          <label htmlFor="filter-pricing" className="block text-[11px] font-semibold text-body">
             Pricing Preference
           </label>
           <select
@@ -157,7 +157,7 @@ export default function PeerFilters({
             onChange={(e) => {
               e.currentTarget.form?.requestSubmit();
             }}
-            className="w-full px-3 py-2 rounded-lg border border-stone-300 text-xs text-stone-900 bg-stone-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-colors"
+            className="w-full px-3 py-2 rounded-lg border border-edge text-xs text-ink bg-panel/50 focus:bg-surface focus:outline-none focus:ring-2 focus:ring-accent transition-colors"
           >
             <option value="">Any Preference</option>
             <option value="free">Free Peer Help (or Both)</option>

@@ -24,30 +24,30 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   return (
     <div className="max-w-xl mx-auto px-4 py-12 sm:py-16">
-      <div className="bg-white rounded-2xl border border-stone-200/90 shadow-sm p-6 sm:p-8 space-y-6">
+      <div className="bg-surface rounded-2xl border border-line/90 shadow-sm p-6 sm:p-8 space-y-6">
         {/* Header */}
         <div className="space-y-2 text-center">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-50 text-emerald-700 mx-auto">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-accent/10 text-accent mx-auto">
             <KeyRound className="w-6 h-6" aria-hidden="true" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-stone-900">
+          <h1 className="text-2xl font-bold tracking-tight text-ink">
             Sign in to Peerly
           </h1>
-          <p className="text-sm text-stone-600 max-w-md mx-auto">
+          <p className="text-sm text-muted max-w-md mx-auto">
             Sign in with your Google account to exchange academic help, share study materials, and connect with peers.
           </p>
         </div>
 
         {/* Existing Session State */}
         {session?.user ? (
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-5 space-y-4">
+          <div className="rounded-xl border border-accent/25 bg-accent/10 p-5 space-y-4">
             <div className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-emerald-600 mt-0.5 shrink-0" aria-hidden="true" />
+              <CheckCircle className="w-5 h-5 text-accent mt-0.5 shrink-0" aria-hidden="true" />
               <div>
-                <h2 className="text-sm font-semibold text-emerald-900">
+                <h2 className="text-sm font-semibold text-accent">
                   You are already signed in
                 </h2>
-                <p className="text-xs text-emerald-700 mt-0.5">
+                <p className="text-xs text-accent mt-0.5">
                   Signed in as <span className="font-medium">{session.user.name || "Student"}</span> ({session.user.email})
                 </p>
               </div>
@@ -56,14 +56,14 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             <div className="flex flex-col sm:flex-row gap-2 pt-2">
               <Link
                 href="/dashboard"
-                className="flex-1 inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors min-h-[44px] focus-visible:ring-2 focus-visible:ring-emerald-600"
+                className="flex-1 inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-action text-white text-sm font-medium hover:bg-action-hover transition-colors min-h-[44px] focus-visible:ring-2 focus-visible:ring-accent"
               >
                 Go to Dashboard
               </Link>
               <form action={logoutAction} className="sm:inline-flex">
                 <button
                   type="submit"
-                  className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2.5 rounded-lg border border-stone-300 bg-white text-stone-700 text-sm font-medium hover:bg-stone-50 transition-colors min-h-[44px] focus-visible:ring-2 focus-visible:ring-emerald-600 cursor-pointer"
+                  className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2.5 rounded-lg border border-edge bg-surface text-body text-sm font-medium hover:bg-panel transition-colors min-h-[44px] focus-visible:ring-2 focus-visible:ring-accent cursor-pointer"
                 >
                   Sign Out
                 </button>
@@ -76,7 +76,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             {error && (
               <div
                 role="alert"
-                className="rounded-lg border border-red-200 bg-red-50/80 p-4 text-xs text-red-800 space-y-1"
+                className="rounded-lg border border-danger/25 bg-danger/10 p-4 text-xs text-danger space-y-1"
               >
                 <div className="font-semibold">Sign-in Notice:</div>
                 <div>
@@ -94,7 +94,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               <form action={loginWithGoogleAction} className="space-y-4">
                 <button
                   type="submit"
-                  className="w-full inline-flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-stone-300 bg-white hover:bg-stone-50 text-stone-800 text-sm font-semibold transition-colors shadow-xs min-h-[48px] focus-visible:ring-2 focus-visible:ring-emerald-600 cursor-pointer"
+                  className="w-full inline-flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-edge bg-surface hover:bg-panel text-ink text-sm font-semibold transition-colors shadow-xs min-h-[48px] focus-visible:ring-2 focus-visible:ring-accent cursor-pointer"
                 >
                   <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
                     <path
@@ -121,35 +121,35 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               <div className="space-y-4">
                 {isDev ? (
                   /* Developer Configuration Panel */
-                  <div className="rounded-xl border border-amber-200 bg-amber-50/70 p-4 space-y-3">
+                  <div className="rounded-xl border border-warning/25 bg-warning/10 p-4 space-y-3">
                     <div className="flex items-start gap-2.5">
-                      <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" aria-hidden="true" />
+                      <AlertTriangle className="w-5 h-5 text-warning shrink-0 mt-0.5" aria-hidden="true" />
                       <div>
-                        <h2 className="text-sm font-semibold text-amber-900">
+                        <h2 className="text-sm font-semibold text-warning">
                           Local Development Configuration Required
                         </h2>
-                        <p className="text-xs text-amber-800 mt-1 leading-relaxed">
-                          Authentication requires valid local environment credentials in <code className="bg-amber-100 px-1 py-0.5 rounded font-mono">.env.local</code>.
+                        <p className="text-xs text-warning mt-1 leading-relaxed">
+                          Authentication requires valid local environment credentials in <code className="bg-warning/15 px-1 py-0.5 rounded font-mono">.env.local</code>.
                         </p>
                       </div>
                     </div>
 
-                    <div className="rounded-lg bg-white/90 border border-amber-200 p-3 text-xs space-y-2 text-stone-800 font-mono">
-                      <p className="font-sans font-medium text-stone-700">Missing or invalid variables:</p>
-                      <ul className="list-disc list-inside space-y-0.5 text-amber-900">
+                    <div className="rounded-lg bg-surface/90 border border-warning/25 p-3 text-xs space-y-2 text-ink font-mono">
+                      <p className="font-sans font-medium text-body">Missing or invalid variables:</p>
+                      <ul className="list-disc list-inside space-y-0.5 text-warning">
                         {authStatus.missing.map((key) => (
                           <li key={key}>{key}</li>
                         ))}
                       </ul>
-                      <div className="pt-2 border-t border-amber-100 font-sans text-stone-600 space-y-1">
+                      <div className="pt-2 border-t border-warning/25 font-sans text-muted space-y-1">
                         <p>
-                          1. Copy <code className="bg-stone-100 px-1 py-0.5 rounded text-stone-800">.env.example</code> to{" "}
-                          <code className="bg-stone-100 px-1 py-0.5 rounded text-stone-800">.env.local</code>.
+                          1. Copy <code className="bg-raised px-1 py-0.5 rounded text-ink">.env.example</code> to{" "}
+                          <code className="bg-raised px-1 py-0.5 rounded text-ink">.env.local</code>.
                         </p>
                         <p>
                           2. Configure Google OAuth callback URL in Google Cloud Console:
                           <br />
-                          <code className="bg-stone-100 px-1 py-0.5 rounded text-emerald-800 select-all block mt-1 break-all">
+                          <code className="bg-raised px-1 py-0.5 rounded text-accent select-all block mt-1 break-all">
                             http://localhost:3000/api/auth/callback/google
                           </code>
                         </p>
@@ -158,8 +158,8 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                   </div>
                 ) : (
                   /* Customer-Facing Unavailable Notice */
-                  <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 text-center space-y-1 text-xs text-stone-600">
-                    <p className="font-semibold text-stone-800">Google Sign-In is temporarily unavailable</p>
+                  <div className="rounded-xl border border-line bg-panel p-4 text-center space-y-1 text-xs text-muted">
+                    <p className="font-semibold text-ink">Google Sign-In is temporarily unavailable</p>
                     <p>Our team is verifying authentication settings. Please check back shortly.</p>
                   </div>
                 )}
@@ -169,7 +169,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                   type="button"
                   disabled
                   aria-disabled="true"
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-stone-200 bg-stone-100 text-stone-400 text-sm font-medium cursor-not-allowed min-h-[48px]"
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-line bg-raised text-faint text-sm font-medium cursor-not-allowed min-h-[48px]"
                 >
                   <KeyRound className="w-4 h-4" aria-hidden="true" />
                   <span>Google Sign-In Unavailable</span>
@@ -179,12 +179,12 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
             {/* Development-only database status note if not configured */}
             {isDev && !dbConfigured && (
-              <div className="rounded-lg border border-stone-200 bg-stone-50 p-3 flex items-start gap-2.5 text-xs text-stone-600">
-                <Database className="w-4 h-4 text-stone-500 shrink-0 mt-0.5" aria-hidden="true" />
+              <div className="rounded-lg border border-line bg-panel p-3 flex items-start gap-2.5 text-xs text-muted">
+                <Database className="w-4 h-4 text-muted shrink-0 mt-0.5" aria-hidden="true" />
                 <div>
-                  <span className="font-medium text-stone-800">Database Note: </span>
-                  <code className="bg-stone-200/60 px-1 py-0.2 rounded text-stone-800">MONGODB_URI</code> is not set in{" "}
-                  <code className="bg-stone-200/60 px-1 py-0.2 rounded text-stone-800">.env.local</code>. MongoDB is required for user account persistence.
+                  <span className="font-medium text-ink">Database Note: </span>
+                  <code className="bg-edge/60 px-1 py-0.2 rounded text-ink">MONGODB_URI</code> is not set in{" "}
+                  <code className="bg-edge/60 px-1 py-0.2 rounded text-ink">.env.local</code>. MongoDB is required for user account persistence.
                 </div>
               </div>
             )}
@@ -192,10 +192,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         )}
 
         {/* Privacy Note */}
-        <div className="pt-4 border-t border-stone-100 flex items-start gap-2 text-xs text-stone-500">
-          <Shield className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" aria-hidden="true" />
+        <div className="pt-4 border-t border-line flex items-start gap-2 text-xs text-muted">
+          <Shield className="w-4 h-4 text-accent shrink-0 mt-0.5" aria-hidden="true" />
           <p className="leading-relaxed">
-            <span className="font-medium text-stone-700">Your contact stays private:</span> We use your Google account strictly for login and profile verification. Your email and direct contact details will never appear in public search results.
+            <span className="font-medium text-body">Your contact stays private:</span> We use your Google account strictly for login and profile verification. Your email and direct contact details will never appear in public search results.
           </p>
         </div>
       </div>

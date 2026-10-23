@@ -43,11 +43,11 @@ export default async function PeersPage(props: PeersPageProps) {
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 py-6">
-      <div className="space-y-2 border-b border-stone-200/80 pb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-900">
+      <div className="space-y-2 border-b border-line/80 pb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-ink">
           Discover Peer Helpers
         </h1>
-        <p className="text-sm text-stone-600">
+        <p className="text-sm text-muted">
           Find classmates and peer tutors offering coursework assistance, problem-solving, and study sessions.
         </p>
       </div>
@@ -63,7 +63,7 @@ export default async function PeersPage(props: PeersPageProps) {
       {/* State 1: Active peer helpers matching query */}
       {result.state === "success" && (
         <div className="space-y-6">
-          <div className="flex items-center justify-between text-xs text-stone-500 px-1">
+          <div className="flex items-center justify-between text-xs text-muted px-1">
             <span>
               Showing {result.peers.length} of {result.pagination.totalCount} peer helper
               {result.pagination.totalCount === 1 ? "" : "s"}
@@ -77,7 +77,7 @@ export default async function PeersPage(props: PeersPageProps) {
             {result.peers.map((peer) => (
               <article
                 key={peer.id}
-                className="flex flex-col justify-between rounded-2xl border border-stone-200/90 bg-white p-5 space-y-4 shadow-xs hover:border-emerald-300 transition-colors"
+                className="flex flex-col justify-between rounded-2xl border border-line/90 bg-surface p-5 space-y-4 shadow-xs hover:border-accent/25 transition-colors"
               >
                 <div className="space-y-3">
                   <div className="flex items-start justify-between gap-3">
@@ -87,17 +87,17 @@ export default async function PeersPage(props: PeersPageProps) {
                         <img
                           src={peer.image}
                           alt=""
-                          className="w-11 h-11 rounded-full object-cover border border-stone-200"
+                          className="w-11 h-11 rounded-full object-cover border border-line"
                           aria-hidden="true"
                         />
                       ) : (
-                        <div className="w-11 h-11 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-sm">
+                        <div className="w-11 h-11 rounded-full bg-accent/15 text-accent flex items-center justify-center font-bold text-sm">
                           {peer.name[0]?.toUpperCase() || "P"}
                         </div>
                       )}
                       <div>
-                        <h2 className="text-sm font-bold text-stone-900">{peer.name}</h2>
-                        <p className="text-xs text-stone-500">
+                        <h2 className="text-sm font-bold text-ink">{peer.name}</h2>
+                        <p className="text-xs text-muted">
                           {peer.university || "University Student"}
                         </p>
                       </div>
@@ -106,22 +106,22 @@ export default async function PeersPage(props: PeersPageProps) {
                     {/* Review & Fast-Reply Badges */}
                     <div className="flex flex-col items-end gap-1 shrink-0">
                       {peer.reviewCount === 0 ? (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-accent/10 text-accent border border-accent/25">
                           New
                         </span>
                       ) : (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-warning/10 text-warning border border-warning/25">
                           ★ {peer.averageRating.toFixed(1)} ({peer.reviewCount})
                         </span>
                       )}
 
                       {peer.hasFastReplyBadge && (
                         <span
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-teal-50 text-teal-800 border border-teal-200"
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-accent/10 text-accent border border-accent/25"
                           title={`Fast responder: based on ${peer.responseCount} responses (averages <= 2h)`}
                           aria-label={`Fast responder badge: ${peer.responseCount} responses averaging under 2 hours`}
                         >
-                          <Zap className="w-2.5 h-2.5 text-teal-600 fill-teal-600" aria-hidden="true" />
+                          <Zap className="w-2.5 h-2.5 text-accent fill-accent" aria-hidden="true" />
                           Fast reply
                         </span>
                       )}
@@ -130,21 +130,21 @@ export default async function PeersPage(props: PeersPageProps) {
 
                   {/* Deterministic Match Score Breakdown (Shown when search/topic is supplied) */}
                   {typeof peer.matchScore === "number" && (
-                    <div className="rounded-xl bg-stone-50/90 p-2.5 border border-stone-200/80 space-y-1">
-                      <div className="flex items-center justify-between text-xs font-bold text-stone-900">
-                        <span className="text-emerald-800 font-bold">
+                    <div className="rounded-xl bg-panel/90 p-2.5 border border-line/80 space-y-1">
+                      <div className="flex items-center justify-between text-xs font-bold text-ink">
+                        <span className="text-accent font-bold">
                           Match score: {peer.matchScore}/100
                         </span>
                         {peer.matchScore >= 70 ? (
-                          <span className="text-[10px] text-emerald-700 font-semibold">High match</span>
+                          <span className="text-[10px] text-accent font-semibold">High match</span>
                         ) : (
-                          <span className="text-[10px] text-stone-500 font-normal">Relevant</span>
+                          <span className="text-[10px] text-muted font-normal">Relevant</span>
                         )}
                       </div>
                       {peer.matchBreakdown && (
-                        <div className="text-[11px] text-stone-600 flex flex-wrap gap-x-2 gap-y-0.5">
+                        <div className="text-[11px] text-muted flex flex-wrap gap-x-2 gap-y-0.5">
                           {peer.matchBreakdown.topicPoints > 0 && (
-                            <span className="text-emerald-700">Topic: +{peer.matchBreakdown.topicPoints}</span>
+                            <span className="text-accent">Topic: +{peer.matchBreakdown.topicPoints}</span>
                           )}
                           {peer.matchBreakdown.modePoints > 0 && (
                             <span>Mode: +{peer.matchBreakdown.modePoints}</span>
@@ -161,17 +161,17 @@ export default async function PeersPage(props: PeersPageProps) {
                   )}
 
                   {peer.bio && (
-                    <p className="text-xs text-stone-600 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-muted line-clamp-2 leading-relaxed">
                       {peer.bio}
                     </p>
                   )}
 
                   {/* Badges for Mode & Pricing */}
                   <div className="flex flex-wrap gap-1.5 text-[11px]">
-                    <span className="px-2 py-0.5 rounded font-medium bg-stone-100 text-stone-700 capitalize">
+                    <span className="px-2 py-0.5 rounded font-medium bg-raised text-body capitalize">
                       {peer.mode === "both" ? "Online & Campus" : peer.mode}
                     </span>
-                    <span className="px-2 py-0.5 rounded font-medium bg-stone-100 text-stone-700 capitalize">
+                    <span className="px-2 py-0.5 rounded font-medium bg-raised text-body capitalize">
                       {peer.pricingPreference === "free"
                         ? "Free Exchange"
                         : peer.pricingPreference === "paid"
@@ -183,20 +183,20 @@ export default async function PeersPage(props: PeersPageProps) {
                   {/* Topics Pills */}
                   {peer.topics.length > 0 && (
                     <div className="space-y-1">
-                      <div className="text-[10px] font-semibold uppercase tracking-wider text-stone-400">
+                      <div className="text-[10px] font-semibold uppercase tracking-wider text-faint">
                         Topics
                       </div>
                       <div className="flex flex-wrap gap-1">
                         {peer.topics.slice(0, 4).map((topic) => (
                           <span
                             key={topic}
-                            className="px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-50 text-emerald-800"
+                            className="px-2 py-0.5 rounded text-[11px] font-medium bg-accent/10 text-accent"
                           >
                             {topic}
                           </span>
                         ))}
                         {peer.topics.length > 4 && (
-                          <span className="px-1.5 py-0.5 rounded text-[11px] text-stone-500">
+                          <span className="px-1.5 py-0.5 rounded text-[11px] text-muted">
                             +{peer.topics.length - 4} more
                           </span>
                         )}
@@ -206,18 +206,18 @@ export default async function PeersPage(props: PeersPageProps) {
 
                   {/* Availability excerpt */}
                   {peer.availability && (
-                    <div className="flex items-center gap-1.5 text-[11px] text-stone-500 pt-1">
-                      <Clock className="w-3.5 h-3.5 text-stone-400 shrink-0" aria-hidden="true" />
+                    <div className="flex items-center gap-1.5 text-[11px] text-muted pt-1">
+                      <Clock className="w-3.5 h-3.5 text-faint shrink-0" aria-hidden="true" />
                       <span className="truncate">{peer.availability}</span>
                     </div>
                   )}
                 </div>
 
                 {/* View Profile Action */}
-                <div className="pt-2 border-t border-stone-100">
+                <div className="pt-2 border-t border-line">
                   <Link
                     href={`/peers/${peer.id}`}
-                    className="inline-flex items-center justify-between w-full px-3 py-2 rounded-lg text-xs font-semibold text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50/70 transition-colors"
+                    className="inline-flex items-center justify-between w-full px-3 py-2 rounded-lg text-xs font-semibold text-accent hover:text-accent hover:bg-accent/10 transition-colors"
                   >
                     <span>View Peer Profile</span>
                     <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
@@ -233,32 +233,32 @@ export default async function PeersPage(props: PeersPageProps) {
               {result.pagination.hasPrev ? (
                 <Link
                   href={buildPaginationUrl(result.pagination.page - 1)}
-                  className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-stone-300 bg-white text-xs font-semibold text-stone-700 hover:bg-stone-50 transition-colors"
+                  className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-edge bg-surface text-xs font-semibold text-body hover:bg-panel transition-colors"
                 >
                   <ChevronLeft className="w-4 h-4" aria-hidden="true" />
                   Previous
                 </Link>
               ) : (
-                <span className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-stone-200 bg-stone-50 text-xs font-semibold text-stone-400 cursor-not-allowed">
+                <span className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-line bg-panel text-xs font-semibold text-faint cursor-not-allowed">
                   <ChevronLeft className="w-4 h-4" aria-hidden="true" />
                   Previous
                 </span>
               )}
 
-              <span className="text-xs text-stone-600 px-3">
+              <span className="text-xs text-muted px-3">
                 Page {result.pagination.page} of {result.pagination.totalPages}
               </span>
 
               {result.pagination.hasNext ? (
                 <Link
                   href={buildPaginationUrl(result.pagination.page + 1)}
-                  className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-stone-300 bg-white text-xs font-semibold text-stone-700 hover:bg-stone-50 transition-colors"
+                  className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-edge bg-surface text-xs font-semibold text-body hover:bg-panel transition-colors"
                 >
                   Next
                   <ChevronRight className="w-4 h-4" aria-hidden="true" />
                 </Link>
               ) : (
-                <span className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-stone-200 bg-stone-50 text-xs font-semibold text-stone-400 cursor-not-allowed">
+                <span className="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-line bg-panel text-xs font-semibold text-faint cursor-not-allowed">
                   Next
                   <ChevronRight className="w-4 h-4" aria-hidden="true" />
                 </span>
@@ -270,22 +270,22 @@ export default async function PeersPage(props: PeersPageProps) {
 
       {/* State 2: No results matching current search/filters */}
       {result.state === "no_results" && (
-        <div className="rounded-2xl border border-stone-200/80 bg-white p-8 sm:p-12 text-center space-y-4">
-          <div className="w-12 h-12 rounded-xl bg-stone-100 text-stone-500 flex items-center justify-center mx-auto">
+        <div className="rounded-2xl border border-line/80 bg-surface p-8 sm:p-12 text-center space-y-4">
+          <div className="w-12 h-12 rounded-xl bg-raised text-muted flex items-center justify-center mx-auto">
             <Search className="w-6 h-6" aria-hidden="true" />
           </div>
           <div className="max-w-md mx-auto space-y-1.5">
-            <h2 className="text-base font-semibold text-stone-900">
+            <h2 className="text-base font-semibold text-ink">
               No peer helpers match your criteria
             </h2>
-            <p className="text-xs text-stone-600 leading-relaxed">
+            <p className="text-xs text-muted leading-relaxed">
               Try broadening your keywords or removing some of your mode and pricing filters.
             </p>
           </div>
           <div className="pt-2">
             <Link
               href="/peers"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors min-h-[44px]"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-action hover:bg-action-hover text-white text-xs font-semibold transition-colors min-h-[44px]"
             >
               Clear All Filters
             </Link>
@@ -295,15 +295,15 @@ export default async function PeersPage(props: PeersPageProps) {
 
       {/* State 3: Genuinely empty database (0 complete profiles in system) */}
       {result.state === "database_empty" && (
-        <div className="rounded-2xl border border-stone-200/80 bg-white p-8 sm:p-12 text-center space-y-4">
-          <div className="w-12 h-12 rounded-xl bg-stone-100 text-stone-500 flex items-center justify-center mx-auto">
+        <div className="rounded-2xl border border-line/80 bg-surface p-8 sm:p-12 text-center space-y-4">
+          <div className="w-12 h-12 rounded-xl bg-raised text-muted flex items-center justify-center mx-auto">
             <UserIcon className="w-6 h-6" aria-hidden="true" />
           </div>
           <div className="max-w-md mx-auto space-y-1.5">
-            <h2 className="text-base font-semibold text-stone-900">
+            <h2 className="text-base font-semibold text-ink">
               No registered peer helpers yet
             </h2>
-            <p className="text-xs text-stone-600 leading-relaxed">
+            <p className="text-xs text-muted leading-relaxed">
               Real peer profiles will appear here as students complete their registration and publish their study topics.
             </p>
           </div>
@@ -311,7 +311,7 @@ export default async function PeersPage(props: PeersPageProps) {
             <div className="pt-2">
               <Link
                 href="/profile"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors min-h-[44px]"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-action hover:bg-action-hover text-white text-xs font-semibold transition-colors min-h-[44px]"
               >
                 Complete Your Profile
                 <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
@@ -321,7 +321,7 @@ export default async function PeersPage(props: PeersPageProps) {
             <div className="pt-2">
               <Link
                 href="/login"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors min-h-[44px]"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-action hover:bg-action-hover text-white text-xs font-semibold transition-colors min-h-[44px]"
               >
                 Sign In to Join Peerly
                 <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
@@ -333,15 +333,15 @@ export default async function PeersPage(props: PeersPageProps) {
 
       {/* State 4: Missing database configuration */}
       {result.state === "unconfigured" && (
-        <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-6 sm:p-8 text-center space-y-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center mx-auto">
+        <div className="rounded-2xl border border-warning/25 bg-warning/10 p-6 sm:p-8 text-center space-y-3">
+          <div className="w-10 h-10 rounded-xl bg-warning/15 text-warning flex items-center justify-center mx-auto">
             <AlertTriangle className="w-5 h-5" aria-hidden="true" />
           </div>
           <div className="max-w-md mx-auto space-y-1">
-            <h2 className="text-base font-semibold text-amber-900">
+            <h2 className="text-base font-semibold text-warning">
               Directory Setup Required
             </h2>
-            <p className="text-xs text-amber-800 leading-relaxed">
+            <p className="text-xs text-warning leading-relaxed">
               The peer directory is currently waiting for database configuration. Please set up the database connection string in your environment.
             </p>
           </div>
@@ -350,15 +350,15 @@ export default async function PeersPage(props: PeersPageProps) {
 
       {/* State 5: Database outage or connection error */}
       {result.state === "error" && (
-        <div className="rounded-2xl border border-red-200 bg-red-50/70 p-6 sm:p-8 text-center space-y-3">
-          <div className="w-10 h-10 rounded-xl bg-red-100 text-red-800 flex items-center justify-center mx-auto">
+        <div className="rounded-2xl border border-danger/25 bg-danger/10 p-6 sm:p-8 text-center space-y-3">
+          <div className="w-10 h-10 rounded-xl bg-danger/15 text-danger flex items-center justify-center mx-auto">
             <AlertCircle className="w-5 h-5" aria-hidden="true" />
           </div>
           <div className="max-w-md mx-auto space-y-1">
-            <h2 className="text-base font-semibold text-red-900">
+            <h2 className="text-base font-semibold text-danger">
               Directory Temporarily Unavailable
             </h2>
-            <p className="text-xs text-red-700 leading-relaxed">
+            <p className="text-xs text-danger leading-relaxed">
               {result.message}
             </p>
           </div>

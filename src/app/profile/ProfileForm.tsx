@@ -96,12 +96,12 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
         <div
           role="status"
           aria-live="polite"
-          className="rounded-xl border border-emerald-200 bg-emerald-50/90 p-4 flex items-start gap-3 text-xs text-emerald-900 shadow-xs"
+          className="rounded-xl border border-accent/25 bg-accent/10 p-4 flex items-start gap-3 text-xs text-accent shadow-xs"
         >
-          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" aria-hidden="true" />
+          <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-0.5" aria-hidden="true" />
           <div className="space-y-1">
             <p className="font-semibold">{resultState.message || "Profile saved successfully."}</p>
-            <p className="text-emerald-700">
+            <p className="text-accent">
               {resultState.isComplete
                 ? "Your profile is active and discoverable in the peer directory."
                 : "Your profile was saved. Complete university and at least one topic to appear in peer discovery."}
@@ -114,13 +114,13 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
         <div
           role="alert"
           aria-live="assertive"
-          className="rounded-xl border border-red-200 bg-red-50/90 p-4 flex items-start gap-3 text-xs text-red-900 shadow-xs"
+          className="rounded-xl border border-danger/25 bg-danger/10 p-4 flex items-start gap-3 text-xs text-danger shadow-xs"
         >
-          <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" aria-hidden="true" />
+          <AlertCircle className="w-5 h-5 text-danger shrink-0 mt-0.5" aria-hidden="true" />
           <div className="space-y-1">
             <p className="font-semibold">{resultState.message || "Could not save profile."}</p>
             {resultState.errors && Object.keys(resultState.errors).length > 0 && (
-              <ul className="list-disc list-inside space-y-0.5 text-red-700 mt-1">
+              <ul className="list-disc list-inside space-y-0.5 text-danger mt-1">
                 {Object.entries(resultState.errors).map(([field, err]) => (
                   <li key={field}>
                     <span className="font-medium capitalize">{field.replace(".", " ")}</span>: {err}
@@ -133,21 +133,21 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
       )}
 
       {/* Profile Completion Indicator */}
-      <div className="rounded-xl border border-stone-200 bg-stone-50 p-4 flex items-center justify-between text-xs">
+      <div className="rounded-xl border border-line bg-panel p-4 flex items-center justify-between text-xs">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-emerald-600" aria-hidden="true" />
-          <span className="font-medium text-stone-800">Directory Status:</span>
+          <Sparkles className="w-4 h-4 text-accent" aria-hidden="true" />
+          <span className="font-medium text-ink">Directory Status:</span>
           <span
             className={`px-2.5 py-0.5 rounded-full font-semibold ${
               formData.isProfileComplete
-                ? "bg-emerald-100 text-emerald-800"
-                : "bg-amber-100 text-amber-800"
+                ? "bg-accent/15 text-accent"
+                : "bg-warning/15 text-warning"
             }`}
           >
             {formData.isProfileComplete ? "Complete & Discoverable" : "Incomplete (Hidden from Search)"}
           </span>
         </div>
-        <span className="text-stone-500 hidden sm:inline">
+        <span className="text-muted hidden sm:inline">
           {formData.isProfileComplete
             ? "Peers can find you for coursework help"
             : "Fill in university, topics, and availability to publish"}
@@ -155,18 +155,18 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
       </div>
 
       {/* Section 1: Academic & Basic Identity */}
-      <fieldset className="rounded-2xl border border-stone-200/90 bg-white p-6 sm:p-7 space-y-5 shadow-xs">
-        <legend className="text-base font-bold text-stone-900 px-1">
+      <fieldset className="rounded-2xl border border-line/90 bg-surface p-6 sm:p-7 space-y-5 shadow-xs">
+        <legend className="text-base font-bold text-ink px-1">
           Academic Identity
         </legend>
-        <p className="text-xs text-stone-500 -mt-3">
+        <p className="text-xs text-muted -mt-3">
           Information shared with classmates and peers looking for study help.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div className="space-y-1.5">
-            <label htmlFor="name" className="block text-xs font-semibold text-stone-800">
-              Full Name <span className="text-emerald-700">*</span>
+            <label htmlFor="name" className="block text-xs font-semibold text-ink">
+              Full Name <span className="text-accent">*</span>
             </label>
             <input
               type="text"
@@ -177,22 +177,22 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               aria-describedby={resultState?.errors?.name ? "name-error" : undefined}
-              className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-stone-900 bg-stone-50/50 focus:bg-white focus:outline-none focus:ring-2 transition-colors ${
+              className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-ink bg-panel/50 focus:bg-surface focus:outline-none focus:ring-2 transition-colors ${
                 resultState?.errors?.name
-                  ? "border-red-300 focus:ring-red-400"
-                  : "border-stone-300 focus:ring-emerald-600"
+                  ? "border-danger/25 focus:ring-red-400"
+                  : "border-edge focus:ring-accent"
               }`}
             />
             {resultState?.errors?.name && (
-              <p id="name-error" className="text-xs text-red-600">
+              <p id="name-error" className="text-xs text-danger">
                 {resultState.errors.name}
               </p>
             )}
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="university" className="block text-xs font-semibold text-stone-800">
-              University / Institution <span className="text-emerald-700">*</span>
+            <label htmlFor="university" className="block text-xs font-semibold text-ink">
+              University / Institution <span className="text-accent">*</span>
             </label>
             <input
               type="text"
@@ -204,14 +204,14 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
               value={formData.university}
               onChange={(e) => setFormData({ ...formData, university: e.target.value })}
               aria-describedby={resultState?.errors?.university ? "university-error" : undefined}
-              className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-stone-900 bg-stone-50/50 focus:bg-white focus:outline-none focus:ring-2 transition-colors ${
+              className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-ink bg-panel/50 focus:bg-surface focus:outline-none focus:ring-2 transition-colors ${
                 resultState?.errors?.university
-                  ? "border-red-300 focus:ring-red-400"
-                  : "border-stone-300 focus:ring-emerald-600"
+                  ? "border-danger/25 focus:ring-red-400"
+                  : "border-edge focus:ring-accent"
               }`}
             />
             {resultState?.errors?.university && (
-              <p id="university-error" className="text-xs text-red-600">
+              <p id="university-error" className="text-xs text-danger">
                 {resultState.errors.university}
               </p>
             )}
@@ -220,7 +220,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div className="space-y-1.5">
-            <label htmlFor="campus" className="block text-xs font-semibold text-stone-800">
+            <label htmlFor="campus" className="block text-xs font-semibold text-ink">
               Campus / Faculty
             </label>
             <input
@@ -231,12 +231,12 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
               placeholder="e.g. Main Campus, School of Engineering"
               value={formData.campus}
               onChange={(e) => setFormData({ ...formData, campus: e.target.value })}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 text-sm text-stone-900 bg-stone-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-colors"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-edge text-sm text-ink bg-panel/50 focus:bg-surface focus:outline-none focus:ring-2 focus:ring-accent transition-colors"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="bio" className="block text-xs font-semibold text-stone-800">
+            <label htmlFor="bio" className="block text-xs font-semibold text-ink">
               Bio / Study Focus
             </label>
             <textarea
@@ -247,24 +247,24 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
               placeholder="Brief overview of what courses you excel at or want to help with..."
               value={formData.bio}
               onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-              className="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 text-sm text-stone-900 bg-stone-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-colors"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-edge text-sm text-ink bg-panel/50 focus:bg-surface focus:outline-none focus:ring-2 focus:ring-accent transition-colors"
             />
           </div>
         </div>
       </fieldset>
 
       {/* Section 2: Study Help Topics & Availability */}
-      <fieldset className="rounded-2xl border border-stone-200/90 bg-white p-6 sm:p-7 space-y-5 shadow-xs">
-        <legend className="text-base font-bold text-stone-900 px-1">
+      <fieldset className="rounded-2xl border border-line/90 bg-surface p-6 sm:p-7 space-y-5 shadow-xs">
+        <legend className="text-base font-bold text-ink px-1">
           Topics, Subjects &amp; Availability
         </legend>
-        <p className="text-xs text-stone-500 -mt-3">
+        <p className="text-xs text-muted -mt-3">
           Tell fellow students where you can offer help and when you are free.
         </p>
 
         <div className="space-y-1.5">
-          <label htmlFor="topics" className="block text-xs font-semibold text-stone-800">
-            Topics (comma-separated) <span className="text-emerald-700">*</span>
+          <label htmlFor="topics" className="block text-xs font-semibold text-ink">
+            Topics (comma-separated) <span className="text-accent">*</span>
           </label>
           <input
             type="text"
@@ -274,15 +274,15 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
             value={topicsInput}
             onChange={(e) => setTopicsInput(e.target.value)}
             aria-describedby="topics-help"
-            className="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 text-sm text-stone-900 bg-stone-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-colors"
+            className="w-full px-3.5 py-2.5 rounded-lg border border-edge text-sm text-ink bg-panel/50 focus:bg-surface focus:outline-none focus:ring-2 focus:ring-accent transition-colors"
           />
-          <p id="topics-help" className="text-[11px] text-stone-500">
-            Enter topics separated by commas. These will be indexed for peer discovery search.
+          <p id="topics-help" className="text-[11px] text-muted">
+            Separate topics with commas so classmates can find what you can explain.
           </p>
         </div>
 
         <div className="space-y-1.5">
-          <label htmlFor="subjects" className="block text-xs font-semibold text-stone-800">
+          <label htmlFor="subjects" className="block text-xs font-semibold text-ink">
             Broader Subjects or Courses (comma-separated)
           </label>
           <input
@@ -293,9 +293,9 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
             value={subjectsInput}
             onChange={(e) => setSubjectsInput(e.target.value)}
             aria-describedby="subjects-help"
-            className="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 text-sm text-stone-900 bg-stone-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-colors"
+            className="w-full px-3.5 py-2.5 rounded-lg border border-edge text-sm text-ink bg-panel/50 focus:bg-surface focus:outline-none focus:ring-2 focus:ring-accent transition-colors"
           />
-          <p id="subjects-help" className="text-[11px] text-stone-500">
+          <p id="subjects-help" className="text-[11px] text-muted">
             General department or program areas.
           </p>
         </div>
@@ -303,7 +303,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
           {/* Learning Mode */}
           <fieldset className="space-y-2">
-            <legend className="text-xs font-semibold text-stone-800">
+            <legend className="text-xs font-semibold text-ink">
               Learning Mode
             </legend>
             <div className="space-y-2">
@@ -316,8 +316,8 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                   key={opt.value}
                   className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                     formData.mode === opt.value
-                      ? "border-emerald-600 bg-emerald-50/40 text-emerald-950"
-                      : "border-stone-200 hover:bg-stone-50 text-stone-800"
+                      ? "border-accent bg-accent/10 text-accent"
+                      : "border-line hover:bg-panel text-ink"
                   }`}
                 >
                   <input
@@ -326,11 +326,11 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                     value={opt.value}
                     checked={formData.mode === opt.value}
                     onChange={() => setFormData({ ...formData, mode: opt.value as LearningMode })}
-                    className="mt-0.5 text-emerald-600 focus:ring-emerald-600"
+                    className="mt-0.5 text-accent focus:ring-accent"
                   />
                   <div>
                     <span className="block text-xs font-semibold">{opt.label}</span>
-                    <span className="block text-[11px] text-stone-500">{opt.desc}</span>
+                    <span className="block text-[11px] text-muted">{opt.desc}</span>
                   </div>
                 </label>
               ))}
@@ -339,7 +339,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
 
           {/* Pricing Preference */}
           <fieldset className="space-y-2">
-            <legend className="text-xs font-semibold text-stone-800">
+            <legend className="text-xs font-semibold text-ink">
               Pricing Preference
             </legend>
             <div className="space-y-2">
@@ -352,8 +352,8 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                   key={opt.value}
                   className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                     formData.pricingPreference === opt.value
-                      ? "border-emerald-600 bg-emerald-50/40 text-emerald-950"
-                      : "border-stone-200 hover:bg-stone-50 text-stone-800"
+                      ? "border-accent bg-accent/10 text-accent"
+                      : "border-line hover:bg-panel text-ink"
                   }`}
                 >
                   <input
@@ -364,11 +364,11 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                     onChange={() =>
                       setFormData({ ...formData, pricingPreference: opt.value as PricingPreference })
                     }
-                    className="mt-0.5 text-emerald-600 focus:ring-emerald-600"
+                    className="mt-0.5 text-accent focus:ring-accent"
                   />
                   <div>
                     <span className="block text-xs font-semibold">{opt.label}</span>
-                    <span className="block text-[11px] text-stone-500">{opt.desc}</span>
+                    <span className="block text-[11px] text-muted">{opt.desc}</span>
                   </div>
                 </label>
               ))}
@@ -377,8 +377,8 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
         </div>
 
         <div className="space-y-1.5 pt-2">
-          <label htmlFor="availability" className="block text-xs font-semibold text-stone-800">
-            Availability Schedule <span className="text-emerald-700">*</span>
+          <label htmlFor="availability" className="block text-xs font-semibold text-ink">
+            Availability Schedule <span className="text-accent">*</span>
           </label>
           <input
             type="text"
@@ -389,14 +389,14 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
             value={formData.availability}
             onChange={(e) => setFormData({ ...formData, availability: e.target.value })}
             aria-describedby={resultState?.errors?.availability ? "availability-error" : "availability-help"}
-            className="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 text-sm text-stone-900 bg-stone-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-colors"
+            className="w-full px-3.5 py-2.5 rounded-lg border border-edge text-sm text-ink bg-panel/50 focus:bg-surface focus:outline-none focus:ring-2 focus:ring-accent transition-colors"
           />
           {resultState?.errors?.availability ? (
-            <p id="availability-error" className="text-xs text-red-600">
+            <p id="availability-error" className="text-xs text-danger">
               {resultState.errors.availability}
             </p>
           ) : (
-            <p id="availability-help" className="text-[11px] text-stone-500">
+            <p id="availability-help" className="text-[11px] text-muted">
               When can peers reasonably reach out or schedule a session with you?
             </p>
           )}
@@ -404,23 +404,23 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
       </fieldset>
 
       {/* Section 3: Private Contact Details */}
-      <fieldset className="rounded-2xl border border-stone-200/90 bg-white p-6 sm:p-7 space-y-5 shadow-xs">
+      <fieldset className="rounded-2xl border border-line/90 bg-surface p-6 sm:p-7 space-y-5 shadow-xs">
         <div className="flex items-center gap-2">
-          <legend className="text-base font-bold text-stone-900 px-1">
+          <legend className="text-base font-bold text-ink px-1">
             Private Contact Settings
           </legend>
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-accent/10 text-accent border border-accent/25">
             <Lock className="w-3 h-3" aria-hidden="true" />
             Hidden until request accepted
           </span>
         </div>
-        <p className="text-xs text-stone-500 -mt-3">
+        <p className="text-xs text-muted -mt-3">
           These details are never exposed in search or public profiles. They are only shared with a student after you explicitly accept their study request.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div className="space-y-1.5">
-            <label htmlFor="whatsapp" className="block text-xs font-semibold text-stone-800">
+            <label htmlFor="whatsapp" className="block text-xs font-semibold text-ink">
               WhatsApp Number
             </label>
             <input
@@ -436,12 +436,12 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                   contact: { ...formData.contact, whatsapp: e.target.value },
                 })
               }
-              className="w-full px-3.5 py-2.5 rounded-lg border border-stone-300 text-sm text-stone-900 bg-stone-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-colors"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-edge text-sm text-ink bg-panel/50 focus:bg-surface focus:outline-none focus:ring-2 focus:ring-accent transition-colors"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="meetingLink" className="block text-xs font-semibold text-stone-800">
+            <label htmlFor="meetingLink" className="block text-xs font-semibold text-ink">
               Personal Meeting Link (HTTP/HTTPS)
             </label>
             <input
@@ -458,14 +458,14 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                 })
               }
               aria-describedby={resultState?.errors?.["contact.meetingLink"] ? "meetingLink-error" : undefined}
-              className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-stone-900 bg-stone-50/50 focus:bg-white focus:outline-none focus:ring-2 transition-colors ${
+              className={`w-full px-3.5 py-2.5 rounded-lg border text-sm text-ink bg-panel/50 focus:bg-surface focus:outline-none focus:ring-2 transition-colors ${
                 resultState?.errors?.["contact.meetingLink"]
-                  ? "border-red-300 focus:ring-red-400"
-                  : "border-stone-300 focus:ring-emerald-600"
+                  ? "border-danger/25 focus:ring-red-400"
+                  : "border-edge focus:ring-accent"
               }`}
             />
             {resultState?.errors?.["contact.meetingLink"] && (
-              <p id="meetingLink-error" className="text-xs text-red-600">
+              <p id="meetingLink-error" className="text-xs text-danger">
                 {resultState.errors["contact.meetingLink"]}
               </p>
             )}
@@ -473,7 +473,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
         </div>
 
         <div className="space-y-1.5">
-          <label htmlFor="preferredMethod" className="block text-xs font-semibold text-stone-800">
+          <label htmlFor="preferredMethod" className="block text-xs font-semibold text-ink">
             Preferred Contact Method
           </label>
           <select
@@ -489,7 +489,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
                 },
               })
             }
-            className="w-full sm:w-64 px-3.5 py-2.5 rounded-lg border border-stone-300 text-sm text-stone-900 bg-stone-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-colors"
+            className="w-full sm:w-64 px-3.5 py-2.5 rounded-lg border border-edge text-sm text-ink bg-panel/50 focus:bg-surface focus:outline-none focus:ring-2 focus:ring-accent transition-colors"
           >
             <option value="unspecified">Unspecified (Peer chooses)</option>
             <option value="email">Google Account Email</option>
@@ -501,15 +501,15 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
 
       {/* Submit Button & Actions */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-        <div className="flex items-center gap-2 text-xs text-stone-500">
-          <HelpCircle className="w-4 h-4 text-stone-400 shrink-0" aria-hidden="true" />
-          <span>Fields marked with <span className="text-emerald-700 font-bold">*</span> are required for peer discovery.</span>
+        <div className="flex items-center gap-2 text-xs text-muted">
+          <HelpCircle className="w-4 h-4 text-faint shrink-0" aria-hidden="true" />
+          <span>Fields marked with <span className="text-accent font-bold">*</span> are required for peer discovery.</span>
         </div>
 
         <button
           type="submit"
           disabled={isPending}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-all shadow-xs min-h-[44px] disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 rounded-xl bg-action hover:bg-action-hover text-white text-sm font-semibold transition-all shadow-xs min-h-[44px] disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
         >
           {isPending ? (
             <>

@@ -34,7 +34,7 @@ Include basic reporting of a peer/resource by signed-in users; store reports for
 - Manage own resources and profile.
 - Minimal moderation page for configured admin emails if implemented.
 
-Design: polished student workspace, warm off-white background, charcoal typography, emerald/teal primary accent, restrained peach highlights. Strong typography and spacing, rounded cards, clear useful information, desktop sidebar and mobile navigation. Accessible form labels, keyboard navigation, loading/error/pending states, mobile layouts. English UI. No decorative fake users, fake counts, fake reviews, fabricated successful actions or pretend functionality. Empty database should show honest onboarding/empty states.
+Design: polished student product with a default dark charcoal/forest background, off-white typography and mint accents. The approved landing direction combines spacious product presentation, a custom animated topic network, working topic search, an interactive workflow, shared resources and honest community states. Use shared semantic colour tokens across all app screens. Strong typography and spacing, rounded cards, clear useful information, desktop sidebar and mobile navigation. Accessible form labels, keyboard navigation, loading/error/pending states, mobile layouts. English UI. No decorative fake users, fake counts, fake reviews, fabricated successful actions or pretend functionality. Empty database should show honest onboarding/empty states.
 
 ## Configuration and security
 

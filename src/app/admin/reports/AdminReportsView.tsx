@@ -165,16 +165,16 @@ export default function AdminReportsView({
       {actionSuccess && (
         <div
           role="status"
-          className="rounded-xl border border-emerald-200 bg-emerald-50/90 p-4 text-xs text-emerald-900 flex items-center justify-between gap-3 shadow-xs"
+          className="rounded-xl border border-accent/25 bg-accent/10 p-4 text-xs text-accent flex items-center justify-between gap-3 shadow-xs"
         >
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" aria-hidden="true" />
+            <CheckCircle2 className="w-4 h-4 text-accent shrink-0" aria-hidden="true" />
             <p className="font-medium">{actionSuccess}</p>
           </div>
           <button
             type="button"
             onClick={() => setActionSuccess(null)}
-            className="text-emerald-700 hover:text-emerald-900 text-xs font-semibold"
+            className="text-accent hover:text-accent text-xs font-semibold"
           >
             Dismiss
           </button>
@@ -184,16 +184,16 @@ export default function AdminReportsView({
       {actionError && (
         <div
           role="alert"
-          className="rounded-xl border border-red-200 bg-red-50/90 p-4 text-xs text-red-900 flex items-center justify-between gap-3 shadow-xs"
+          className="rounded-xl border border-danger/25 bg-danger/10 p-4 text-xs text-danger flex items-center justify-between gap-3 shadow-xs"
         >
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 text-red-600 shrink-0" aria-hidden="true" />
+            <AlertTriangle className="w-4 h-4 text-danger shrink-0" aria-hidden="true" />
             <p className="font-medium">{actionError}</p>
           </div>
           <button
             type="button"
             onClick={() => setActionError(null)}
-            className="text-red-700 hover:text-red-900 text-xs font-semibold"
+            className="text-danger hover:text-danger text-xs font-semibold"
           >
             Dismiss
           </button>
@@ -201,17 +201,17 @@ export default function AdminReportsView({
       )}
 
       {/* Tabs / Status Navigation */}
-      <div className="flex items-center gap-2 border-b border-stone-200/90 pb-px overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-line/90 pb-px overflow-x-auto">
         <Link
           href={buildFilterUrl("ALL")}
           className={`px-4 py-2.5 rounded-t-xl text-xs font-semibold transition-colors flex items-center gap-2 shrink-0 ${
             activeTab === "ALL"
-              ? "border-b-2 border-stone-900 text-stone-900 bg-stone-100/70"
-              : "text-stone-500 hover:text-stone-800 hover:bg-stone-50"
+              ? "border-b-2 border-edge text-ink bg-raised/70"
+              : "text-muted hover:text-ink hover:bg-panel"
           }`}
         >
           <span>All Reports</span>
-          <span className="px-2 py-0.5 rounded-full text-[10px] bg-stone-200 text-stone-700">
+          <span className="px-2 py-0.5 rounded-full text-[10px] bg-edge text-body">
             {counts.all}
           </span>
         </Link>
@@ -220,14 +220,14 @@ export default function AdminReportsView({
           href={buildFilterUrl("OPEN")}
           className={`px-4 py-2.5 rounded-t-xl text-xs font-semibold transition-colors flex items-center gap-2 shrink-0 ${
             activeTab === "OPEN"
-              ? "border-b-2 border-red-600 text-red-700 bg-red-50/60"
-              : "text-stone-500 hover:text-stone-800 hover:bg-stone-50"
+              ? "border-b-2 border-red-600 text-danger bg-danger/10"
+              : "text-muted hover:text-ink hover:bg-panel"
           }`}
         >
           <span>Open</span>
           <span
             className={`px-2 py-0.5 rounded-full text-[10px] ${
-              counts.open > 0 ? "bg-red-100 text-red-800 font-bold" : "bg-stone-200 text-stone-700"
+              counts.open > 0 ? "bg-danger/15 text-danger font-bold" : "bg-edge text-body"
             }`}
           >
             {counts.open}
@@ -238,12 +238,12 @@ export default function AdminReportsView({
           href={buildFilterUrl("RESOLVED")}
           className={`px-4 py-2.5 rounded-t-xl text-xs font-semibold transition-colors flex items-center gap-2 shrink-0 ${
             activeTab === "RESOLVED"
-              ? "border-b-2 border-emerald-600 text-emerald-800 bg-emerald-50/60"
-              : "text-stone-500 hover:text-stone-800 hover:bg-stone-50"
+              ? "border-b-2 border-accent text-accent bg-accent/10"
+              : "text-muted hover:text-ink hover:bg-panel"
           }`}
         >
           <span>Resolved</span>
-          <span className="px-2 py-0.5 rounded-full text-[10px] bg-stone-200 text-stone-700">
+          <span className="px-2 py-0.5 rounded-full text-[10px] bg-edge text-body">
             {counts.resolved}
           </span>
         </Link>
@@ -252,12 +252,12 @@ export default function AdminReportsView({
           href={buildFilterUrl("DISMISSED")}
           className={`px-4 py-2.5 rounded-t-xl text-xs font-semibold transition-colors flex items-center gap-2 shrink-0 ${
             activeTab === "DISMISSED"
-              ? "border-b-2 border-stone-600 text-stone-800 bg-stone-100/70"
-              : "text-stone-500 hover:text-stone-800 hover:bg-stone-50"
+              ? "border-b-2 border-edge text-ink bg-raised/70"
+              : "text-muted hover:text-ink hover:bg-panel"
           }`}
         >
           <span>Dismissed</span>
-          <span className="px-2 py-0.5 rounded-full text-[10px] bg-stone-200 text-stone-700">
+          <span className="px-2 py-0.5 rounded-full text-[10px] bg-edge text-body">
             {counts.dismissed}
           </span>
         </Link>
@@ -269,19 +269,19 @@ export default function AdminReportsView({
           {reports.map((report) => (
             <article
               key={report.id}
-              className={`rounded-2xl border bg-white p-5 space-y-4 shadow-xs transition-colors ${
-                report.status === "OPEN" ? "border-amber-200" : "border-stone-200"
+              className={`rounded-2xl border bg-surface p-5 space-y-4 shadow-xs transition-colors ${
+                report.status === "OPEN" ? "border-warning/25" : "border-line"
               }`}
             >
               {/* Header: Target & Status Badge */}
-              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-stone-100 pb-3">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-line pb-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span
                       className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold uppercase tracking-wider ${
                         report.targetType === "user"
-                          ? "bg-blue-50 text-blue-800 border border-blue-200"
-                          : "bg-purple-50 text-purple-800 border border-purple-200"
+                          ? "bg-info/10 text-info border border-info/25"
+                          : "bg-lilac/10 text-lilac border border-lilac/25"
                       }`}
                     >
                       {report.targetType === "user" ? (
@@ -294,12 +294,12 @@ export default function AdminReportsView({
 
                     {/* Target Moderation Status */}
                     {report.target.isHidden ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-red-100 text-red-800 border border-red-200">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-danger/15 text-danger border border-danger/25">
                         <EyeOff className="w-3 h-3" aria-hidden="true" />
                         <span>Hidden From Public</span>
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-emerald-50 text-emerald-800 border border-emerald-200">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium bg-accent/10 text-accent border border-accent/25">
                         <Eye className="w-3 h-3" aria-hidden="true" />
                         <span>Publicly Visible</span>
                       </span>
@@ -307,7 +307,7 @@ export default function AdminReportsView({
 
                     {/* Moderation Audit Trail Badge (Both Hide and Restore) */}
                     {report.target.moderationAction && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium bg-stone-100 text-stone-600 border border-stone-200">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium bg-raised text-muted border border-line">
                         <span>
                           Last: {report.target.moderationAction === "HIDE" ? "Hidden" : "Restored"}
                         </span>
@@ -321,14 +321,14 @@ export default function AdminReportsView({
                     )}
 
                     {report.target.isDeleted && (
-                      <span className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-stone-100 text-stone-500">
+                      <span className="px-2 py-0.5 rounded-md text-[11px] font-medium bg-raised text-muted">
                         Item Deleted from Database
                       </span>
                     )}
                   </div>
 
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h2 className="text-sm font-bold text-stone-900">
+                    <h2 className="text-sm font-bold text-ink">
                       {report.target.title}
                     </h2>
                     {report.target.link && !report.target.isDeleted && (
@@ -336,7 +336,7 @@ export default function AdminReportsView({
                         href={report.target.link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-xs text-emerald-700 hover:text-emerald-800 hover:underline font-medium"
+                        className="inline-flex items-center gap-1 text-xs text-accent hover:text-accent hover:underline font-medium"
                       >
                         <span>View item</span>
                         <ExternalLink className="w-3 h-3" aria-hidden="true" />
@@ -345,11 +345,11 @@ export default function AdminReportsView({
                   </div>
 
                   {report.target.subtitle && (
-                    <p className="text-xs text-stone-500">{report.target.subtitle}</p>
+                    <p className="text-xs text-muted">{report.target.subtitle}</p>
                   )}
 
                   {report.target.moderationReason && (
-                    <p className="text-[11px] text-stone-500 italic">
+                    <p className="text-[11px] text-muted italic">
                       Moderation note: &ldquo;{report.target.moderationReason}&rdquo;
                     </p>
                   )}
@@ -360,10 +360,10 @@ export default function AdminReportsView({
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
                       report.status === "OPEN"
-                        ? "bg-red-100 text-red-800 border border-red-300"
+                        ? "bg-danger/15 text-danger border border-danger/25"
                         : report.status === "RESOLVED"
-                        ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
-                        : "bg-stone-100 text-stone-700 border border-stone-300"
+                        ? "bg-accent/15 text-accent border border-accent/25"
+                        : "bg-raised text-body border border-edge"
                     }`}
                   >
                     {report.status}
@@ -376,27 +376,27 @@ export default function AdminReportsView({
                 {/* Reason & Explanation */}
                 <div className="md:col-span-2 space-y-2">
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-stone-500">Reason:</span>
-                    <span className="px-2 py-0.5 rounded-md bg-stone-100 text-stone-800 font-semibold">
+                    <span className="font-semibold text-muted">Reason:</span>
+                    <span className="px-2 py-0.5 rounded-md bg-raised text-ink font-semibold">
                       {report.reason}
                     </span>
                   </div>
-                  <div className="rounded-xl border border-stone-200/80 bg-stone-50/70 p-3 space-y-1">
-                    <span className="font-semibold text-stone-600 block">Reported Explanation:</span>
-                    <p className="text-stone-800 leading-relaxed whitespace-pre-line">
+                  <div className="rounded-xl border border-line/80 bg-panel/70 p-3 space-y-1">
+                    <span className="font-semibold text-muted block">Reported Explanation:</span>
+                    <p className="text-ink leading-relaxed whitespace-pre-line">
                       {report.explanation}
                     </p>
                   </div>
                 </div>
 
                 {/* Reporter Identity (Admin Only) */}
-                <div className="rounded-xl border border-stone-200 bg-stone-50/50 p-3 space-y-1.5 self-start">
-                  <span className="font-semibold text-stone-500 block">Reporter (Admin View)</span>
-                  <p className="font-bold text-stone-900">{report.reporter.name}</p>
-                  <p className="text-[11px] text-stone-600 font-mono break-all">
+                <div className="rounded-xl border border-line bg-panel/50 p-3 space-y-1.5 self-start">
+                  <span className="font-semibold text-muted block">Reporter (Admin View)</span>
+                  <p className="font-bold text-ink">{report.reporter.name}</p>
+                  <p className="text-[11px] text-muted font-mono break-all">
                     {report.reporter.email}
                   </p>
-                  <div className="flex items-center gap-1 text-[11px] text-stone-400 pt-1 border-t border-stone-200/60">
+                  <div className="flex items-center gap-1 text-[11px] text-faint pt-1 border-t border-line/60">
                     <Clock className="w-3 h-3" aria-hidden="true" />
                     <span>Submitted {new Date(report.createdAt).toLocaleString()}</span>
                   </div>
@@ -405,24 +405,24 @@ export default function AdminReportsView({
 
               {/* Resolution Details if not OPEN */}
               {report.status !== "OPEN" && (
-                <div className="rounded-xl border border-stone-200 bg-stone-50 p-3 text-xs space-y-1.5">
+                <div className="rounded-xl border border-line bg-panel p-3 text-xs space-y-1.5">
                   <div className="flex items-center justify-between flex-wrap gap-2">
-                    <span className="font-bold text-stone-800">
+                    <span className="font-bold text-ink">
                       Moderation Decision ({report.status})
                     </span>
                     {report.resolvedAt && (
-                      <span className="text-stone-500 text-[11px]">
+                      <span className="text-muted text-[11px]">
                         {new Date(report.resolvedAt).toLocaleString()}
                       </span>
                     )}
                   </div>
                   {report.resolvedBy && (
-                    <p className="text-stone-600">
+                    <p className="text-muted">
                       Moderator: <span className="font-semibold">{report.resolvedBy.name}</span> ({report.resolvedBy.email})
                     </p>
                   )}
                   {report.moderatorNotes && (
-                    <p className="text-stone-700 italic">
+                    <p className="text-body italic">
                       &ldquo;{report.moderatorNotes}&rdquo;
                     </p>
                   )}
@@ -430,7 +430,7 @@ export default function AdminReportsView({
               )}
 
               {/* Admin Actions Bar */}
-              <div className="pt-2 border-t border-stone-100 flex flex-wrap items-center justify-between gap-3">
+              <div className="pt-2 border-t border-line flex flex-wrap items-center justify-between gap-3">
                 {/* Target Moderation: Reversible Hide / Restore */}
                 {!report.target.isDeleted && (
                   <div className="flex items-center gap-2">
@@ -446,9 +446,9 @@ export default function AdminReportsView({
                             report.target.title
                           )
                         }
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-300 hover:bg-stone-50 text-stone-700 text-xs font-semibold transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-edge hover:bg-panel text-body text-xs font-semibold transition-colors cursor-pointer"
                       >
-                        <RotateCcw className="w-3.5 h-3.5 text-stone-500" aria-hidden="true" />
+                        <RotateCcw className="w-3.5 h-3.5 text-muted" aria-hidden="true" />
                         <span>Restore to Public</span>
                       </button>
                     ) : (
@@ -463,9 +463,9 @@ export default function AdminReportsView({
                             report.target.title
                           )
                         }
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-200 hover:bg-red-50 text-red-700 text-xs font-semibold transition-colors cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-danger/25 hover:bg-danger/10 text-danger text-xs font-semibold transition-colors cursor-pointer"
                       >
-                        <EyeOff className="w-3.5 h-3.5 text-red-600" aria-hidden="true" />
+                        <EyeOff className="w-3.5 h-3.5 text-danger" aria-hidden="true" />
                         <span>Hide From Public</span>
                       </button>
                     )}
@@ -479,9 +479,9 @@ export default function AdminReportsView({
                       type="button"
                       disabled={isPending}
                       onClick={() => handleOpenResolve(report.id, "DISMISS")}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-stone-300 hover:bg-stone-100 text-stone-700 text-xs font-semibold transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-edge hover:bg-raised text-body text-xs font-semibold transition-colors cursor-pointer"
                     >
-                      <XCircle className="w-3.5 h-3.5 text-stone-500" aria-hidden="true" />
+                      <XCircle className="w-3.5 h-3.5 text-muted" aria-hidden="true" />
                       <span>Dismiss Report</span>
                     </button>
 
@@ -489,7 +489,7 @@ export default function AdminReportsView({
                       type="button"
                       disabled={isPending}
                       onClick={() => handleOpenResolve(report.id, "RESOLVE")}
-                      className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-action hover:bg-action-hover text-white text-xs font-semibold transition-colors cursor-pointer"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" aria-hidden="true" />
                       <span>Resolve Report</span>
@@ -501,10 +501,10 @@ export default function AdminReportsView({
           ))}
         </div>
       ) : (
-        <div className="rounded-2xl border border-stone-200 bg-white p-12 text-center space-y-2">
-          <ShieldAlert className="w-10 h-10 text-stone-300 mx-auto" aria-hidden="true" />
-          <h3 className="text-sm font-bold text-stone-900">No Reports Found</h3>
-          <p className="text-xs text-stone-500 max-w-sm mx-auto">
+        <div className="rounded-2xl border border-line bg-surface p-12 text-center space-y-2">
+          <ShieldAlert className="w-10 h-10 text-faint mx-auto" aria-hidden="true" />
+          <h3 className="text-sm font-bold text-ink">No Reports Found</h3>
+          <p className="text-xs text-muted max-w-sm mx-auto">
             {activeTab === "OPEN"
               ? "All clear! There are currently no pending open reports awaiting moderator review."
               : `No reports matching status "${activeTab}".`}
@@ -514,36 +514,36 @@ export default function AdminReportsView({
 
       {/* Pagination */}
       {initialResult.pagination.totalPages > 1 && (
-        <div className="flex items-center justify-center gap-3 pt-4 border-t border-stone-200">
+        <div className="flex items-center justify-center gap-3 pt-4 border-t border-line">
           {initialResult.pagination.hasPrev ? (
             <Link
               href={buildFilterUrl(activeTab, initialResult.pagination.page - 1)}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-stone-300 bg-white text-xs font-semibold text-stone-700 hover:bg-stone-50 transition-colors"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-edge bg-surface text-xs font-semibold text-body hover:bg-panel transition-colors"
             >
               <ChevronLeft className="w-3.5 h-3.5" aria-hidden="true" />
               <span>Previous</span>
             </Link>
           ) : (
-            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-stone-200 bg-stone-50 text-xs font-semibold text-stone-400 cursor-not-allowed">
+            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-line bg-panel text-xs font-semibold text-faint cursor-not-allowed">
               <ChevronLeft className="w-3.5 h-3.5" aria-hidden="true" />
               <span>Previous</span>
             </span>
           )}
 
-          <span className="text-xs text-stone-600 font-medium">
+          <span className="text-xs text-muted font-medium">
             Page {initialResult.pagination.page} of {initialResult.pagination.totalPages}
           </span>
 
           {initialResult.pagination.hasNext ? (
             <Link
               href={buildFilterUrl(activeTab, initialResult.pagination.page + 1)}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-stone-300 bg-white text-xs font-semibold text-stone-700 hover:bg-stone-50 transition-colors"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-edge bg-surface text-xs font-semibold text-body hover:bg-panel transition-colors"
             >
               <span>Next</span>
               <ChevronRight className="w-3.5 h-3.5" aria-hidden="true" />
             </Link>
           ) : (
-            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-stone-200 bg-stone-50 text-xs font-semibold text-stone-400 cursor-not-allowed">
+            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-line bg-panel text-xs font-semibold text-faint cursor-not-allowed">
               <span>Next</span>
               <ChevronRight className="w-3.5 h-3.5" aria-hidden="true" />
             </span>
@@ -558,13 +558,13 @@ export default function AdminReportsView({
           role="dialog"
           aria-modal="true"
           aria-labelledby="resolve-dialog-title"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-xs"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs"
         >
-          <div className="w-full max-w-md rounded-2xl border border-stone-200 bg-white p-6 space-y-4 shadow-xl animate-in fade-in zoom-in-95 duration-150">
-            <h3 id="resolve-dialog-title" className="text-sm font-bold text-stone-900">
+          <div className="w-full max-w-md rounded-2xl border border-line bg-surface p-6 space-y-4 shadow-xl animate-in fade-in zoom-in-95 duration-150">
+            <h3 id="resolve-dialog-title" className="text-sm font-bold text-ink">
               {resolveAction === "RESOLVE" ? "Resolve Report" : "Dismiss Report"}
             </h3>
-            <p className="text-xs text-stone-600">
+            <p className="text-xs text-muted">
               {resolveAction === "RESOLVE"
                 ? "Mark this report as resolved. Your moderator identity and timestamp will be atomically recorded."
                 : "Dismiss this report if no community guideline violation occurred."}
@@ -574,7 +574,7 @@ export default function AdminReportsView({
               <div className="space-y-1">
                 <label
                   htmlFor="moderator-notes"
-                  className="block text-xs font-semibold text-stone-700"
+                  className="block text-xs font-semibold text-body"
                 >
                   Decision Note (Optional)
                 </label>
@@ -585,16 +585,16 @@ export default function AdminReportsView({
                   value={moderatorNotes}
                   onChange={(e) => setModeratorNotes(e.target.value)}
                   placeholder="Provide context or decision rationale for platform audit logs..."
-                  className="w-full text-xs rounded-xl border border-stone-300 p-2.5 text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                  className="w-full text-xs rounded-xl border border-edge p-2.5 text-ink focus:outline-none focus:ring-2 focus:ring-accent"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-stone-100">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-line">
                 <button
                   type="button"
                   disabled={isPending}
                   onClick={() => setResolvingReportId(null)}
-                  className="px-4 py-2 rounded-xl border border-stone-300 hover:bg-stone-50 text-stone-700 text-xs font-semibold transition-colors"
+                  className="px-4 py-2 rounded-xl border border-edge hover:bg-panel text-body text-xs font-semibold transition-colors"
                 >
                   Cancel
                 </button>
@@ -603,8 +603,8 @@ export default function AdminReportsView({
                   disabled={isPending}
                   className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-white text-xs font-semibold transition-colors ${
                     resolveAction === "RESOLVE"
-                      ? "bg-emerald-600 hover:bg-emerald-700"
-                      : "bg-stone-800 hover:bg-stone-900"
+                      ? "bg-action hover:bg-action-hover"
+                      : "bg-canvas hover:bg-canvas"
                   }`}
                 >
                   {isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" aria-hidden="true" />}
@@ -623,15 +623,15 @@ export default function AdminReportsView({
           role="dialog"
           aria-modal="true"
           aria-labelledby="mod-target-title"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-xs"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs"
         >
-          <div className="w-full max-w-md rounded-2xl border border-stone-200 bg-white p-6 space-y-4 shadow-xl animate-in fade-in zoom-in-95 duration-150">
-            <h3 id="mod-target-title" className="text-sm font-bold text-stone-900">
+          <div className="w-full max-w-md rounded-2xl border border-line bg-surface p-6 space-y-4 shadow-xl animate-in fade-in zoom-in-95 duration-150">
+            <h3 id="mod-target-title" className="text-sm font-bold text-ink">
               {moderatingTarget.action === "HIDE"
                 ? `Hide ${moderatingTarget.type === "user" ? "Peer Profile" : "Study Resource"}`
                 : `Restore ${moderatingTarget.type === "user" ? "Peer Profile" : "Study Resource"}`}
             </h3>
-            <p className="text-xs text-stone-600 leading-relaxed">
+            <p className="text-xs text-muted leading-relaxed">
               {moderatingTarget.action === "HIDE"
                 ? `Hiding will remove "${moderatingTarget.title}" from all public discovery pages, detail views, and filter chips. This action is completely reversible.`
                 : `Restoring will immediately return "${moderatingTarget.title}" to public search and discovery.`}
@@ -641,7 +641,7 @@ export default function AdminReportsView({
               <div className="space-y-1">
                 <label
                   htmlFor="mod-reason"
-                  className="block text-xs font-semibold text-stone-700"
+                  className="block text-xs font-semibold text-body"
                 >
                   Moderation Reason
                 </label>
@@ -656,16 +656,16 @@ export default function AdminReportsView({
                       ? "e.g. Inappropriate content, academic policy violation..."
                       : "e.g. Content reviewed and compliant, appeal accepted..."
                   }
-                  className="w-full text-xs rounded-xl border border-stone-300 p-2.5 text-stone-900 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                  className="w-full text-xs rounded-xl border border-edge p-2.5 text-ink focus:outline-none focus:ring-2 focus:ring-accent"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-stone-100">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-line">
                 <button
                   type="button"
                   disabled={isPending}
                   onClick={() => setModeratingTarget(null)}
-                  className="px-4 py-2 rounded-xl border border-stone-300 hover:bg-stone-50 text-stone-700 text-xs font-semibold transition-colors"
+                  className="px-4 py-2 rounded-xl border border-edge hover:bg-panel text-body text-xs font-semibold transition-colors"
                 >
                   Cancel
                 </button>
@@ -675,7 +675,7 @@ export default function AdminReportsView({
                   className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-white text-xs font-semibold transition-colors ${
                     moderatingTarget.action === "HIDE"
                       ? "bg-red-600 hover:bg-red-700"
-                      : "bg-emerald-600 hover:bg-emerald-700"
+                      : "bg-action hover:bg-action-hover"
                   }`}
                 >
                   {isPending && <Loader2 className="w-3.5 h-3.5 animate-spin" aria-hidden="true" />}

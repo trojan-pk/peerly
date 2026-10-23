@@ -78,6 +78,18 @@ This is a **Next.js Node application**, not a static export. It requires a serve
 
 No payment processing, hosted calls, file uploads, email delivery or AI answers. A paid preference is informational; users arrange any terms directly. Use public campus spaces for physical sessions. Dashboard updates appear after actions or refresh; there are no email/push notifications.
 
+## Visual design
+
+Peerly uses a default dark theme throughout the landing page, discovery, forms,
+requests and moderation screens. Shared semantic colours live in `src/app/globals.css`.
+Manrope is served locally with its OFL license in `src/app/fonts/`.
+
+The landing's topic search and subject links open real discovery results. Its
+workflow illustration is explanatory; community cards come from persisted public
+profiles. Connecting paths and one-time section entrances respect reduced-motion
+preferences. Scroll entrances progressively enhance visible server-rendered content.
+No third-party animation runtime or external font request is needed.
+
 ## Important rules
 
 Requests move `PENDING → ACCEPTED → COMPLETED → REVIEWED`, or `PENDING → REJECTED / CANCELLED`. Only the helper accepts/rejects; the learner may cancel while pending. Both participants confirm completion; this is not independent attendance verification. Only that learner may submit one review.
@@ -108,7 +120,7 @@ To verify writes on your configured cluster as well, run:
 npm run test:e2e:atlas
 ```
 
-This opt-in command loads your ignored environment file and runs the three configured browser workflows against a fresh `peerly_e2e_<random>` database. The database is dropped after the run. Your database user needs permission to create/drop that temporary database and its indexes. Keep ports 3101/3102 free. This still uses test-only sessions, not Google's consent flow. A forcibly terminated run can leave a temporary database behind.
+This opt-in command loads your ignored environment file and runs the configured browser workflows against a fresh `peerly_e2e_<random>` database. The database is dropped after the run. Your database user needs permission to create/drop that temporary database and its indexes. Keep ports 3101/3102 free. This still uses test-only sessions, not Google's consent flow. A forcibly terminated run can leave a temporary database behind.
 
 ### Real-account acceptance (after configuration)
 

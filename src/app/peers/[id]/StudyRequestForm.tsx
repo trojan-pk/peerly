@@ -36,22 +36,22 @@ export default function StudyRequestForm({
   // Case 1: Unauthenticated visitor
   if (!isAuthenticated) {
     return (
-      <div className="rounded-2xl border border-stone-200/90 bg-stone-50/70 p-6 sm:p-7 space-y-3 text-center">
-        <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto">
+      <div className="rounded-2xl border border-line/90 bg-panel/70 p-6 sm:p-7 space-y-3 text-center">
+        <div className="w-10 h-10 rounded-xl bg-accent/15 text-accent flex items-center justify-center mx-auto">
           <Lock className="w-5 h-5" aria-hidden="true" />
         </div>
         <div className="max-w-md mx-auto space-y-1">
-          <h2 className="text-base font-bold text-stone-900">
+          <h2 className="text-base font-bold text-ink">
             Sign In to Request Help
           </h2>
-          <p className="text-xs text-stone-600 leading-relaxed">
+          <p className="text-xs text-muted leading-relaxed">
             Please sign in with your Google account to send a study session request to {peerName}.
           </p>
         </div>
         <div className="pt-2">
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors min-h-[44px] shadow-xs"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-action hover:bg-action-hover text-white text-xs font-semibold transition-colors min-h-[44px] shadow-xs"
           >
             Sign In with Google
             <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
@@ -64,10 +64,10 @@ export default function StudyRequestForm({
   // Case 2: Viewing own profile
   if (isCurrentUser) {
     return (
-      <div className="rounded-2xl border border-stone-200/90 bg-stone-50/70 p-5 flex items-center gap-3 text-xs text-stone-700">
-        <UserCheck className="w-5 h-5 text-emerald-600 shrink-0" aria-hidden="true" />
+      <div className="rounded-2xl border border-line/90 bg-panel/70 p-5 flex items-center gap-3 text-xs text-body">
+        <UserCheck className="w-5 h-5 text-accent shrink-0" aria-hidden="true" />
         <div>
-          <span className="font-semibold block text-stone-900">This is your public peer profile</span>
+          <span className="font-semibold block text-ink">This is your public peer profile</span>
           <span>You cannot send study session requests to yourself.</span>
         </div>
       </div>
@@ -96,14 +96,14 @@ export default function StudyRequestForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-2xl border border-stone-200/90 bg-white p-6 sm:p-7 space-y-6 shadow-xs"
+      className="rounded-2xl border border-line/90 bg-surface p-6 sm:p-7 space-y-6 shadow-xs"
       noValidate
     >
-      <div className="space-y-1 border-b border-stone-100 pb-4">
-        <h2 className="text-base font-bold text-stone-900">
+      <div className="space-y-1 border-b border-line pb-4">
+        <h2 className="text-base font-bold text-ink">
           Request Study Assistance
         </h2>
-        <p className="text-xs text-stone-500">
+        <p className="text-xs text-muted">
           Send a coursework problem or concept question directly to {peerName}.
         </p>
       </div>
@@ -113,19 +113,19 @@ export default function StudyRequestForm({
         <div
           role="status"
           aria-live="polite"
-          className="rounded-xl border border-emerald-200 bg-emerald-50/90 p-4 space-y-2 text-xs text-emerald-950"
+          className="rounded-xl border border-accent/25 bg-accent/10 p-4 space-y-2 text-xs text-accent"
         >
           <div className="flex items-center gap-2 font-semibold">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" aria-hidden="true" />
+            <CheckCircle2 className="w-4 h-4 text-accent" aria-hidden="true" />
             <span>{result.message}</span>
           </div>
-          <p className="text-emerald-800">
+          <p className="text-accent">
             Once {peerName} accepts your request, their private contact details will unlock automatically in your dashboard.
           </p>
           <div className="pt-1">
             <Link
               href="/dashboard"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-700 text-white font-medium hover:bg-emerald-800 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-action-hover text-white font-medium hover:bg-action-hover transition-colors"
             >
               Go to Dashboard
               <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
@@ -138,14 +138,14 @@ export default function StudyRequestForm({
         <div
           role="alert"
           aria-live="assertive"
-          className="rounded-xl border border-red-200 bg-red-50/90 p-4 space-y-1 text-xs text-red-950"
+          className="rounded-xl border border-danger/25 bg-danger/10 p-4 space-y-1 text-xs text-danger"
         >
-          <div className="flex items-center gap-2 font-semibold text-red-900">
-            <AlertCircle className="w-4 h-4 text-red-600 shrink-0" aria-hidden="true" />
+          <div className="flex items-center gap-2 font-semibold text-danger">
+            <AlertCircle className="w-4 h-4 text-danger shrink-0" aria-hidden="true" />
             <span>{result.message}</span>
           </div>
           {result.errors && (
-            <ul className="list-disc list-inside space-y-0.5 text-red-700 pt-1">
+            <ul className="list-disc list-inside space-y-0.5 text-danger pt-1">
               {Object.entries(result.errors).map(([field, err]) => (
                 <li key={field}>
                   <span className="font-medium capitalize">{field}</span>: {err}
@@ -158,8 +158,8 @@ export default function StudyRequestForm({
 
       {/* Topic selection / input */}
       <div className="space-y-1.5">
-        <label htmlFor="request-topic" className="block text-xs font-semibold text-stone-800">
-          Study Topic <span className="text-emerald-700">*</span>
+        <label htmlFor="request-topic" className="block text-xs font-semibold text-ink">
+          Study Topic <span className="text-accent">*</span>
         </label>
         <input
           type="text"
@@ -170,11 +170,11 @@ export default function StudyRequestForm({
           value={topic}
           onChange={(e) => setTopic(e.target.value)}
           placeholder="e.g. Linear Algebra, Dynamic Programming, Organic Chemistry"
-          className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm text-stone-900 bg-stone-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-colors"
+          className="w-full px-3.5 py-2.5 rounded-xl border border-edge text-sm text-ink bg-panel/50 focus:bg-surface focus:outline-none focus:ring-2 focus:ring-accent transition-colors"
         />
         {peerTopics.length > 0 && (
           <div className="flex flex-wrap items-center gap-1.5 pt-1">
-            <span className="text-[11px] text-stone-400">Quick select:</span>
+            <span className="text-[11px] text-faint">Quick select:</span>
             {peerTopics.map((pt) => (
               <button
                 type="button"
@@ -182,8 +182,8 @@ export default function StudyRequestForm({
                 onClick={() => setTopic(pt)}
                 className={`px-2 py-0.5 rounded text-[11px] font-medium transition-colors ${
                   topic === pt
-                    ? "bg-emerald-600 text-white"
-                    : "bg-stone-100 text-stone-700 hover:bg-stone-200"
+                    ? "bg-action text-white"
+                    : "bg-raised text-body hover:bg-edge"
                 }`}
               >
                 {pt}
@@ -195,33 +195,33 @@ export default function StudyRequestForm({
 
       {/* Mode Selection */}
       <fieldset className="space-y-2">
-        <legend className="text-xs font-semibold text-stone-800">
-          Preferred Session Mode <span className="text-emerald-700">*</span>
+        <legend className="text-xs font-semibold text-ink">
+          Preferred Session Mode <span className="text-accent">*</span>
         </legend>
         <div className="flex flex-wrap gap-4">
           {(peerMode === "online" || peerMode === "both") && (
-            <label className="flex items-center gap-2 cursor-pointer text-xs text-stone-800">
+            <label className="flex items-center gap-2 cursor-pointer text-xs text-ink">
               <input
                 type="radio"
                 name="mode"
                 value="online"
                 checked={mode === "online"}
                 onChange={() => setMode("online")}
-                className="text-emerald-600 focus:ring-emerald-600"
+                className="text-accent focus:ring-accent"
               />
               <span>Online (Video / Call)</span>
             </label>
           )}
 
           {(peerMode === "campus" || peerMode === "both") && (
-            <label className="flex items-center gap-2 cursor-pointer text-xs text-stone-800">
+            <label className="flex items-center gap-2 cursor-pointer text-xs text-ink">
               <input
                 type="radio"
                 name="mode"
                 value="campus"
                 checked={mode === "campus"}
                 onChange={() => setMode("campus")}
-                className="text-emerald-600 focus:ring-emerald-600"
+                className="text-accent focus:ring-accent"
               />
               <span>In-person on Campus</span>
             </label>
@@ -232,10 +232,10 @@ export default function StudyRequestForm({
       {/* Problem Description */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
-          <label htmlFor="problemDescription" className="block text-xs font-semibold text-stone-800">
-            Problem or Question Description <span className="text-emerald-700">*</span>
+          <label htmlFor="problemDescription" className="block text-xs font-semibold text-ink">
+            Problem or Question Description <span className="text-accent">*</span>
           </label>
-          <span className="text-[11px] text-stone-400">
+          <span className="text-[11px] text-faint">
             {problemDescription.length} / 2000 chars (min 10)
           </span>
         </div>
@@ -249,7 +249,7 @@ export default function StudyRequestForm({
           value={problemDescription}
           onChange={(e) => setProblemDescription(e.target.value)}
           placeholder="Briefly explain what coursework problem, proof, or exam topic you need guidance on..."
-          className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 text-sm text-stone-900 bg-stone-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-colors"
+          className="w-full px-3.5 py-2.5 rounded-xl border border-edge text-sm text-ink bg-panel/50 focus:bg-surface focus:outline-none focus:ring-2 focus:ring-accent transition-colors"
         />
       </div>
 
@@ -257,7 +257,7 @@ export default function StudyRequestForm({
         <button
           type="submit"
           disabled={isPending || !topic.trim() || problemDescription.trim().length < 10}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-all shadow-xs min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-action hover:bg-action-hover text-white text-xs font-semibold transition-all shadow-xs min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2"
         >
           {isPending ? (
             <>

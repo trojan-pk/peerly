@@ -1,19 +1,12 @@
 import Link from "next/link";
 import { auth } from "@/auth";
 import { isDatabaseConfigured, connectToDatabase } from "@/lib/db";
-import { getAuthConfigStatus } from "@/lib/auth-config";
 import { User, toPublicProfile } from "@/models/User";
 import { PublicUserProfile } from "@/types/user";
-import {
-  GraduationCap,
-  Search,
-  Lock,
-  CheckCircle2,
-  BookOpen,
-  ArrowRight,
-  AlertTriangle,
-  UserCheck,
-} from "lucide-react";
+import { ArrowRight, ArrowUpRight, Search, LockKeyhole, BookOpen, Sparkles, Check, Plus, Globe2, MapPin } from "lucide-react";
+import { StudyNetwork } from "@/components/landing/StudyNetwork";
+import { Workflow } from "@/components/landing/Workflow";
+import { LandingMotion } from "@/components/landing/LandingMotion";
 
 export const dynamic = "force-dynamic";
 
@@ -40,269 +33,75 @@ async function getRecentPublicPeers(): Promise<{ peers: PublicUserProfile[]; una
   }
 }
 
-export default async function HomePage() {
-  const session = await auth();
-  const authStatus = getAuthConfigStatus();
-  const dbConfigured = isDatabaseConfigured();
-  const recentResult = await getRecentPublicPeers();
-  const recentPeers = recentResult.peers;
-  const isDev = process.env.NODE_ENV === "development";
+const faqs = [
+  ["What can I get help with?", "Search for a coursework topic or subject, then explain your question in a study request. Peerly is for learning together: working through concepts, understanding examples and sharing useful resources."],
+  ["Can I learn and help other people?", "Absolutely. Your account does both. Add the subjects you're comfortable explaining to your profile, and find other peers when you need a hand."],
+  ["Is Peerly free to use?", "You can browse peers, share resource links and send study requests without a platform fee. Helpers indicate whether they prefer free or paid sessions. Peerly does not process payments; discuss any terms directly before meeting."],
+  ["When are contact details shared?", "A helper's chosen contact details unlock to the learner only after the helper accepts the request. Your email, WhatsApp number and meeting links never appear in public search results."],
+  ["Are study sessions online or on campus?", "Both are possible. Filter by online or campus preferences, agree on a time after acceptance, and use your helper's shared contact method. For in-person sessions, choose a public campus space."],
+  ["How do reviews work?", "Both participants must confirm a session is complete before the learner can leave one review. These confirmations are self-reported, not independent proof of attendance."],
+];
 
-  const isFullyConfigured = authStatus.isConfigured && dbConfigured;
+export default async function HomePage() {
+  const [session, recentResult] = await Promise.all([auth(), getRecentPublicPeers()]);
+  const offerHref = session?.user ? "/profile" : "/login";
 
   return (
-    <div className="space-y-16 py-6 sm:py-10">
-      {/* Developer Environment Notice (only shown in development mode when configuration is incomplete) */}
-      {isDev && !isFullyConfigured && (
-        <section aria-label="Development Setup Notice">
-          <div className="max-w-4xl mx-auto rounded-xl border border-amber-200 bg-amber-50/70 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" aria-hidden="true" />
-              <div>
-                <h2 className="text-sm font-semibold text-amber-900">
-                  Developer Setup: Local Credentials Needed
-                </h2>
-                <p className="text-xs text-amber-800 mt-0.5 leading-relaxed">
-                  {!dbConfigured && !authStatus.isConfigured
-                    ? "MongoDB and Google OAuth credentials need to be set in .env.local."
-                    : !dbConfigured
-                    ? "MongoDB connection string (MONGODB_URI) is missing or set to a placeholder."
-                    : "Google OAuth credentials (AUTH_GOOGLE_ID / AUTH_GOOGLE_SECRET) are missing."}
-                </p>
-              </div>
-            </div>
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-800 text-white text-xs font-medium hover:bg-amber-900 transition-colors shrink-0 min-h-[44px] focus-visible:ring-2 focus-visible:ring-amber-700"
-            >
-              Setup Guide
-              <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-            </Link>
-          </div>
-        </section>
-      )}
-
-      {/* Hero Section */}
-      <section aria-labelledby="hero-title" className="text-center max-w-3xl mx-auto space-y-6">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-emerald-800 text-xs font-medium">
-          <GraduationCap className="w-4 h-4 text-emerald-600" aria-hidden="true" />
-          <span>Student Peer-to-Peer Learning</span>
+    <LandingMotion>
+      <section className="landing-hero" aria-labelledby="hero-title">
+        <div className="hero-ambient" aria-hidden="true" />
+        <div className="hero-copy">
+          <span className="eyebrow-pill"><span className="small-spark"><Sparkles size={13} /></span> A little help goes a long way <ArrowUpRight size={13} /></span>
+          <h1 id="hero-title">Get unstuck.<br /><span>Learn with your people.</span></h1>
+          <p>The topic that has you stuck is someone else’s strong suit.<br className="hidden sm:block" /> Find a university peer. Work it out together. Pass it forward.</p>
+          <form action="/peers" method="get" className="hero-search" role="search" aria-label="Find a study peer">
+            <Search size={20} aria-hidden="true" />
+            <label className="sr-only" htmlFor="hero-topic">What do you want to understand?</label>
+            <input id="hero-topic" name="q" type="search" maxLength={100} placeholder="What do you want to understand?" autoComplete="off" />
+            <button type="submit"><span>Find a peer</span><ArrowRight size={18} aria-hidden="true" /></button>
+          </form>
+          <div className="hero-topics"><span>A place to start</span>{["Calculus", "Data structures", "Physics"].map(topic => <Link key={topic} href={`/peers?q=${encodeURIComponent(topic)}`}>{topic}<ArrowUpRight size={11} /></Link>)}</div>
+          <Link href={offerHref} className="hero-secondary">Good at something? Share what you know <ArrowRight size={13} /></Link>
         </div>
-
-        <h1
-          id="hero-title"
-          className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-stone-900 leading-tight"
-        >
-          Master your coursework with help from fellow students.
-        </h1>
-
-        <p className="text-base sm:text-lg text-stone-600 leading-relaxed max-w-2xl mx-auto">
-          Connect with university peers for subject-specific problem solving, study sessions, and shared academic resources. Find a helper, request a session, and keep your contact private.
-        </p>
-
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-          <Link
-            href="/peers"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-colors shadow-xs min-h-[48px] focus-visible:ring-2 focus-visible:ring-emerald-600"
-          >
-            <Search className="w-4 h-4" aria-hidden="true" />
-            Find Peers
-          </Link>
-
-          {session?.user ? (
-            <Link
-              href="/dashboard"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-stone-300 bg-white hover:bg-stone-50 text-stone-800 text-sm font-semibold transition-colors min-h-[48px] focus-visible:ring-2 focus-visible:ring-emerald-600"
-            >
-              <UserCheck className="w-4 h-4 text-emerald-600" aria-hidden="true" />
-              Go to Dashboard
-            </Link>
-          ) : (
-            <Link
-              href="/login"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-stone-300 bg-white hover:bg-stone-50 text-stone-800 text-sm font-semibold transition-colors min-h-[48px] focus-visible:ring-2 focus-visible:ring-emerald-600"
-            >
-              Sign In to Participate
-            </Link>
-          )}
-        </div>
+        <StudyNetwork />
+        <div className="hero-principles"><span><Search size={14} /> Find help by topic</span><span><LockKeyhole size={14} /> Keep contact private</span><span><BookOpen size={14} /> Learn in both directions</span></div>
       </section>
 
-      {/* Core Principles Section */}
-      <section aria-labelledby="principles-title" className="max-w-5xl mx-auto">
-        <h2 id="principles-title" className="sr-only">
-          Peerly Core Principles
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Card 1 */}
-          <div className="rounded-2xl border border-stone-200/80 bg-white p-6 space-y-3 shadow-xs">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
-              <Search className="w-5 h-5" aria-hidden="true" />
-            </div>
-            <h3 className="text-base font-semibold text-stone-900">
-              Topic &amp; Subject Search
-            </h3>
-            <p className="text-xs text-stone-600 leading-relaxed">
-              Find peers who have mastered specific subjects and topics. Filter by university, study mode (online or campus), and free or paid preferences.
-            </p>
-          </div>
+      <section className="landing-section" id="how-it-works" aria-labelledby="workflow-title">
+        <div className="section-heading"><div><span className="section-kicker">01 / BETTER TOGETHER</span><h2 id="workflow-title">From “I’m stuck”<br />to “I get it.”</h2></div><p>No need to figure everything out alone.<br />Start with one question and the right person.</p></div>
+        <Workflow />
+      </section>
 
-          {/* Card 2 */}
-          <div className="rounded-2xl border border-stone-200/80 bg-white p-6 space-y-3 shadow-xs">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
-              <Lock className="w-5 h-5" aria-hidden="true" />
-            </div>
-            <h3 className="text-base font-semibold text-stone-900">
-              Protected Contact Details
-            </h3>
-            <p className="text-xs text-stone-600 leading-relaxed">
-              Your email, WhatsApp number, and meeting links are strictly protected. They only unlock to your study partner after you accept their request.
-            </p>
+      <section className="landing-section" aria-labelledby="learning-title">
+        <div className="section-heading"><div><span className="section-kicker">02 / YOUR WAY TO LEARN</span><h2 id="learning-title">Different strengths.<br /><span className="text-muted">Common ground.</span></h2></div><p>A study circle that fits your subject,<br />your schedule and your way of learning.</p></div>
+        <div className="learning-grid">
+          <div className="learning-main">
+            <span className="section-kicker">START WITH WHAT YOU NEED</span>
+            <h3>Big subjects.<br />Small breakthroughs.</h3>
+            <p>Find someone who can explain that one concept. Search specific topics, then compare availability and study preferences.</p>
+            <div className="subject-cloud">{["Linear algebra", "Python", "Economics", "Chemistry", "Statistics", "Data structures"].map((topic, i) => <Link key={topic} href={`/peers?q=${encodeURIComponent(topic)}`} className={i === 5 ? "featured-subject" : ""}>{topic}<ArrowUpRight size={14} /></Link>)}</div>
+            <Link href="/peers" className="text-link">Explore peer discovery <ArrowRight size={15} /></Link>
           </div>
-
-          {/* Card 3 */}
-          <div className="rounded-2xl border border-stone-200/80 bg-white p-6 space-y-3 shadow-xs">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
-              <CheckCircle2 className="w-5 h-5" aria-hidden="true" />
-            </div>
-            <h3 className="text-base font-semibold text-stone-900">
-              Reviews After Completion
-            </h3>
-            <p className="text-xs text-stone-600 leading-relaxed">
-              Reviews and helpfulness scores derive strictly from completed sessions confirmed by both students. Real peers without vanity metrics.
-            </p>
+          <div className="learning-side">
+            <div className="privacy-feature"><div className="privacy-illustration" aria-hidden="true"><span className="privacy-ring" /><span><LockKeyhole size={26} strokeWidth={1.4} /></span><i /><i /><i /></div><h3>A connection.<br />On your terms.</h3><p>Contact unlocks after acceptance. Your personal details stay out of public profiles.</p></div>
+            <div className="study-mode-feature"><span><Globe2 size={19} /> Online</span><span className="mode-divider">or</span><span><MapPin size={19} /> On campus</span><p>Your study session. Your setting.</p></div>
           </div>
         </div>
       </section>
 
-      {/* Peer Discovery Section */}
-      <section aria-labelledby="peers-heading" className="max-w-5xl mx-auto space-y-6">
-        <div className="flex items-center justify-between border-b border-stone-200/80 pb-4">
-          <div>
-            <h2 id="peers-heading" className="text-xl font-bold tracking-tight text-stone-900">
-              Available Peer Helpers
-            </h2>
-            <p className="text-xs text-stone-500 mt-0.5">
-              Browse students offering academic support in their coursework topics.
-            </p>
-          </div>
-          <Link
-            href="/peers"
-            className="text-xs font-semibold text-emerald-700 hover:text-emerald-800 inline-flex items-center gap-1 min-h-[44px] px-2 focus-visible:ring-2 focus-visible:ring-emerald-600 rounded"
-          >
-            Browse all peers
-            <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-          </Link>
-        </div>
-
-        {recentPeers.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {recentPeers.map((peer) => (
-              <Link
-                key={peer.id}
-                href={`/peers/${peer.id}`}
-                className="rounded-xl border border-stone-200/90 bg-white p-5 space-y-3 hover:border-emerald-300 transition-colors shadow-xs block"
-              >
-                <div className="flex items-center gap-3">
-                  {peer.image ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={peer.image}
-                      alt=""
-                      className="w-10 h-10 rounded-full object-cover border border-stone-200"
-                      aria-hidden="true"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-semibold text-sm">
-                      {peer.name[0]?.toUpperCase() || "P"}
-                    </div>
-                  )}
-                  <div>
-                    <h3 className="text-sm font-semibold text-stone-900">{peer.name}</h3>
-                    <p className="text-xs text-stone-500">
-                      {peer.university || "University Student"}
-                    </p>
-                  </div>
-                </div>
-
-                {peer.bio && (
-                  <p className="text-xs text-stone-600 line-clamp-2 leading-relaxed">
-                    {peer.bio}
-                  </p>
-                )}
-
-                {peer.topics.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {peer.topics.slice(0, 3).map((topic) => (
-                      <span
-                        key={topic}
-                        className="px-2 py-0.5 rounded text-[11px] font-medium bg-stone-100 text-stone-700"
-                      >
-                        {topic}
-                      </span>
-                    ))}
-                    {peer.topics.length > 3 && (
-                      <span className="text-[11px] text-stone-500 self-center">
-                        +{peer.topics.length - 3} more
-                      </span>
-                    )}
-                  </div>
-                )}
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-2xl border border-stone-200/80 bg-white p-8 sm:p-12 text-center space-y-4">
-            <div className="w-12 h-12 rounded-xl bg-stone-100 text-stone-500 flex items-center justify-center mx-auto">
-              <Search className="w-6 h-6" aria-hidden="true" />
-            </div>
-            <div className="max-w-md mx-auto space-y-1.5">
-              <h3 className="text-base font-semibold text-stone-900">
-                {recentResult.unavailable ? "Peer directory temporarily unavailable" : "No peer profiles available yet"}
-              </h3>
-              <p className="text-xs text-stone-600 leading-relaxed">
-                {recentResult.unavailable
-                  ? "We cannot load the directory right now. Please try again shortly."
-                  : "Connect with classmates and campus peers. Once students sign in with Google and complete their profiles, they will appear here."}
-              </p>
-            </div>
-            <div className="pt-2">
-              <Link
-                href="/login"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors min-h-[44px] focus-visible:ring-2 focus-visible:ring-emerald-600"
-              >
-                Sign In to Offer Peer Help
-                <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-              </Link>
-            </div>
-          </div>
-        )}
+      <section className="landing-section resources-feature" aria-labelledby="resources-title">
+        <div className="resource-copy"><span className="section-kicker">03 / KNOWLEDGE WORTH SHARING</span><h2 id="resources-title">Good notes<br />deserve company.</h2><p>A clear explanation. A useful problem set. That link you wish you’d found earlier. Explore resources shared by students, or add your own.</p><Link href="/resources" className="landing-button">Explore study resources <ArrowUpRight size={17} /></Link><span className="resource-footnote">Open to browse. No study request needed.</span></div>
+        <div className="resource-art" aria-hidden="true"><div className="resource-orbit" /><div className="note-sheet sheet-back"><span>PASS IT FORWARD</span><BookOpen size={36} strokeWidth={1} /></div><div className="note-sheet sheet-front"><span className="note-badge"><BookOpen size={15} /> A little clarity</span><strong>Everything makes<br />sense eventually.</strong><div className="note-rule" /><span className="note-equation">question + perspective</span><span className="note-answer">= a new understanding.</span><div className="note-bottom"><span>Made to be shared</span><ArrowUpRight size={18} /></div></div><span className="resource-star star-one">✳</span><span className="resource-star star-two">+</span></div>
       </section>
 
-      {/* Academic Resources Hub Callout */}
-      <section aria-labelledby="resources-callout" className="max-w-5xl mx-auto">
-        <div className="rounded-2xl border border-emerald-200/80 bg-emerald-50/50 p-6 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-xl">
-            <div className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-emerald-800">
-              <BookOpen className="w-4 h-4 text-emerald-700" aria-hidden="true" />
-              <span>Study Materials &amp; Resources</span>
-            </div>
-            <h2 id="resources-callout" className="text-xl font-bold tracking-tight text-stone-900">
-              Academic Resource Hub
-            </h2>
-            <p className="text-xs text-stone-600 leading-relaxed">
-              Explore subject-specific reference links, lecture notes, and practice problems shared by fellow students. Browse without signing in, or sign in to share your own.
-            </p>
-          </div>
-          <Link
-            href="/resources"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-stone-300 hover:bg-stone-50 text-stone-800 text-xs font-semibold transition-colors shrink-0 shadow-xs min-h-[44px] focus-visible:ring-2 focus-visible:ring-emerald-600"
-          >
-            Explore Resources
-            <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-          </Link>
-        </div>
+      <section className="landing-section" aria-labelledby="community-title">
+        <div className="section-heading"><div><span className="section-kicker">04 / FIND YOUR STUDY CIRCLE</span><h2 id="community-title">Someone gets it.<br />Find them here.</h2></div><Link href="/peers" className="text-link">Browse all peers <ArrowUpRight size={16} /></Link></div>
+        {recentResult.peers.length > 0 ? <div className="landing-peers">{recentResult.peers.slice(0, 3).map(peer => <Link href={`/peers/${peer.id}`} key={peer.id} className="landing-peer"><div className="peer-heading"><span className="peer-initial">{peer.name[0]?.toUpperCase() || "P"}</span><ArrowUpRight size={18} /></div><h3>{peer.name}</h3><span>{peer.university || "University student"}</span><p>{peer.bio || "Explore their subjects, availability and study preferences."}</p><div>{peer.topics.slice(0, 3).map(topic => <small key={topic}>{topic}</small>)}</div></Link>)}</div> : <div className="community-invitation"><span className="community-symbol"><Sparkles size={25} /></span><div><h3>{recentResult.unavailable ? "The study circle is taking a moment." : "Every study circle starts with someone."}</h3><p>{recentResult.unavailable ? "We couldn’t load the peer directory. Try discovery again shortly." : "Add your subjects and share what you know. Your next classmate can start with you."}</p></div><Link href={recentResult.unavailable ? "/peers" : offerHref} className="landing-button secondary">{recentResult.unavailable ? "Try discovery" : "Create your profile"}<ArrowRight size={16} /></Link></div>}
       </section>
-    </div>
+
+      <section className="landing-section faq-section" id="questions" aria-labelledby="faq-title"><div><span className="section-kicker">A LITTLE MORE CLARITY</span><h2 id="faq-title">Good questions.<br />Straight answers.</h2><p>Still curious? Here’s how Peerly fits<br className="hidden sm:block" /> into your student life.</p></div><div className="faq-list">{faqs.map(([question, answer]) => <details key={question}><summary>{question}<Plus size={17} aria-hidden="true" /></summary><p>{answer}</p></details>)}</div></section>
+
+      <section className="landing-section final-invitation" aria-labelledby="final-title"><span className="section-kicker">YOUR NEXT BREAKTHROUGH STARTS HERE</span><h2 id="final-title">You don’t have to<br />figure it out <span>alone.</span></h2><div><Link href="/peers" className="landing-button">Find your people <ArrowRight size={18} /></Link><Link href={offerHref} className="text-link">Share your strengths <ArrowUpRight size={16} /></Link></div><p><Check size={13} /> One account. A learner and a helper.</p></section>
+    </LandingMotion>
   );
 }

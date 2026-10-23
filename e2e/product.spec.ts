@@ -27,7 +27,7 @@ test("configured auth HTTP routes handle proxied requests and POST bodies", asyn
   expect(new URL(canceled.headers().location).pathname).toBe("/login");
 });
 
-test("learner and helper complete a private request and publish one review", async ({ browser, app }) => {
+test("learner and helper complete a private request and publish one review", async ({ browser, app }, testInfo) => {
   const learner = await browser.newContext();
   const helper = await browser.newContext();
   await app.signIn(learner, "learner");
@@ -36,6 +36,7 @@ test("learner and helper complete a private request and publish one review", asy
   const helperPage = await helper.newPage();
   try {
     await studentPage.goto("/profile");
+    await studentPage.screenshot({ path: testInfo.outputPath("profile-dark.png"), fullPage: true });
     await studentPage.getByLabel("Short Bio", { exact: false }).count().then(async (count) => {
       if (count) await studentPage.getByLabel("Short Bio", { exact: false }).fill("I enjoy learning algorithms with classmates.");
       else await studentPage.locator("#bio").fill("I enjoy learning algorithms with classmates.");
@@ -52,6 +53,7 @@ test("learner and helper complete a private request and publish one review", asy
     await expect(helperPage.getByRole("status")).toContainText(/accepted/i);
     await studentPage.goto("/dashboard?tab=outgoing");
     await expect(studentPage.getByRole("link", { name: /WhatsApp/ })).toHaveAttribute("href", "https://wa.me/923001234567");
+    await studentPage.screenshot({ path: testInfo.outputPath("dashboard-dark.png"), fullPage: true });
     await studentPage.getByRole("button", { name: "Confirm Session Completed", exact: true }).click();
     await expect(studentPage.getByRole("status")).toContainText(/Waiting for the other participant/i);
     await helperPage.reload();
@@ -70,7 +72,7 @@ test("learner and helper complete a private request and publish one review", asy
   } finally { await learner.close(); await helper.close(); }
 });
 
-test("resources, modal keyboard focus and admin hide/restore/resolve work through the UI", async ({ browser, app }) => {
+test("resources, modal keyboard focus and admin hide/restore/resolve work through the UI", async ({ browser, app }, testInfo) => {
   const owner = await browser.newContext();
   const reporter = await browser.newContext();
   const moderator = await browser.newContext();
@@ -83,6 +85,7 @@ test("resources, modal keyboard focus and admin hide/restore/resolve work throug
     await ownerPage.locator("#create-topic").fill("C++ Sorting");
     await ownerPage.locator("#create-url").fill("https://example.com/sorting-notes");
     await ownerPage.locator("#create-desc").fill("My own revision notes about sorting algorithms and complexity.");
+    await ownerPage.screenshot({ path: testInfo.outputPath("resource-form-dark.png"), fullPage: true });
     await ownerPage.getByRole("button", { name: "Publish Resource", exact: true }).click();
     await expect(ownerPage.getByRole("heading", { name: "Sorting revision notes", exact: true })).toBeVisible();
     await ownerPage.getByRole("button", { name: "Edit", exact: true }).click();
@@ -110,6 +113,7 @@ test("resources, modal keyboard focus and admin hide/restore/resolve work throug
     await reportPage.keyboard.press("Escape");
     await adminPage.goto("/admin/reports?status=OPEN");
     await expect(adminPage.locator("main")).toContainText("Sorting revision notes");
+    await adminPage.screenshot({ path: testInfo.outputPath("admin-dark.png"), fullPage: true });
     await adminPage.getByRole("button", { name: /Hide.*Public/ }).click();
     await adminPage.getByRole("dialog").getByRole("button", { name: /Hide from Public/ }).click();
     await expect(adminPage.getByRole("status")).toContainText(/hidden/i);
@@ -149,4 +153,33 @@ test("public mobile routes stay usable and signed-out visitors cannot open priva
   await page.getByRole("button", { name: "Open navigation menu" }).click();
   await expect(page.getByRole("navigation", { name: "Mobile Navigation" })).toBeVisible();
   expect(pageErrors).toEqual([]);
+});
+
+test("dark landing search, workflow keyboard controls and FAQs work on mobile and desktop", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("searchbox", { name: "What do you want to understand?" }).fill("C++ Sorting");
+  await page.getByRole("button", { name: "Find a peer", exact: true }).click();
+  await expect(page).toHaveURL(/\/peers\?q=C%2B%2B\+Sorting/);
+  await expect(page.getByRole("heading", { name: "Hamza Helper", exact: true })).toBeVisible();
+  await expect(page.locator("main")).not.toContainText("+923001234567");
+
+  await page.goto("/");
+  const connect = page.getByRole("tab", { name: /03 Connect on your terms/ });
+  await connect.click();
+  await expect(page.getByRole("tabpanel")).toContainText("Contact unlocks privately");
+  await connect.press("ArrowDown");
+  await expect(page.getByRole("tab", { name: /04 Learn/ })).toBeFocused();
+  await expect(page.getByRole("tabpanel")).toContainText("Feedback opens after both confirmations");
+  const privacyQuestion = page.locator("summary", { hasText: "When are contact details shared?" });
+  await privacyQuestion.click();
+  await expect(privacyQuestion.locator("..")).toHaveAttribute("open", "");
+  await expect(privacyQuestion.locator("..")).toContainText("only after the helper accepts");
+
+  await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
+  expect(await page.locator("html").evaluate(el => getComputedStyle(el).colorScheme)).toBe("dark");
+  expect(await page.locator(".connection-pulse").first().evaluate(el => parseFloat(getComputedStyle(el).animationDuration))).toBeLessThan(0.01);
+  for (const width of [320, 390, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
 });

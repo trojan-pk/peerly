@@ -6,6 +6,14 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { getAuthConfigStatus } from "@/lib/auth-config";
 import { getCurrentDbUser } from "@/lib/auth-guards";
+import localFont from "next/font/local";
+
+const manrope = localFont({
+  src: "./fonts/Manrope-Variable.ttf",
+  variable: "--font-manrope",
+  display: "swap",
+  weight: "200 800",
+});
 
 export const metadata: Metadata = {
   title: "Peerly — Student Peer-Learning Platform",
@@ -35,8 +43,8 @@ export default function RootLayout({
   const authStatus = getAuthConfigStatus();
 
   return (
-    <html lang="en">
-      <body className="flex flex-col min-h-screen bg-[#FAF8F5] text-stone-900 antialiased">
+    <html lang="en" className={manrope.variable} data-theme="dark">
+      <body className="flex flex-col min-h-screen bg-canvas text-ink antialiased">
         <Suspense fallback={<Navbar user={null} isAdmin={false} isAuthConfigured={authStatus.isConfigured} />}>
           <DynamicNavbar />
         </Suspense>
