@@ -187,3 +187,26 @@ Production build (including TypeScript), ESLint and both relevant browser checks
 Desktop, mobile, footer and login screenshots were reviewed. Logo layout was checked
 at 320/390/768/1440px with no horizontal overflow or uncaught browser errors.
 External social-network cache/preview rendering was not tested against a public URL.
+
+## Clean workspace and confirmed logout
+
+Marketing footer markup is omitted from workspace routes, including dashboard,
+profile, peer discovery, resources and resource management. The shared logout
+control now opens a dark warning dialog from the desktop header, mobile menu and
+already-signed-in login screen. It initially focuses Cancel, traps keyboard focus,
+closes on Cancel/Escape and restores focus to the trigger. Background content is
+inert while the native dialog is open. Confirmation calls the existing Auth.js
+server action, shows a pending state and prevents duplicate confirmation.
+
+A browser regression verifies footer absence across workspace pages, cancellation
+without ending the session, keyboard focus/escape, real session-cookie invalidation
+and protected-route redirection after confirmed logout on desktop and mobile. It
+also checks the signed-in login screen and that the mobile menu closes after logout.
+The first keyboard run exposed reverse Tab escaping the dialog controls; an
+explicit Tab wrap was added before rerunning the flow. The mobile flow also
+exposed menu state surviving the logout redirect; navigation state is now scoped
+to the current pathname.
+
+Final production build/TypeScript and ESLint passed. All three relevant browser
+checks passed after these corrections. Desktop and 375px mobile warning-dialog
+screenshots were visually reviewed against the dark workspace styling.

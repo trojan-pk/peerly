@@ -86,6 +86,10 @@ returns to `/dashboard`. Existing members can open their workspace directly.
 Peer discovery, peer details, resources, profile editing and requests require login.
 The landing page does not query or expose member profiles or resource collections.
 
+The marketing footer appears only on the landing and login pages. Workspace pages
+have no footer. Desktop, mobile and the signed-in login screen require a logout
+confirmation; Cancel or Escape keeps the session active.
+
 The landing uses a purple/blue/sky palette with dark product scenes. Subject
 selection sits directly above its illustrative discovery result. A request scene
 explains pending versus accepted contact access; study preferences, resource

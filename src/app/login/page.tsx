@@ -1,6 +1,7 @@
+import { LogoutButton } from "@/components/LogoutButton";
 import { BrandMark } from "@/components/BrandMark";
 import { auth } from "@/auth";
-import { loginWithGoogleAction, logoutAction } from "@/app/actions/auth";
+import { loginWithGoogleAction } from "@/app/actions/auth";
 import { getAuthConfigStatus } from "@/lib/auth-config";
 import { isDatabaseConfigured } from "@/lib/db";
 import Link from "next/link";
@@ -61,14 +62,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               >
                 Go to Dashboard
               </Link>
-              <form action={logoutAction} className="sm:inline-flex">
-                <button
-                  type="submit"
-                  className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2.5 rounded-lg border border-edge bg-surface text-body text-sm font-medium hover:bg-panel transition-colors min-h-[44px] focus-visible:ring-2 focus-visible:ring-accent cursor-pointer"
-                >
-                  Sign Out
-                </button>
-              </form>
+              <LogoutButton
+                className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2.5 rounded-lg border border-edge bg-surface text-body text-sm font-medium hover:bg-panel transition-colors min-h-[44px] focus-visible:ring-2 focus-visible:ring-accent cursor-pointer"
+              >
+                Sign Out
+              </LogoutButton>
             </div>
           </div>
         ) : (

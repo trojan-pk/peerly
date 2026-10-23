@@ -470,3 +470,17 @@ body:has(.landing-v3) .is-marketing .nav-link { font-size:14px; }
 @media (prefers-reduced-motion:reduce) {
  .landing-v3 .connection-track i,.landing-v3 .example-peer,.landing-v3 .resource-sample { animation:none; }
 }
+
+/* Native modal stays above sticky navigation and makes the background inert. */
+.logout-dialog { width:min(440px,calc(100% - 32px)); max-height:calc(100dvh - 32px); margin:auto; padding:28px; overflow:auto; border:1px solid #495575; border-radius:18px; background:#14182a; color:#f1f4ff; box-shadow:0 28px 100px #0007; }
+.logout-dialog::backdrop { background:#050711b8; backdrop-filter:blur(5px); }
+.logout-dialog-icon { display:grid; place-items:center; width:48px; height:48px; margin-bottom:20px; border:1px solid #f5cf8847; border-radius:13px; color:#f5cf88; background:#f5cf8812; }
+.logout-dialog h2 { font-size:22px; font-weight:650; letter-spacing:-.6px; line-height:1.4; }
+.logout-dialog > p { margin-top:12px; color:#bfcbe5; font-size:14px; line-height:1.8; }
+.logout-dialog > .logout-dialog-error { color:#ffa7a7; }
+.logout-dialog-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:28px; }
+.logout-dialog-actions button { display:inline-flex; align-items:center; justify-content:center; gap:9px; min-height:46px; padding:11px 19px; border-radius:8px; font-size:14px; font-weight:600; transition:background .2s,border-color .2s; }
+.logout-cancel { border:1px solid #566382; color:#e1e7f7; background:#1c2339; }.logout-cancel:hover { background:#29324e; }
+.logout-confirm { border:1px solid #c7bfff; color:#201b44; background:#c7bfff; }.logout-confirm:hover { background:#dbd5ff; }
+.logout-dialog-actions button:disabled { opacity:.6; cursor:wait; }
+@media (max-width:374px) { .logout-dialog { padding:23px; }.logout-dialog-actions button { flex:1; padding-inline:13px; } }

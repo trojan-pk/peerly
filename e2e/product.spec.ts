@@ -227,3 +227,66 @@ test("one-page landing keeps sections together and gates the workspace behind lo
   await page.getByRole("link", { name: "Find your study circle", exact: true }).first().click();
   await expect(page).toHaveURL(/\/login$/);
 });
+
+test("workspace footer is absent and logout requires confirmation on desktop and mobile", async ({ browser, app }, testInfo) => {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+  await app.signIn(context, "helper");
+  const page = await context.newPage();
+  try {
+    for (const route of ["/dashboard", "/profile", "/peers", "/resources", "/resources/manage"]) {
+      await page.goto(route);
+      await expect(page.locator("footer.site-footer")).toHaveCount(0);
+    }
+    await page.goto("/dashboard");
+    const trigger = page.getByRole("button", { name: "Sign out of Peerly", exact: true });
+    await trigger.click();
+    const confirmation = page.getByRole("alertdialog", { name: "Log out of Peerly?" });
+    await expect(confirmation).toBeVisible();
+    const cancel = confirmation.getByRole("button", { name: "Cancel", exact: true });
+    await expect(cancel).toBeFocused();
+    await cancel.press("Shift+Tab");
+    await expect(confirmation.getByRole("button", { name: "Log out", exact: true })).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(cancel).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(confirmation).not.toBeVisible();
+    await expect(trigger).toBeFocused();
+    await expect(page).toHaveURL(/\/dashboard$/);
+    expect((await (await context.request.get("/api/auth/session")).json()).user).toBeTruthy();
+    await trigger.click();
+    await page.screenshot({ path: testInfo.outputPath("logout-desktop.png") });
+    await confirmation.getByRole("button", { name: "Log out", exact: true }).click();
+    await expect(page).toHaveURL("/");
+    expect(await (await context.request.get("/api/auth/session")).json()).toBeNull();
+    await expect(page.locator("footer.site-footer")).toBeVisible();
+    await page.goto("/dashboard");
+    await expect(page).toHaveURL(/\/login$/);
+
+    // The already-signed-in login screen uses the same confirmation boundary.
+    await app.signIn(context, "helper");
+    await page.goto("/login");
+    await page.getByRole("button", { name: "Sign Out", exact: true }).click();
+    await expect(confirmation).toBeVisible();
+    await confirmation.getByRole("button", { name: "Cancel", exact: true }).click();
+    await expect(confirmation).not.toBeVisible();
+    expect((await (await context.request.get("/api/auth/session")).json()).user).toBeTruthy();
+
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto("/dashboard");
+    await page.getByRole("button", { name: "Open navigation menu" }).click();
+    const mobileTrigger = page.getByRole("navigation", { name: "Mobile Navigation" }).getByRole("button", { name: "Sign Out", exact: true });
+    await mobileTrigger.click();
+    await expect(confirmation).toBeVisible();
+    await page.screenshot({ path: testInfo.outputPath("logout-mobile.png") });
+    await confirmation.getByRole("button", { name: "Cancel", exact: true }).click();
+    await expect(mobileTrigger).toBeFocused();
+    await expect(page).toHaveURL(/\/dashboard$/);
+    await mobileTrigger.click();
+    await confirmation.getByRole("button", { name: "Log out", exact: true }).click();
+    await expect(page).toHaveURL("/");
+    expect(await (await context.request.get("/api/auth/session")).json()).toBeNull();
+    await expect(page.getByRole("navigation", { name: "Mobile Navigation" })).not.toBeVisible();
+    await page.goto("/dashboard");
+    await expect(page).toHaveURL(/\/login$/);
+  } finally { await context.close(); }
+});
