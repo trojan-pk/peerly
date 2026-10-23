@@ -6,6 +6,8 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  Archive,
+  ArchiveRestore,
   Inbox,
   Send,
   Clock,
@@ -23,6 +25,7 @@ import {
 } from "lucide-react";
 import { StudyRequestDTO } from "@/lib/study-requests";
 import {
+  archiveStudyRequest,
   transitionStudyRequest,
   confirmStudyRequestCompletion,
   submitStudyRequestReview,
@@ -42,6 +45,8 @@ interface DashboardViewProps {
     page: number;
     totalPages: number;
   };
+  statusFilter?: string;
+  archivedView?: boolean;
   initialTab?: "incoming" | "outgoing";
   incomingPage?: number;
   outgoingPage?: number;
@@ -50,6 +55,8 @@ interface DashboardViewProps {
 export default function DashboardView({
   incoming,
   outgoing,
+  statusFilter = "all",
+  archivedView = false,
   initialTab = "incoming",
   incomingPage = 1,
   outgoingPage = 1,
@@ -69,7 +76,7 @@ export default function DashboardView({
     setActiveTab(newTab);
     setActionError(null);
     setActionSuccess(null);
-    router.push(`/dashboard?tab=${newTab}&incomingPage=${incomingPage}&outgoingPage=${outgoingPage}`);
+    router.push(`/dashboard?tab=${newTab}&incomingPage=${incomingPage}&outgoingPage=${outgoingPage}&status=${statusFilter}${archivedView ? "&view=archived" : ""}`);
   };
 
   const handleTransitionAction = (requestId: string, action: "accept" | "reject" | "cancel") => {
@@ -136,6 +143,21 @@ export default function DashboardView({
   };
 
   const currentList = activeTab === "incoming" ? incoming : outgoing;
+  const filterSuffix = `&status=${statusFilter}${archivedView ? "&view=archived" : ""}`;
+  function changeFilter(key: string, value: string) {
+    const params = new URLSearchParams({ tab: activeTab, status: statusFilter });
+    if (archivedView) params.set("view", "archived");
+    if (value) params.set(key, value); else params.delete(key);
+    router.push(`/dashboard?${params.toString()}`);
+  }
+  function handleArchive(requestId: string) {
+    setActionError(null); setActionSuccess(null);
+    startTransition(async () => {
+      const result = await safeAction(() => archiveStudyRequest({ requestId, archive: !archivedView }));
+      if (result.success) setActionSuccess(result.message || "History updated.");
+      else setActionError(result.message || "History could not be updated.");
+    });
+  }
 
   return (
     <div className="space-y-6">
@@ -231,6 +253,8 @@ export default function DashboardView({
         </button>
       </div>
 
+      <div className="request-filter-bar"><label htmlFor="request-status">Request status<select id="request-status" value={statusFilter} onChange={event => changeFilter("status", event.target.value)}><option value="all">All statuses</option>{[["PENDING","Pending"],["ACCEPTED","Accepted"],["REJECTED","Declined"],["CANCELLED","Cancelled"],["COMPLETED","Completed"],["REVIEWED","Reviewed"]].map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label><div className="history-toggle" aria-label="Request history view"><button type="button" aria-pressed={!archivedView} onClick={() => changeFilter("view", "")}>Current</button><button type="button" aria-pressed={archivedView} onClick={() => changeFilter("view", "archived")}><Archive size={15} />Archived</button></div></div>
+      {archivedView && <p className="text-sm text-muted">Archived requests are hidden from your current list. You can restore them at any time.</p>}
       {/* Request Cards List */}
       {currentList.items.length > 0 ? (
         <div className="space-y-4">
@@ -241,7 +265,7 @@ export default function DashboardView({
             return (
               <article
                 key={req.id}
-                className="rounded-2xl border border-line/90 bg-surface p-5 sm:p-6 space-y-4 shadow-xs"
+                className="request-card rounded-2xl border border-line/90 bg-surface p-5 sm:p-6 space-y-4 shadow-xs"
               >
                 {/* Header: Participant & Status */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line pb-3">
@@ -265,7 +289,7 @@ export default function DashboardView({
                           {participant.name}
                         </span>
                         <span className="text-[11px] text-faint">
-                          {isPeer ? "(Learner)" : "(Peer Helper)"}
+                          {isPeer ? "Asking for help" : "Helping you"}
                         </span>
                       </div>
                       <p className="text-xs text-muted">
@@ -280,7 +304,7 @@ export default function DashboardView({
                       {req.mode === "online" ? "Online" : "Campus in-person"}
                     </span>
                     <span
-                      className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider ${
+                      className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${
                         req.status === "PENDING"
                           ? "bg-warning/15 text-warning border border-warning/25"
                           : req.status === "ACCEPTED"
@@ -292,26 +316,12 @@ export default function DashboardView({
                           : "bg-raised text-body"
                       }`}
                     >
-                      {req.status}
+                      {({ PENDING: "Pending", ACCEPTED: "Accepted", REJECTED: "Declined", CANCELLED: "Cancelled", COMPLETED: "Completed", REVIEWED: "Reviewed" })[req.status]}
                     </span>
                   </div>
                 </div>
 
-                {/* Body: Topic & Problem Description */}
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold text-muted">Topic:</span>
-                    <span className="px-2 py-0.5 rounded text-xs font-semibold bg-accent/10 text-accent">
-                      {req.topic}
-                    </span>
-                  </div>
-                  <div className="space-y-1">
-                    <span className="text-xs font-semibold text-muted">Problem Description:</span>
-                    <p className="text-xs text-body leading-relaxed whitespace-pre-line bg-panel/70 p-3 rounded-xl border border-line">
-                      {req.problemDescription}
-                    </p>
-                  </div>
-                </div>
+                <div className="request-body"><h3>{req.topic}</h3><p className="request-description">{req.problemDescription}</p>{req.respondedAt && <span className="workspace-caption">{req.status === "REJECTED" ? "Declined" : "Accepted"} on {new Date(req.respondedAt).toLocaleDateString()}</span>}</div>
 
                 {/* Unlocked Contact Box: preserved for ACCEPTED, COMPLETED, and REVIEWED for learner */}
                 {!isPeer &&
@@ -322,7 +332,7 @@ export default function DashboardView({
                     <div className="rounded-xl border border-accent/25 bg-accent/10 p-4 space-y-3">
                       <div className="flex items-center gap-2 text-xs font-bold text-accent">
                         <CheckCircle2 className="w-4 h-4 text-accent shrink-0" aria-hidden="true" />
-                        <span>Peer Helper Contact Details</span>
+                        <span>Your helper’s contact</span>
                       </div>
 
                       {req.unlockedContact.unavailable ? (
@@ -445,10 +455,10 @@ export default function DashboardView({
                     <div className="flex items-center justify-between gap-2 border-b border-line pb-2">
                       <div>
                         <h3 className="text-xs font-bold text-ink">
-                          Rate &amp; Review Your Study Session
+                          How was your session?
                         </h3>
                         <p className="text-[11px] text-muted">
-                          Share your honest feedback. Ratings directly update peer helper aggregates.
+                          Help other students understand what the session was like.
                         </p>
                       </div>
                       {reviewingId !== req.id && (
@@ -594,6 +604,7 @@ export default function DashboardView({
 
                   {/* Permitted Actions */}
                   <div className="flex items-center gap-2 flex-wrap">
+                    {["REJECTED","CANCELLED","COMPLETED","REVIEWED"].includes(req.status) && <button type="button" disabled={isPending} onClick={() => handleArchive(req.id)} className="workspace-text-button">{archivedView ? <ArchiveRestore size={16} /> : <Archive size={16} />}{archivedView ? "Restore request" : "Archive request"}</button>}
                     {/* Incoming Actions: Peer accepts or declines PENDING request */}
                     {isPeer && req.status === "PENDING" && (
                       <>
@@ -685,7 +696,7 @@ export default function DashboardView({
                 <Link
                   href={`/dashboard?tab=${activeTab}&incomingPage=${
                     activeTab === "incoming" ? currentList.page - 1 : incomingPage
-                  }&outgoingPage=${activeTab === "outgoing" ? currentList.page - 1 : outgoingPage}`}
+                  }&outgoingPage=${activeTab === "outgoing" ? currentList.page - 1 : outgoingPage}${filterSuffix}`}
                   className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-edge bg-surface text-xs font-semibold text-body hover:bg-panel transition-colors"
                 >
                   <ChevronLeft className="w-4 h-4" aria-hidden="true" />
@@ -706,7 +717,7 @@ export default function DashboardView({
                 <Link
                   href={`/dashboard?tab=${activeTab}&incomingPage=${
                     activeTab === "incoming" ? currentList.page + 1 : incomingPage
-                  }&outgoingPage=${activeTab === "outgoing" ? currentList.page + 1 : outgoingPage}`}
+                  }&outgoingPage=${activeTab === "outgoing" ? currentList.page + 1 : outgoingPage}${filterSuffix}`}
                   className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-edge bg-surface text-xs font-semibold text-body hover:bg-panel transition-colors"
                 >
                   Next
@@ -733,17 +744,17 @@ export default function DashboardView({
           </div>
           <div className="max-w-md mx-auto space-y-1.5">
             <h2 className="text-base font-semibold text-ink">
-              {activeTab === "incoming"
+              {archivedView ? "No archived requests" : statusFilter !== "all" ? "No requests with this status" : activeTab === "incoming"
                 ? "No incoming study requests yet"
                 : "You haven't sent any study requests yet"}
             </h2>
             <p className="text-xs text-muted leading-relaxed">
-              {activeTab === "incoming"
+              {archivedView || statusFilter !== "all" ? "Choose another status or return to your current requests." : activeTab === "incoming"
                 ? "When classmates and peers need assistance with your listed subjects, their requests will appear here."
                 : "Browse the peer directory to find students offering coursework help in your courses."}
             </p>
           </div>
-          {activeTab === "outgoing" && (
+          {activeTab === "outgoing" && !archivedView && statusFilter === "all" && (
             <div className="pt-2">
               <Link
                 href="/peers"

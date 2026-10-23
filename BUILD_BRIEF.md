@@ -29,7 +29,7 @@ Include basic reporting of a peer/resource by signed-in users; store reports for
 - One public marketing landing with Features, How it works and Resources sections. CTAs go to login, then dashboard.
 - Signed-in peer search/list with filters and member-visible peer details.
 - Signed-in resources hub with searchable topic resource links.
-- Google sign-in and onboarding/profile settings.
+- Google sign-in and onboarding/profile settings, including editable name and profile photo.
 - Authenticated dashboard: incoming/outgoing requests, status, accept/reject/cancel, authorized contact, completion confirmations and review form.
 - Manage own resources and profile.
 - Minimal moderation page for configured admin emails if implemented.
@@ -42,7 +42,7 @@ Provide `.env.example` with MONGODB_URI, AUTH_SECRET, AUTH_GOOGLE_ID, AUTH_GOOGL
 
 ## Excluded
 
-AI helper, payments, full chat, video calling, maps/live location, subscription tiers, file upload. Paid is a profile preference only. Google OAuth setup and external production deployment depend on owner accounts; do not claim those have been verified without credentials.
+AI helper, payments, full chat, video calling, maps/live location, subscription tiers, resource file upload. Profile-photo uploads are supported separately, with validation and a bounded private avatar endpoint. Paid is a profile preference only. Google OAuth setup and external production deployment depend on owner accounts; do not claim those have been verified without credentials.
 
 ## Verification and handoff
 

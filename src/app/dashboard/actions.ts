@@ -665,3 +665,25 @@ export async function submitStudyRequestReview(rawInput: unknown): Promise<Reque
     };
   }
 }
+
+/** Archive only the caller's finished request view; preserve the other participant's record. */
+export async function archiveStudyRequest(rawInput: unknown): Promise<RequestActionResult> {
+  let context;
+  try { context = await requireAuth(); }
+  catch { return { success: false, message: "Sign in to manage your request history." }; }
+  if (!rawInput || typeof rawInput !== "object") return { success: false, message: "Invalid request." };
+  const { requestId, archive } = rawInput as Record<string, unknown>;
+  if (typeof requestId !== "string" || !/^[a-f\d]{24}$/i.test(requestId) || typeof archive !== "boolean") return { success: false, message: "Invalid request." };
+  try {
+    const limited = await checkRateLimit(`request_archive:${context.user._id}`, 20, 60000);
+    if (!limited.allowed) return { success: false, message: "Please wait a minute before changing your history again." };
+    const updated = await StudyRequest.findOneAndUpdate({
+      _id: requestId,
+      $or: [{ learner: context.user._id }, { peer: context.user._id }],
+      status: { $in: ["REJECTED", "CANCELLED", "COMPLETED", "REVIEWED"] },
+    }, archive ? { $addToSet: { archivedBy: context.user._id } } : { $pull: { archivedBy: context.user._id } }, { returnDocument: "after" });
+    if (!updated) return { success: false, message: "Only participants can archive finished requests. Cancel a pending request or complete the session first." };
+    try { revalidatePath("/dashboard"); } catch { /* outside Next request */ }
+    return { success: true, message: archive ? "Request archived from your list." : "Request restored to your list." };
+  } catch { return { success: false, message: "We couldn’t update your history. Please try again." }; }
+}

@@ -76,7 +76,7 @@ This is a **Next.js Node application**, not a static export. It requires a serve
 - Reports and `/admin/reports` with reversible moderation.
 - Server validation, private/public DTO separation and database-backed write throttling.
 
-No payment processing, hosted calls, file uploads, email delivery or AI answers. A paid preference is informational; users arrange any terms directly. Use public campus spaces for physical sessions. Dashboard updates appear after actions or refresh; there are no email/push notifications.
+No payment processing, hosted calls, resource file uploads, email delivery or AI answers. A paid preference is informational; users arrange any terms directly. Use public campus spaces for physical sessions. Dashboard updates appear after actions or refresh; there are no email/push notifications.
 
 ## Visual design and entry flow
 
@@ -172,3 +172,22 @@ This opt-in command loads your ignored environment file and runs the configured 
 - Search loads all matching candidates to rank before pagination. Returned pages are bounded; candidate memory is not. Move ranking into MongoDB before a large rollout.
 - Free services have quotas/shared capacity and backup limitations. Establish backups and support before relying on the app for real users.
 - Dependency auditing flags an unpatched `braces` advisory through development-only ESLint glob tooling. User input never reaches that tooling. See [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm). Do not downgrade Next.js or force incompatible packages to silence it.
+
+
+## Account settings and request history
+
+The header settings control opens your profile, sent/received requests, archives,
+shared resources and logout. `/settings` contains the profile editor, private
+account information and photo controls; `/profile` remains available too. Edited
+names and photos update the workspace and remain saved across future sign-ins.
+
+Photos support still JPG/PNG/WebP files up to 2 MB. They are validated on the server,
+resized to 256×256 JPEG, stripped of metadata and stored in MongoDB. No separate
+storage service or new environment key is needed. Image bytes are excluded from
+normal user queries; `/api/avatars/[id]` requires an active member account.
+
+Dashboard status filters apply before pagination. Cancel a pending sent request;
+archive a finished request to remove it from your current list. Archiving is
+personal and reversible, and does not remove the other participant's record.
+
+See `DASHBOARD_DESIGN_REVIEW.md` for the visual audit and its implemented corrections.

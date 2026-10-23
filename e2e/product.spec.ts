@@ -238,6 +238,7 @@ test("workspace footer is absent and logout requires confirmation on desktop and
       await expect(page.locator("footer.site-footer")).toHaveCount(0);
     }
     await page.goto("/dashboard");
+    await page.getByRole("button", { name: "Open account settings", exact: true }).click();
     const trigger = page.getByRole("button", { name: "Sign out of Peerly", exact: true });
     await trigger.click();
     const confirmation = page.getByRole("alertdialog", { name: "Log out of Peerly?" });

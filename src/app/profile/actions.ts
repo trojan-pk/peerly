@@ -99,6 +99,8 @@ export async function updateProfile(rawInput: unknown): Promise<ProfileActionSta
 
     try {
       revalidatePath("/profile");
+      revalidatePath("/settings");
+      revalidatePath("/dashboard");
       revalidatePath("/peers");
       revalidatePath("/");
     } catch {

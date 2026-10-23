@@ -28,6 +28,7 @@ export interface IStudyRequestDocument extends Document {
   learnerConfirmedAt?: Date | null;
   peerConfirmedAt?: Date | null;
   review?: IStudyRequestReview | null;
+  archivedBy?: Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -103,6 +104,7 @@ const StudyRequestSchema = new Schema<IStudyRequestDocument>(
       default: "PENDING",
       index: true,
     },
+    archivedBy: { type: [Schema.Types.ObjectId], ref: "User", default: [], select: false },
     respondedAt: {
       type: Date,
       default: null,

@@ -47,16 +47,16 @@ export default async function ResourcesPage(props: ResourcesPageProps) {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 py-6">
+    <div className="workspace-page resources-page max-w-5xl mx-auto space-y-8 py-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-line/80 pb-6">
         <div>
           <div className="inline-flex items-center gap-2 text-xs font-semibold text-accent mb-1">
             <BookOpen className="w-4 h-4" aria-hidden="true" />
-            <span>Academic Knowledge Share</span>
+            <span>YOUR STUDY LIBRARY</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-ink">
-            Study Resources &amp; Notes
+            Resource library
           </h1>
           <p className="text-xs sm:text-sm text-muted mt-0.5">
             Peer-shared lecture notes, problem sets, and study guides across university courses.

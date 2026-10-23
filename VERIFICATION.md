@@ -210,3 +210,39 @@ to the current pathname.
 Final production build/TypeScript and ESLint passed. All three relevant browser
 checks passed after these corrections. Desktop and 375px mobile warning-dialog
 screenshots were visually reviewed against the dark workspace styling.
+
+## Settings, profile photos and request-history design pass
+
+Removed the dashboard's signed-in email/role line and the resource manager's
+identity banner. A desktop/mobile account settings control now groups profile,
+request history, archives, resource management and confirmed logout. `/settings`
+reuses the existing complete profile editor; names are refreshed from the database
+in the header/dashboard. Settings include real photo upload/removal. Photos are
+validated, bounded, re-encoded as 256×256 JPEG with source metadata removed, and
+served through a signed-in endpoint. Photo bytes are excluded from ordinary queries.
+Explicit photo removal and edited names are preserved on later Google sign-ins.
+
+Request status filtering occurs in MongoDB before pagination. Finished requests
+support per-participant archive/restore, with cancellation retained for pending
+sent requests. A participant cannot archive another user's view or silently hide
+an ongoing accepted session. The other participant's record, eligible contact and
+review data remain intact. Outgoing responses now include the response timestamp.
+
+See `DASHBOARD_DESIGN_REVIEW.md` for the detailed visual critique. Resource inputs
+now have a single inward focus boundary instead of a ring plus offset outline.
+Observed production computed styles: outline offset `-2px`, box shadow `none`.
+The editor no longer repeats an empty-state card while creating a resource.
+Dashboard question text, headings, copy and request/status controls were refined.
+
+Validation: 191 unit/integration tests passed, along with TypeScript/production
+build and ESLint. All existing seven browser scenarios passed. The new account
+scenario initially used an unsuitable exact label-text locator for the status
+select; using its accessible combobox role corrected the test. The focused rerun
+passed both account/history and logout scenarios, exercising name persistence,
+actual avatar upload/HTTP retrieval/removal, unauthenticated avatar denial,
+request filtering/cancellation/archive/restore, responsive widths and mobile menu.
+Desktop resource focus, settings and mobile account-menu screenshots were reviewed.
+Browser fixtures used a temporary test database; the owner's data was not seeded.
+
+No pause control is present in the current source. The owner's unfinished pause
+reference remains an optional clarification about which other control they mean.

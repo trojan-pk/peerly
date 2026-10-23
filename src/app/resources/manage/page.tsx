@@ -89,7 +89,7 @@ export default async function ManageResourcesPage(props: ManageResourcesPageProp
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 py-6">
+    <div className="workspace-page resources-page max-w-4xl mx-auto space-y-6 py-6">
       {/* Back Link */}
       <div>
         <Link
@@ -112,7 +112,7 @@ export default async function ManageResourcesPage(props: ManageResourcesPageProp
             My Study Resources
           </h1>
           <p className="text-xs text-muted mt-0.5">
-            Signed in as {session.user.email}
+            Keep your shared notes, guides and practice links organised.
           </p>
         </div>
       </div>

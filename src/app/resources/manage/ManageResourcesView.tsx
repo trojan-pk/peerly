@@ -217,25 +217,16 @@ export default function ManageResourcesView({
         </div>
       )}
 
-      {/* Sharing Responsibility Reminder */}
-      <div className="rounded-xl border border-line bg-panel/80 p-4 flex items-start gap-3 text-xs text-muted">
-        <ShieldAlert className="w-4 h-4 text-accent shrink-0 mt-0.5" aria-hidden="true" />
-        <div className="space-y-0.5">
-          <p className="font-semibold text-ink">Contributor Guidelines</p>
-          <p className="leading-relaxed">
-            Only share study materials, guides, and notes that you authored or have explicit rights to publish. Links must use safe HTTP/HTTPS protocols. Embedded passwords and file uploads are prohibited.
-          </p>
-        </div>
-      </div>
+      <p className="resource-sharing-note"><ShieldAlert size={16} aria-hidden="true" />Share links to material you created or have permission to share.</p>
 
       {/* Action Bar */}
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="text-base font-bold text-ink">
-            Your Published Resources ({resources.length})
+            Published resources ({pagination?.totalCount ?? resources.length})
           </h2>
           <p className="text-xs text-muted">
-            Manage, edit, or publish study links visible across the public directory.
+            Manage, edit, or publish study links available to other Peerly members.
           </p>
         </div>
 
@@ -259,7 +250,7 @@ export default function ManageResourcesView({
       {showCreateForm && (
         <form
           onSubmit={handleCreateSubmit}
-          className="rounded-2xl border border-accent/25 bg-surface p-6 space-y-4 shadow-sm"
+          className="resource-editor rounded-2xl border border-line bg-surface p-6 space-y-5"
         >
           <div className="border-b border-line pb-3">
             <h3 className="text-sm font-bold text-ink">Publish a New Study Resource</h3>
@@ -313,7 +304,7 @@ export default function ManageResourcesView({
           {/* URL */}
           <div className="space-y-1">
             <label htmlFor="create-url" className="block text-xs font-semibold text-body">
-              Resource Web URL (HTTP/HTTPS) <span className="text-danger">*</span>
+              Resource link <span className="text-danger">*</span>
             </label>
             <input
               id="create-url"
@@ -326,7 +317,7 @@ export default function ManageResourcesView({
               className="w-full text-xs rounded-xl border border-edge p-2.5 text-ink focus:outline-none focus:ring-2 focus:ring-accent"
             />
             <p className="text-[11px] text-faint">
-              Must be a valid HTTP or HTTPS URL with a valid domain. Embedded credentials are not allowed.
+              Paste a link students can open, such as Google Docs or a course website.
             </p>
             {fieldErrors.url && (
               <p className="text-[11px] text-danger">{fieldErrors.url}</p>
@@ -435,7 +426,7 @@ export default function ManageResourcesView({
 
           <div className="space-y-1">
             <label htmlFor="edit-url" className="block text-xs font-semibold text-body">
-              Resource Web URL (HTTP/HTTPS) <span className="text-danger">*</span>
+              Resource link <span className="text-danger">*</span>
             </label>
             <input
               id="edit-url"
@@ -561,7 +552,7 @@ export default function ManageResourcesView({
                     <p className="text-[11px] text-warning leading-relaxed">
                       This study resource was hidden by a platform moderator
                       {res.moderation.reason ? `: "${res.moderation.reason}"` : "."}
-                      It remains visible in your management area, but is excluded from the public directory.
+                      It remains visible in your management area, but is excluded from the resource library.
                     </p>
                   </div>
                 </div>
@@ -600,7 +591,7 @@ export default function ManageResourcesView({
                     </span>
                   </div>
                   <p className="text-xs text-danger leading-relaxed">
-                    Are you sure you want to delete this study resource? This action cannot be undone and will immediately remove the resource from the public directory.
+                    Are you sure you want to delete this study resource? This action cannot be undone and will immediately remove the resource from the resource library.
                   </p>
                   <div className="flex items-center justify-end gap-2 pt-1">
                     <button
@@ -669,7 +660,7 @@ export default function ManageResourcesView({
           </nav>
         )}
         </>
-      ) : (
+      ) : !showCreateForm ? (
         /* Empty State */
         <div className="rounded-2xl border border-line/80 bg-surface p-8 sm:p-12 text-center space-y-4">
           <div className="w-12 h-12 rounded-xl bg-raised text-muted flex items-center justify-center mx-auto">
@@ -680,7 +671,7 @@ export default function ManageResourcesView({
               You haven&apos;t published any study resources yet
             </h3>
             <p className="text-xs text-muted leading-relaxed">
-              Publishing study notes, lecture outlines, and problem sets makes it easy for other students to find helpful material and discover your peer tutoring services.
+              Share a useful explanation, worksheet or guide with other students.
             </p>
           </div>
           {!showCreateForm && (
@@ -696,7 +687,7 @@ export default function ManageResourcesView({
             </div>
           )}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

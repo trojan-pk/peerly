@@ -3,6 +3,7 @@
 import { safeAction } from "@/lib/client-action";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { updateProfile, ProfileActionState } from "./actions";
 import {
   CheckCircle2,
@@ -37,6 +38,7 @@ interface ProfileFormProps {
 }
 
 export default function ProfileForm({ initialData }: ProfileFormProps) {
+  const router = useRouter();
   const [formData, setFormData] = useState<ProfileFormData>(initialData);
   const [topicsInput, setTopicsInput] = useState<string>(initialData.topics.join(", "));
   const [subjectsInput, setSubjectsInput] = useState<string>(initialData.subjects.join(", "));
@@ -78,6 +80,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
     startTransition(async () => {
       const res = await safeAction(() => updateProfile(payload));
       setResultState(res);
+      if (res.success) router.refresh();
       if (res.success && typeof res.isComplete === "boolean") {
         setFormData((prev) => ({
           ...prev,
@@ -157,7 +160,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
       {/* Section 1: Academic & Basic Identity */}
       <fieldset className="rounded-2xl border border-line/90 bg-surface p-6 sm:p-7 space-y-5 shadow-xs">
         <legend className="text-base font-bold text-ink px-1">
-          Academic Identity
+          About you
         </legend>
         <p className="text-xs text-muted -mt-3">
           Information shared with classmates and peers looking for study help.
@@ -256,7 +259,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
       {/* Section 2: Study Help Topics & Availability */}
       <fieldset className="rounded-2xl border border-line/90 bg-surface p-6 sm:p-7 space-y-5 shadow-xs">
         <legend className="text-base font-bold text-ink px-1">
-          Topics, Subjects &amp; Availability
+          Study preferences
         </legend>
         <p className="text-xs text-muted -mt-3">
           Tell fellow students where you can offer help and when you are free.
@@ -264,7 +267,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
 
         <div className="space-y-1.5">
           <label htmlFor="topics" className="block text-xs font-semibold text-ink">
-            Topics (comma-separated) <span className="text-accent">*</span>
+            Topics you can help with <span className="text-accent">*</span>
           </label>
           <input
             type="text"
@@ -283,7 +286,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
 
         <div className="space-y-1.5">
           <label htmlFor="subjects" className="block text-xs font-semibold text-ink">
-            Broader Subjects or Courses (comma-separated)
+            Subjects
           </label>
           <input
             type="text"
@@ -442,7 +445,7 @@ export default function ProfileForm({ initialData }: ProfileFormProps) {
 
           <div className="space-y-1.5">
             <label htmlFor="meetingLink" className="block text-xs font-semibold text-ink">
-              Personal Meeting Link (HTTP/HTTPS)
+              Meeting link
             </label>
             <input
               type="url"

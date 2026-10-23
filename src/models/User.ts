@@ -23,6 +23,8 @@ export interface IUserDocument extends Document {
   email: string;
   name: string;
   image: string;
+  avatarData?: Buffer | null;
+  avatarUpdated?: boolean;
   role: UserRole;
   bio: string;
   university: string;
@@ -93,6 +95,8 @@ const UserSchema = new Schema<IUserDocument>(
       type: String,
       default: "",
     },
+    avatarData: { type: Buffer, default: null, select: false },
+    avatarUpdated: { type: Boolean, default: false },
     role: {
       type: String,
       enum: ["student", "admin"],

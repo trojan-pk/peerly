@@ -1,10 +1,12 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/auth";
+import { getCurrentDbUser } from "@/lib/auth-guards";
+import type { RequestStatus } from "@/models/StudyRequest";
 import { isDatabaseConfigured } from "@/lib/db";
 import { getDashboardRequests } from "@/lib/study-requests";
 import DashboardView from "./DashboardView";
-import { LayoutDashboard, User, AlertTriangle, BookOpen } from "lucide-react";
+import { LayoutDashboard, Settings, AlertTriangle, BookOpen } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +15,8 @@ interface DashboardPageProps {
     tab?: string;
     incomingPage?: string;
     outgoingPage?: string;
+    status?: string;
+    view?: string;
   }>;
 }
 
@@ -46,18 +50,22 @@ export default async function DashboardPage(props: DashboardPageProps) {
   const incomingPage = parseInt(searchParams.incomingPage || "1", 10) || 1;
   const outgoingPage = parseInt(searchParams.outgoingPage || "1", 10) || 1;
 
+  const validStatuses = ["PENDING", "ACCEPTED", "REJECTED", "CANCELLED", "COMPLETED", "REVIEWED"];
+  const status = validStatuses.includes(searchParams.status || "") ? searchParams.status as RequestStatus : undefined;
+  const archivedView = searchParams.view === "archived";
+  const context = await getCurrentDbUser();
   let requestsData = null;
   let dbError = false;
 
   try {
-    requestsData = await getDashboardRequests(incomingPage, outgoingPage);
+    requestsData = await getDashboardRequests(incomingPage, outgoingPage, 10, { status, archived: archivedView });
   } catch (err) {
     console.error("[DashboardPage] Error loading study requests:", err);
     dbError = true;
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 py-6">
+    <div className="workspace-page dashboard-page max-w-5xl mx-auto space-y-8 py-8">
       {/* Dashboard Header */}
       <div className="border-b border-line/80 pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -66,12 +74,9 @@ export default async function DashboardPage(props: DashboardPageProps) {
             <span>Student Workspace</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-ink">
-            Welcome back, {session.user.name || "Student"}
+            Your study workspace
           </h1>
-          <p className="text-xs text-muted mt-0.5">
-            Signed in as {session.user.email} • Role:{" "}
-            <span className="font-medium capitalize">{session.user.role || "student"}</span>
-          </p>
+          <p className="text-sm text-muted mt-2">{context?.user.name ? `${context.user.name}, track` : "Track"} your requests, responses and completed sessions.</p>
         </div>
 
         <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
@@ -83,11 +88,11 @@ export default async function DashboardPage(props: DashboardPageProps) {
             <span>My Resources</span>
           </Link>
           <Link
-            href="/profile"
+            href="/settings"
             className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-edge hover:bg-panel text-ink text-xs font-semibold transition-colors min-h-[40px]"
           >
-            <User className="w-3.5 h-3.5 text-muted" aria-hidden="true" />
-            <span>Edit Profile</span>
+            <Settings className="w-3.5 h-3.5 text-muted" aria-hidden="true" />
+            <span>Settings</span>
           </Link>
         </div>
       </div>
@@ -117,6 +122,9 @@ export default async function DashboardPage(props: DashboardPageProps) {
         </div>
       ) : requestsData ? (
         <DashboardView
+          key={`${tab}-${status || "all"}-${archivedView}-${incomingPage}-${outgoingPage}`}
+          statusFilter={status || "all"}
+          archivedView={archivedView}
           incoming={requestsData.incoming}
           outgoing={requestsData.outgoing}
           initialTab={tab}

@@ -1,9 +1,11 @@
+import { AvatarEditor } from "@/components/AvatarEditor";
+import { LogoutButton } from "@/components/LogoutButton";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/auth";
 import { isDatabaseConfigured, connectToDatabase } from "@/lib/db";
 import { User } from "@/models/User";
-import { Mail, Shield, AlertTriangle, AlertCircle } from "lucide-react";
+import { Mail, AlertTriangle, AlertCircle, Send, Inbox, Archive, BookOpen, LogOut } from "lucide-react";
 import ProfileForm, { ProfileFormData } from "./ProfileForm";
 import { LearningMode, PricingPreference, ContactMethod } from "@/types/user";
 
@@ -84,7 +86,6 @@ export default async function ProfilePage() {
 
   const name = dbUser?.name || session.user.name || "Student";
   const email = dbUser?.email || session.user.email || "";
-  const role = dbUser?.role || session.user.role || "student";
 
   const initialFormData: ProfileFormData = {
     name: dbUser?.name || session.user.name || "",
@@ -105,54 +106,27 @@ export default async function ProfilePage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8 py-6">
+    <div className="workspace-page settings-page max-w-4xl mx-auto space-y-8 py-8">
       <div className="border-b border-line/80 pb-6">
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-ink">
-          Your Profile &amp; Settings
+          Profile &amp; settings
         </h1>
         <p className="text-sm text-muted mt-1">
-          Manage your peer helper information, topics of expertise, and private contact preferences.
+          Your name, photo, study preferences and private contact details.
         </p>
       </div>
 
-      {/* Account Overview Header */}
-      <div className="bg-surface rounded-2xl border border-line/90 p-6 sm:p-7 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            {session.user.image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={session.user.image}
-                alt=""
-                className="w-14 h-14 rounded-full object-cover border border-line"
-                aria-hidden="true"
-              />
-            ) : (
-              <div className="w-14 h-14 rounded-full bg-accent/15 text-accent flex items-center justify-center font-bold text-lg">
-                {name[0]?.toUpperCase() || "S"}
-              </div>
-            )}
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <h2 className="text-base font-bold text-ink">{name}</h2>
-                <span className="px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider bg-raised text-body">
-                  {role}
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5 text-xs text-muted">
-                <Mail className="w-3.5 h-3.5" aria-hidden="true" />
-                <span>{email}</span>
-                <span className="text-accent font-medium">(Private identity)</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 text-xs text-muted sm:text-right">
-            <Shield className="w-4 h-4 text-accent shrink-0" aria-hidden="true" />
-            <span>Google Account Authenticated</span>
-          </div>
-        </div>
-      </div>
+      <nav className="settings-shortcuts" aria-label="Your account activity">
+        <Link href="/dashboard?tab=outgoing"><Send size={17} />Sent requests</Link>
+        <Link href="/dashboard?tab=incoming"><Inbox size={17} />Received requests</Link>
+        <Link href="/dashboard?tab=outgoing&view=archived"><Archive size={17} />Archived</Link>
+        <Link href="/resources/manage"><BookOpen size={17} />My resources</Link>
+      </nav>
+      <section className="settings-account" aria-labelledby="account-title">
+        <div className="settings-section-heading"><div><h2 id="account-title">Your account</h2><p>Your photo and name appear on your peer profile.</p></div><LogoutButton className="workspace-secondary-button"><LogOut size={16} />Log out</LogoutButton></div>
+        <AvatarEditor image={dbUser.image || ""} name={name} />
+        <div className="settings-identity"><strong>{name}</strong><span><Mail size={15} />{email}<small>Private sign-in email</small></span></div>
+      </section>
 
       {/* Profile Form */}
       <ProfileForm initialData={initialFormData} />

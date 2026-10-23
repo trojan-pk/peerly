@@ -89,7 +89,7 @@ export async function authSignInCallback({
       if (!userByGoogleId.name && user.name) {
         userByGoogleId.name = user.name.trim();
       }
-      if (user.image && !userByGoogleId.image) {
+      if (user.image && !userByGoogleId.image && !userByGoogleId.avatarUpdated) {
         userByGoogleId.image = user.image;
       }
       userByGoogleId.role = isAdmin ? "admin" : "student";
@@ -100,7 +100,7 @@ export async function authSignInCallback({
       if (!userByEmail.name && user.name) {
         userByEmail.name = user.name.trim();
       }
-      if (user.image && !userByEmail.image) {
+      if (user.image && !userByEmail.image && !userByEmail.avatarUpdated) {
         userByEmail.image = user.image;
       }
       userByEmail.role = isAdmin ? "admin" : "student";

@@ -165,7 +165,8 @@ export async function getAuthorizedRequestContact(
 export async function getDashboardRequests(
   incomingPage = 1,
   outgoingPage = 1,
-  pageSize = 10
+  pageSize = 10,
+  options: { status?: RequestStatus; archived?: boolean } = {}
 ): Promise<DashboardRequestsResult> {
   const authContext = await requireAuth();
   const userObjectId = authContext.user._id as mongoose.Types.ObjectId;
@@ -186,13 +187,18 @@ export async function getDashboardRequests(
   const parsedOutgoing = typeof outgoingPage === "number" ? outgoingPage : parseInt(String(outgoingPage || "1"), 10);
   const safeOutgoing = Math.max(1, Math.min(isNaN(parsedOutgoing) ? 1 : parsedOutgoing, 10000));
 
+  const allowedStatuses = ["PENDING", "ACCEPTED", "REJECTED", "CANCELLED", "COMPLETED", "REVIEWED"];
+  const filters = {
+    archivedBy: options.archived ? userObjectId : { $ne: userObjectId },
+    ...(options.status && allowedStatuses.includes(options.status) ? { status: options.status } : {}),
+  };
   // 1. Fetch incoming requests (current user is peer) with stable sort & _id tie-breaker
-  const incomingTotal = await StudyRequest.countDocuments({ peer: userObjectId });
+  const incomingTotal = await StudyRequest.countDocuments({ peer: userObjectId, ...filters });
   const incomingTotalPages = Math.max(1, Math.ceil(incomingTotal / boundedPageSize));
   const validIncomingPage = Math.min(safeIncoming, incomingTotalPages);
   const incomingSkip = (validIncomingPage - 1) * boundedPageSize;
 
-  const rawIncoming = await StudyRequest.find({ peer: userObjectId })
+  const rawIncoming = await StudyRequest.find({ peer: userObjectId, ...filters })
     .populate("learner", "name image university")
     .sort({ createdAt: -1, _id: -1 })
     .skip(incomingSkip)
@@ -200,12 +206,12 @@ export async function getDashboardRequests(
     .lean();
 
   // 2. Fetch outgoing requests (current user is learner) with stable sort & _id tie-breaker
-  const outgoingTotal = await StudyRequest.countDocuments({ learner: userObjectId });
+  const outgoingTotal = await StudyRequest.countDocuments({ learner: userObjectId, ...filters });
   const outgoingTotalPages = Math.max(1, Math.ceil(outgoingTotal / boundedPageSize));
   const validOutgoingPage = Math.min(safeOutgoing, outgoingTotalPages);
   const outgoingSkip = (validOutgoingPage - 1) * boundedPageSize;
 
-  const rawOutgoing = await StudyRequest.find({ learner: userObjectId })
+  const rawOutgoing = await StudyRequest.find({ learner: userObjectId, ...filters })
     .populate("peer", "name image university")
     .sort({ createdAt: -1, _id: -1 })
     .skip(outgoingSkip)
@@ -272,6 +278,7 @@ export async function getDashboardRequests(
         problemDescription: req.problemDescription,
         mode: req.mode,
         status: req.status,
+        respondedAt: req.respondedAt ? new Date(req.respondedAt).toISOString() : null,
         learnerConfirmedAt: req.learnerConfirmedAt ? new Date(req.learnerConfirmedAt).toISOString() : null,
         peerConfirmedAt: req.peerConfirmedAt ? new Date(req.peerConfirmedAt).toISOString() : null,
         review: req.review

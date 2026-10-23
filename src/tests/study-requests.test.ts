@@ -1,9 +1,10 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from "vitest";
 import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
-import { StudyRequest } from "@/models/StudyRequest";
+import { StudyRequest, type RequestStatus } from "@/models/StudyRequest";
 import { User } from "@/models/User";
 import {
+  archiveStudyRequest,
   createStudyRequest,
   transitionStudyRequest,
   confirmStudyRequestCompletion,
@@ -103,6 +104,42 @@ describe("Study Requests, Atomic Completion, Reviews & Rate Limiter (MongoDB Int
       subjects: ["Science"],
       mode: "online",
       availability: "Mornings",
+    });
+  });
+
+  describe("Personal request history", () => {
+    async function record(status: RequestStatus = "CANCELLED", topic = "history") {
+      return StudyRequest.create({ learner: learnerUser._id, peer: peerUser._id, topic, normalizedTopic: topic, problemDescription: "A sufficiently detailed question about calculus.", mode: "online", status });
+    }
+    function asActor(user: any) { vi.spyOn(authGuards, "requireAuth").mockResolvedValue({ user, session: {} as any, isAdmin: false }); }
+    it("archives and restores only the caller's view while retaining the other participant's record", async () => {
+      const item = await record(); asActor(learnerUser);
+      expect((await archiveStudyRequest({ requestId: String(item._id), archive: true })).success).toBe(true);
+      expect((await getDashboardRequests()).outgoing.total).toBe(0);
+      expect((await getDashboardRequests(1,1,10,{ archived: true })).outgoing.total).toBe(1);
+      asActor(peerUser); expect((await getDashboardRequests()).incoming.total).toBe(1);
+      expect((await archiveStudyRequest({ requestId: String(item._id), archive: true })).success).toBe(true);
+      asActor(learnerUser);
+      expect((await archiveStudyRequest({ requestId: String(item._id), archive: false })).success).toBe(true);
+      expect((await getDashboardRequests()).outgoing.total).toBe(1);
+      asActor(peerUser); expect((await getDashboardRequests()).incoming.total).toBe(0);
+      expect(await StudyRequest.countDocuments()).toBe(1);
+    });
+    it("rejects an unrelated user's archive and restore attempts", async () => {
+      const item = await record(); asActor(thirdPartyUser);
+      for (const archive of [true,false]) expect((await archiveStudyRequest({ requestId: String(item._id), archive })).success).toBe(false);
+      expect((await StudyRequest.findById(item._id).select("+archivedBy"))!.archivedBy).toHaveLength(0);
+    });
+    it("keeps ongoing pending/accepted requests visible and rejects invalid IDs", async () => {
+      asActor(learnerUser);
+      for (const status of ["PENDING","ACCEPTED"] as const) { const item = await record(status,status); expect((await archiveStudyRequest({ requestId: String(item._id), archive: true })).success).toBe(false); }
+      expect((await archiveStudyRequest({ requestId: "not-an-id", archive: true })).success).toBe(false);
+      expect((await getDashboardRequests()).outgoing.total).toBe(2);
+    });
+    it("filters status on the server before pagination and counting", async () => {
+      asActor(learnerUser); await record("PENDING","first"); await record("PENDING","second"); await record("REJECTED","third");
+      const result = await getDashboardRequests(1,1,1,{ status: "PENDING" });
+      expect(result.outgoing.total).toBe(2); expect(result.outgoing.totalPages).toBe(2); expect(result.outgoing.items[0].status).toBe("PENDING");
     });
   });
 

@@ -46,9 +46,9 @@ export default function ResourceFilters({ availableTopics }: ResourceFiltersProp
   };
 
   return (
-    <div className="space-y-4 rounded-2xl border border-line/90 bg-surface p-5 shadow-xs">
+    <div className="resource-filters space-y-4 border-b border-line pb-6">
       {/* Search Input Form */}
-      <form onSubmit={handleSearchSubmit} className="flex gap-2">
+      <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-2">
         <div className="relative flex-1">
           <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-faint">
             <Search className="w-4 h-4" aria-hidden="true" />
@@ -57,7 +57,7 @@ export default function ResourceFilters({ availableTopics }: ResourceFiltersProp
             type="text"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search notes, problem sets, or study guides by title or topic..."
+            placeholder="Search by title or topic"
             className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-edge text-xs text-ink placeholder:text-faint focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent min-h-[44px]"
             aria-label="Search study resources"
           />

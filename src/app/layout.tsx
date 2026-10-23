@@ -51,7 +51,7 @@ async function DynamicNavbar() {
 
   return (
     <Navbar
-      user={session?.user}
+      user={session?.user ? { ...session.user, name: dbContext?.user.name ?? session.user.name, image: dbContext?.user.image ?? session.user.image } : undefined}
       isAdmin={dbContext?.isAdmin ?? false}
       isAuthConfigured={authStatus.isConfigured}
     />
