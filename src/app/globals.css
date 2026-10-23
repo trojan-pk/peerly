@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+:root {
+  --background: #FAF8F5;
+  --foreground: #1C1917;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  min-height: 100vh;
+}
+
+/* Accessible focus visible utility */
+:focus-visible {
+  outline: 2px solid #059669;
+  outline-offset: 2px;
+}
+
+/* Ensure smooth scrolling when jumping via skip-link */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Long topics and resource URLs must not widen mobile layouts. */
+main { overflow-wrap: anywhere; }
+button, input, textarea, select { font: inherit; }
+button:not(:disabled), a { -webkit-tap-highlight-color: transparent; }
+[role="dialog"] > div { max-height: 90dvh; overflow-y: auto; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

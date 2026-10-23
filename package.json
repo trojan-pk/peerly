@@ -1,0 +1,45 @@
+{
+  "name": "student-helper-platform",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "check": "npm run typecheck && npm test && npm run build",
+    "setup": "node scripts/setup-env.mjs",
+    "check:env": "node scripts/check-env.mjs",
+    "test:e2e:atlas": "node scripts/test-atlas.mjs"
+  },
+  "dependencies": {
+    "lucide-react": "^1.60.0",
+    "mongodb": "7.7.0",
+    "mongoose": "^9.11.2",
+    "next": "16.4.2",
+    "next-auth": "^5.0.0-beta.32",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@tailwindcss/turbopack": "^4",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.2",
+    "mongodb-memory-server": "^11.3.0",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vitest": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "type": "module"
+}
