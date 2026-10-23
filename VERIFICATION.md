@@ -167,3 +167,23 @@ absence of the pause control, no infinite animations, reduced motion, responsive
 widths 320/390/768/1024/1440 and login entry. Visual QA found and corrected a
 preview-logo sizing defect, a wrapping workflow number and uneven privacy-control
 labels on narrow screens. A final focused landing rerun covers the corrections.
+
+## Open Page brand rollout
+
+The owner selected the third logo concept, Open Page. Its two-page symbol and
+outlined lowercase wordmark now share editable geometry in `src/lib/brand.ts`.
+Header/footer lockups, the login mark and product illustrations use this identity.
+Colour and white SVG/transparent PNG exports are available in `public/brand/`;
+`scripts/build-brand.mjs` regenerates those and the browser/social assets.
+
+Verified the SVG icon, multi-frame 16/32/48px ICO, opaque 180px Apple icon and
+1200×630 Open Graph/Twitter images. The rendered page includes the icon tags,
+absolute social-image URLs, large-image Twitter card and image alt text.
+Icon and share-image URLs returned HTTP 200; social-image dimensions were decoded
+from the actual HTTP responses. Shared-image URLs use the configured auth origin.
+
+Production build (including TypeScript), ESLint and both relevant browser checks
+(public mobile routes/auth gates and the interactive single-page landing) passed.
+Desktop, mobile, footer and login screenshots were reviewed. Logo layout was checked
+at 320/390/768/1440px with no horizontal overflow or uncaught browser errors.
+External social-network cache/preview rendering was not tested against a public URL.

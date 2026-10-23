@@ -15,10 +15,33 @@ const manrope = localFont({
   weight: "200 800",
 });
 
+function metadataBase() {
+  try {
+    const configured = new URL(process.env.AUTH_URL || process.env.NEXTAUTH_URL || "http://localhost:3000");
+    if (["http:", "https:"].includes(configured.protocol)) return new URL(configured.origin);
+  } catch {
+    // Keep public pages available while local configuration is incomplete.
+  }
+  return new URL("http://localhost:3000");
+}
+
 export const metadata: Metadata = {
+  metadataBase: metadataBase(),
+  applicationName: "Peerly",
   title: "Peerly — Student Peer-Learning Platform",
   description:
     "Connect with fellow university students for subject-specific study help, exchange academic resources, and review completed study sessions.",
+  openGraph: {
+    type: "website",
+    siteName: "Peerly",
+    title: "Peerly — Study help from university peers",
+    description: "Find peers. Share resources. Learn together.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Peerly — Study help from university peers",
+    description: "Find peers. Share resources. Learn together.",
+  },
 };
 
 async function DynamicNavbar() {

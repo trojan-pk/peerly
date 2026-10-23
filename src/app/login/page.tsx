@@ -1,3 +1,4 @@
+import { BrandMark } from "@/components/BrandMark";
 import { auth } from "@/auth";
 import { loginWithGoogleAction, logoutAction } from "@/app/actions/auth";
 import { getAuthConfigStatus } from "@/lib/auth-config";
@@ -28,7 +29,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         {/* Header */}
         <div className="space-y-2 text-center">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-accent/10 text-accent mx-auto">
-            <KeyRound className="w-6 h-6" aria-hidden="true" />
+            <BrandMark className="w-8 h-8" />
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-ink">
             Sign in to Peerly

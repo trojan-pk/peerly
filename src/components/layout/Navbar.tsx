@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, ArrowUpRight, LogOut, UserRound } from "lucide-react";
 import { logoutAction } from "@/app/actions/auth";
-import { BrandMark } from "@/components/BrandMark";
+import { BrandMark, BrandWordmark } from "@/components/BrandMark";
 
 interface NavbarProps {
   user?: { id?: string; name?: string | null; email?: string | null; image?: string | null; role?: string } | null;
@@ -35,7 +35,7 @@ export function Navbar({ user, isAdmin = false }: NavbarProps) {
       <a href="#main-content" className="skip-link">Skip to main content</a>
       <header className={`site-header ${marketing ? "is-marketing" : ""}`} onKeyDown={event => { if (event.key === "Escape") { setIsMobileMenuOpen(false); document.getElementById("mobile-menu-toggle")?.focus(); } }}>
         <div className="nav-container">
-          <Link href="/" aria-label="Peerly Home" className="brand-lockup" onClick={() => setIsMobileMenuOpen(false)}><BrandMark className="brand-symbol" /><span>peerly<span className="brand-period">.</span></span></Link>
+          <Link href="/" aria-label="Peerly Home" className="brand-lockup" onClick={() => setIsMobileMenuOpen(false)}><BrandMark className="brand-symbol" /><BrandWordmark className="brand-wordmark" /></Link>
           <nav aria-label="Main Navigation" className="hidden xl:flex items-center gap-1">
             {links.map(link => <Link key={link.href} href={link.href} aria-current={isActive(link.href) ? "page" : undefined} className={`nav-link ${isActive(link.href) ? "active" : ""}`}>{link.label}</Link>)}
           </nav>

@@ -102,6 +102,24 @@ Illustrative profiles and resources are labelled examples, not real activity,
 testimonials or fabricated ratings. Resource examples show link types, not uploads.
 No third-party animation runtime or external font request is needed.
 
+## Open Page identity
+
+The approved Open Page symbol and outlined `peerly` wordmark appear in the header,
+footer, sign-in screen and product illustrations. UI components and exported
+artwork share the geometry in `src/lib/brand.ts`; the logo needs no font download.
+
+Reusable SVG and transparent PNG exports are in `public/brand/` (colour and white
+lockups, standalone symbol and wordmark). Regenerate them with:
+
+```bash
+node scripts/build-brand.mjs
+```
+
+The same script builds the SVG favicon, 16/32/48px ICO, 180px Apple touch icon and
+1200×630 Open Graph/Twitter images in `src/app/`. Next.js adds the metadata tags
+through its file conventions. Absolute share-image URLs use the origin of
+`AUTH_URL` (or `NEXTAUTH_URL`), with localhost as the development fallback.
+
 ## Important rules
 
 Requests move `PENDING → ACCEPTED → COMPLETED → REVIEWED`, or `PENDING → REJECTED / CANCELLED`. Only the helper accepts/rejects; the learner may cancel while pending. Both participants confirm completion; this is not independent attendance verification. Only that learner may submit one review.
