@@ -146,7 +146,7 @@ test("public mobile routes stay usable and signed-out visitors cannot open priva
   for (const route of ["/", "/peers", "/resources", "/login", "/dashboard", "/profile", "/resources/manage", "/admin/reports"]) {
     const response = await page.goto(route);
     expect(response?.status()).toBeLessThan(400);
-    if (route === "/admin/reports") await expect(page).toHaveURL(/\/login/);
+    if (!["/", "/login"].includes(route)) await expect(page).toHaveURL(/\/login/);
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth).catch(() => false)).toBe(true);
   }
   await page.goto("/");
@@ -155,31 +155,38 @@ test("public mobile routes stay usable and signed-out visitors cannot open priva
   expect(pageErrors).toEqual([]);
 });
 
-test("dark landing search, workflow keyboard controls and FAQs work on mobile and desktop", async ({ page }) => {
+test("one-page landing keeps sections together and gates the workspace behind login", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("searchbox", { name: "What do you want to understand?" }).fill("C++ Sorting");
-  await page.getByRole("button", { name: "Find a peer", exact: true }).click();
-  await expect(page).toHaveURL(/\/peers\?q=C%2B%2B\+Sorting/);
-  await expect(page.getByRole("heading", { name: "Hamza Helper", exact: true })).toBeVisible();
-  await expect(page.locator("main")).not.toContainText("+923001234567");
-
-  await page.goto("/");
+  const nav = page.getByRole("navigation", { name: "Main Navigation", exact: true });
+  for (const [label, hash] of [["Features", "features"], ["How it works", "how-it-works"], ["Resources", "resources"]]) {
+    await expect(nav.getByRole("link", { name: label, exact: true })).toHaveAttribute("href", `/#${hash}`);
+  }
+  await nav.getByRole("link", { name: "Resources", exact: true }).click();
+  await expect(page).toHaveURL(/\/#resources$/);
+  await expect(page.locator("#resources")).toBeVisible();
+  await page.locator(".deck-switcher").getByRole("button", { name: "Practice", exact: true }).click();
+  await expect(page.locator(".deck-practice")).toHaveClass(/is-front/);
+  await page.getByRole("tab", { name: "Mathematics", exact: true }).click();
+  await expect(page.locator("#subject-panel")).toContainText("Linear algebra");
   const connect = page.getByRole("tab", { name: /03 Connect on your terms/ });
   await connect.click();
-  await expect(page.getByRole("tabpanel")).toContainText("Contact unlocks privately");
+  await expect(page.locator("#workflow-panel")).toContainText("Contact unlocks privately");
   await connect.press("ArrowDown");
   await expect(page.getByRole("tab", { name: /04 Learn/ })).toBeFocused();
-  await expect(page.getByRole("tabpanel")).toContainText("Feedback opens after both confirmations");
-  const privacyQuestion = page.locator("summary", { hasText: "When are contact details shared?" });
-  await privacyQuestion.click();
-  await expect(privacyQuestion.locator("..")).toHaveAttribute("open", "");
-  await expect(privacyQuestion.locator("..")).toContainText("only after the helper accepts");
-
+  await expect(page.locator("#workflow-panel")).toContainText("Feedback opens after both confirmations");
+  const question = page.locator("summary", { hasText: "When are contact details shared?" });
+  await question.click();
+  await expect(question.locator("..")).toHaveAttribute("open", "");
+  await page.getByRole("button", { name: "Pause animations", exact: true }).click();
+  await expect(page.locator(".landing-v2")).toHaveAttribute("data-motion", "paused");
+  expect(await page.locator(".aurora-field > i").first().evaluate(el => getComputedStyle(el).animationPlayState)).toBe("paused");
+  await expect(page.locator('main a[href="/peers"], main a[href="/resources"]')).toHaveCount(0);
   await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
-  expect(await page.locator("html").evaluate(el => getComputedStyle(el).colorScheme)).toBe("dark");
-  expect(await page.locator(".connection-pulse").first().evaluate(el => parseFloat(getComputedStyle(el).animationDuration))).toBeLessThan(0.01);
+  expect(await page.locator(".aurora-field > i").first().evaluate(el => getComputedStyle(el).animationName)).toBe("none");
   for (const width of [320, 390, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   }
+  await page.getByRole("link", { name: "Find your study circle", exact: true }).first().click();
+  await expect(page).toHaveURL(/\/login$/);
 });

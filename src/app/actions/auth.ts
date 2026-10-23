@@ -10,7 +10,7 @@ export async function loginWithGoogleAction() {
     redirect("/login?error=ConfigurationRequired");
   }
 
-  await signIn("google", { redirectTo: "/" });
+  await signIn("google", { redirectTo: "/dashboard" });
 }
 
 export async function logoutAction() {

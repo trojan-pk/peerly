@@ -1,9 +1,10 @@
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/auth";
 import { isDatabaseConfigured } from "@/lib/db";
 import { getUserResources } from "@/lib/resources";
 import ManageResourcesView from "./ManageResourcesView";
-import { BookOpen, Lock, ArrowRight, ArrowLeft, AlertTriangle } from "lucide-react";
+import { BookOpen, ArrowLeft, AlertTriangle } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -18,32 +19,7 @@ export default async function ManageResourcesPage(props: ManageResourcesPageProp
   const page = searchParams.page || "1";
   const session = await auth();
 
-  if (!session?.user?.id) {
-    return (
-      <div className="max-w-xl mx-auto py-12 px-4">
-        <div className="rounded-2xl border border-line/90 bg-surface p-8 text-center space-y-4 shadow-xs">
-          <div className="w-12 h-12 rounded-xl bg-warning/10 text-warning flex items-center justify-center mx-auto">
-            <Lock className="w-6 h-6" aria-hidden="true" />
-          </div>
-          <div className="space-y-1">
-            <h1 className="text-xl font-bold text-ink">Sign in to Manage Resources</h1>
-            <p className="text-xs text-muted">
-              You must be signed in with your Google account to publish and manage your study resources.
-            </p>
-          </div>
-          <div className="pt-2">
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-action hover:bg-action-hover text-white text-xs font-semibold transition-colors min-h-[44px] focus-visible:ring-2 focus-visible:ring-accent"
-            >
-              Sign In with Google
-              <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (!session?.user?.id) redirect("/login");
 
   if (!isDatabaseConfigured()) {
     return (

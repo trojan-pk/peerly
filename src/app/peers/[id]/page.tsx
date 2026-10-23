@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import mongoose from "mongoose";
 import {
   ArrowLeft,
@@ -40,6 +40,7 @@ export default async function PeerDetailPage(props: PeerDetailPageProps) {
   const { id } = await props.params;
   const searchParams = props.searchParams ? await props.searchParams : {};
   const session = await auth();
+  if (!session?.user?.id) redirect("/login");
 
   // 1. Validate MongoDB ObjectId format
   if (!mongoose.Types.ObjectId.isValid(id)) {

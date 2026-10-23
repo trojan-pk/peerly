@@ -259,8 +259,13 @@ describe("Peer Discovery, Search Filters & Public Data Privacy", () => {
   describe("Peer Detail Page Outage vs 404 Distinction", () => {
     it("renders temporary error state on database outage and does not call notFound()", async () => {
       const notFoundSpy = vi.fn();
+      const redirectSpy = vi.fn();
       vi.doMock("next/navigation", () => ({
         notFound: notFoundSpy,
+        redirect: redirectSpy,
+      }));
+      vi.doMock("@/auth", () => ({
+        auth: vi.fn().mockResolvedValue({ user: { id: "507f1f77bcf86cd799439012" } }),
       }));
 
       // Simulate database failure
@@ -274,6 +279,7 @@ describe("Peer Discovery, Search Filters & Public Data Privacy", () => {
       });
 
       expect(notFoundSpy).not.toHaveBeenCalled();
+      expect(redirectSpy).not.toHaveBeenCalled();
 
       function extractText(node: any): string {
         if (!node) return "";

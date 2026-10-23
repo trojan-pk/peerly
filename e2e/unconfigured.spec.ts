@@ -32,13 +32,12 @@ test("missing credentials fail closed while public and mobile pages remain usabl
   expect((await request.get(`${origin}/api/auth/session`)).status()).toBe(503);
   expect((await request.post(`${origin}/api/auth/signin/google`)).status()).toBe(503);
   await page.goto(`${origin}/peers`);
-  await expect(page.getByRole("heading", { name: "Directory Setup Required" })).toBeVisible();
-  await expect(page.locator("main")).not.toContainText("No registered peer helpers yet");
-  const missing = await page.goto(`${origin}/peers/not-an-id`);
-  // Next.js streamed not-found pages retain HTTP 200 and inject noindex.
+  await expect(page).toHaveURL(/\/login$/);
+  await page.goto(`${origin}/resources`);
+  await expect(page).toHaveURL(/\/login$/);
+  const missing = await page.goto(`${origin}/page-that-does-not-exist`);
   expect([200, 404]).toContain(missing?.status());
   await expect(page.getByRole("heading", { name: "We couldn't find that page" })).toBeVisible();
-  await expect(page.locator('meta[name="robots"]').first()).toHaveAttribute("content", "noindex");
   for (const width of [375, 1280]) {
     await page.setViewportSize({ width, height: 850 });
     await page.goto(origin);

@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Search, AlertCircle, AlertTriangle, ArrowRight, Clock, ChevronLeft, ChevronRight, User as UserIcon, Zap } from "lucide-react";
 import { auth } from "@/auth";
@@ -20,6 +21,7 @@ interface PeersPageProps {
 export default async function PeersPage(props: PeersPageProps) {
   const searchParams = await props.searchParams;
   const session = await auth();
+  if (!session?.user?.id) redirect("/login");
 
   const q = typeof searchParams.q === "string" ? searchParams.q : undefined;
   const topic = typeof searchParams.topic === "string" ? searchParams.topic : undefined;

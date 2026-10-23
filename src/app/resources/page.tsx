@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
   BookOpen,
@@ -29,6 +30,7 @@ interface ResourcesPageProps {
 export default async function ResourcesPage(props: ResourcesPageProps) {
   const searchParams = await props.searchParams;
   const session = await auth();
+  if (!session?.user?.id) redirect("/login");
 
   const q = typeof searchParams.q === "string" ? searchParams.q : undefined;
   const topic = typeof searchParams.topic === "string" ? searchParams.topic : undefined;

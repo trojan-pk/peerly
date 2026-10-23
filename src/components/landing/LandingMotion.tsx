@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { Pause, Play } from "lucide-react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 export function LandingMotion({ children }: { children: ReactNode }) {
   const root = useRef<HTMLDivElement>(null);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
     const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -39,5 +41,5 @@ export function LandingMotion({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  return <div ref={root} className="landing">{children}</div>;
+  return <div ref={root} className="landing landing-v2" data-motion={paused ? "paused" : "playing"}>{children}<button type="button" className="motion-control" aria-pressed={paused} onClick={() => setPaused(value => !value)}>{paused ? <Play size={12} /> : <Pause size={12} />}{paused ? "Resume animations" : "Pause animations"}</button></div>;
 }

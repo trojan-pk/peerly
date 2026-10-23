@@ -26,15 +26,15 @@ Include basic reporting of a peer/resource by signed-in users; store reports for
 
 ## Screens and experience
 
-- Public home/discover peers with clear search and useful empty states.
-- Peer search/list with filters and public peer detail page.
-- Resources hub with searchable topic resource links.
+- One public marketing landing with Features, How it works and Resources sections. CTAs go to login, then dashboard.
+- Signed-in peer search/list with filters and member-visible peer details.
+- Signed-in resources hub with searchable topic resource links.
 - Google sign-in and onboarding/profile settings.
 - Authenticated dashboard: incoming/outgoing requests, status, accept/reject/cancel, authorized contact, completion confirmations and review form.
 - Manage own resources and profile.
 - Minimal moderation page for configured admin emails if implemented.
 
-Design: polished student product with a default dark charcoal/forest background, off-white typography and mint accents. The approved landing direction combines spacious product presentation, a custom animated topic network, working topic search, an interactive workflow, shared resources and honest community states. Use shared semantic colour tokens across all app screens. Strong typography and spacing, rounded cards, clear useful information, desktop sidebar and mobile navigation. Accessible form labels, keyboard navigation, loading/error/pending states, mobile layouts. English UI. No decorative fake users, fake counts, fake reviews, fabricated successful actions or pretend functionality. Empty database should show honest onboarding/empty states.
+Design: colourful animated marketing page with purple, electric blue and sky gradients, a floating navigation capsule, interactive subject dock, resource deck and workflow sections. All marketing navigation stays on the same page. Use a dark navy workspace after login. Provide reduced-motion and an animation pause control. Strong typography and spacing, rounded cards, clear useful information, desktop sidebar and mobile navigation. Accessible form labels, keyboard navigation, loading/error/pending states, mobile layouts. English UI. No decorative fake users, fake counts, fake reviews, fabricated successful actions or pretend functionality. Empty database should show honest onboarding/empty states.
 
 ## Configuration and security
 

@@ -98,3 +98,22 @@ npm start
 The Atlas check creates a random `peerly_e2e_<random>` database and removes it on
 teardown. It never seeds or drops the application database. The ordinary browser
 suite uses a local temporary MongoDB instead. See the README for requirements.
+
+## Colourful landing and login-first entry revision
+
+The latest owner-approved flow supersedes the earlier public directory/landing
+search design: one marketing page contains Features, How it works and Resources.
+Visitors enter through login; Google sign-in returns to the dashboard. Peer search,
+peer detail, resource listings and other workspace pages redirect signed-out users
+to login. The landing no longer loads member/profile data.
+
+The revised visual system adds purple/blue/sky section transitions, a floating
+navigation capsule, animated aurora layers, pointer-responsive product artwork,
+a subject dock, a selectable resource deck, workflow tabs and pause/reduced-motion
+controls. Desktop and mobile screenshots were reviewed.
+
+Browser checks cover same-page section links, subject selection, resource switches,
+keyboard workflow navigation, FAQs, pausing, reduced motion, responsive widths and
+the login entry point, alongside existing request/review and moderation flows.
+The resource interaction check uses the visible category switcher, rather than
+clicking through the overlapping illustration cards.

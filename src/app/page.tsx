@@ -1,107 +1,56 @@
 import Link from "next/link";
 import { auth } from "@/auth";
-import { isDatabaseConfigured, connectToDatabase } from "@/lib/db";
-import { User, toPublicProfile } from "@/models/User";
-import { PublicUserProfile } from "@/types/user";
-import { ArrowRight, ArrowUpRight, Search, LockKeyhole, BookOpen, Sparkles, Check, Plus, Globe2, MapPin } from "lucide-react";
-import { StudyNetwork } from "@/components/landing/StudyNetwork";
+import { ArrowRight, ArrowUpRight, LockKeyhole, BookOpen, Sparkles, Check, Plus, Globe2, MapPin, Search, UsersRound, Zap, MoveUpRight } from "lucide-react";
 import { Workflow } from "@/components/landing/Workflow";
 import { LandingMotion } from "@/components/landing/LandingMotion";
+import { ProductStage } from "@/components/landing/ProductStage";
+import { ResourceDeck } from "@/components/landing/ResourceDeck";
 
 export const dynamic = "force-dynamic";
 
-async function getRecentPublicPeers(): Promise<{ peers: PublicUserProfile[]; unavailable: boolean }> {
-  if (!isDatabaseConfigured()) {
-    return { peers: [], unavailable: true };
-  }
-
-  try {
-    await connectToDatabase();
-    // Bounded query limit
-    const users = await User.find({
-      isProfileComplete: true,
-      "moderation.isHidden": { $ne: true },
-    })
-      .sort({ createdAt: -1, _id: -1 })
-      .limit(6)
-      .lean();
-
-    return { peers: users.map((u) => toPublicProfile(u)), unavailable: false };
-  } catch (error) {
-    console.error("[Home] Error querying recent peers:", error);
-    return { peers: [], unavailable: true };
-  }
-}
-
 const faqs = [
-  ["What can I get help with?", "Search for a coursework topic or subject, then explain your question in a study request. Peerly is for learning together: working through concepts, understanding examples and sharing useful resources."],
-  ["Can I learn and help other people?", "Absolutely. Your account does both. Add the subjects you're comfortable explaining to your profile, and find other peers when you need a hand."],
-  ["Is Peerly free to use?", "You can browse peers, share resource links and send study requests without a platform fee. Helpers indicate whether they prefer free or paid sessions. Peerly does not process payments; discuss any terms directly before meeting."],
-  ["When are contact details shared?", "A helper's chosen contact details unlock to the learner only after the helper accepts the request. Your email, WhatsApp number and meeting links never appear in public search results."],
-  ["Are study sessions online or on campus?", "Both are possible. Filter by online or campus preferences, agree on a time after acceptance, and use your helper's shared contact method. For in-person sessions, choose a public campus space."],
+  ["How do I get started?", "Sign in with Google, add your university, subjects and availability, then explore your workspace. One account lets you ask for help, offer it and share resource links."],
+  ["Can I learn and help other people?", "Absolutely. Add the topics you're comfortable explaining to your profile, and find other peers when you need a hand. Your account does both."],
+  ["Is Peerly free to use?", "After signing in, you can explore peers, share resource links and send study requests without a platform fee. Helpers indicate whether they prefer free or paid sessions. Peerly does not process payments; agree on any terms directly before meeting."],
+  ["When are contact details shared?", "A helper's chosen contact details unlock to the learner only after the helper accepts the request. Your email, WhatsApp number and meeting links never appear in search results or profile listings."],
+  ["Are study sessions online or on campus?", "Both are possible. Filter by study preference, agree on a time after acceptance, and use your helper's shared contact method. For in-person sessions, choose a public campus space."],
   ["How do reviews work?", "Both participants must confirm a session is complete before the learner can leave one review. These confirmations are self-reported, not independent proof of attendance."],
 ];
 
 export default async function HomePage() {
-  const [session, recentResult] = await Promise.all([auth(), getRecentPublicPeers()]);
-  const offerHref = session?.user ? "/profile" : "/login";
-
+  const session = await auth();
+  const startHref = session?.user?.id ? "/dashboard" : "/login";
   return (
     <LandingMotion>
-      <section className="landing-hero" aria-labelledby="hero-title">
-        <div className="hero-ambient" aria-hidden="true" />
-        <div className="hero-copy">
-          <span className="eyebrow-pill"><span className="small-spark"><Sparkles size={13} /></span> A little help goes a long way <ArrowUpRight size={13} /></span>
-          <h1 id="hero-title">Get unstuck.<br /><span>Learn with your people.</span></h1>
-          <p>The topic that has you stuck is someone else’s strong suit.<br className="hidden sm:block" /> Find a university peer. Work it out together. Pass it forward.</p>
-          <form action="/peers" method="get" className="hero-search" role="search" aria-label="Find a study peer">
-            <Search size={20} aria-hidden="true" />
-            <label className="sr-only" htmlFor="hero-topic">What do you want to understand?</label>
-            <input id="hero-topic" name="q" type="search" maxLength={100} placeholder="What do you want to understand?" autoComplete="off" />
-            <button type="submit"><span>Find a peer</span><ArrowRight size={18} aria-hidden="true" /></button>
-          </form>
-          <div className="hero-topics"><span>A place to start</span>{["Calculus", "Data structures", "Physics"].map(topic => <Link key={topic} href={`/peers?q=${encodeURIComponent(topic)}`}>{topic}<ArrowUpRight size={11} /></Link>)}</div>
-          <Link href={offerHref} className="hero-secondary">Good at something? Share what you know <ArrowRight size={13} /></Link>
+      <section className="m-hero" aria-labelledby="hero-title">
+        <div className="aurora-field" aria-hidden="true"><i /><i /><i /><span className="star-field" /><span className="hero-orbit orbit-a" /><span className="hero-orbit orbit-b" /></div>
+        <div className="m-hero-copy">
+          <span className="m-eyebrow"><Sparkles size={14} /> Your next breakthrough is a conversation away</span>
+          <h1 id="hero-title">Big questions.<br /><span>Brighter together.</span><span className="title-spark" aria-hidden="true">✳</span></h1>
+          <p>The thing that has you stuck is someone else’s strong suit.<br className="hidden sm:block" /> Meet your university peers. Share a little clarity. Go a lot further.</p>
+          <div className="m-hero-actions"><Link href={startHref} className="m-button">{session?.user ? "Open your workspace" : "Find your study circle"}<ArrowUpRight size={18} /></Link><Link href="#how-it-works" className="m-button ghost">See how it works <ArrowRight size={16} /></Link></div>
+          <span className="hero-assurance"><Check size={12} /> One account. A learner and a helper.</span>
         </div>
-        <StudyNetwork />
-        <div className="hero-principles"><span><Search size={14} /> Find help by topic</span><span><LockKeyhole size={14} /> Keep contact private</span><span><BookOpen size={14} /> Learn in both directions</span></div>
+        <ProductStage startHref={startHref} />
       </section>
 
-      <section className="landing-section" id="how-it-works" aria-labelledby="workflow-title">
-        <div className="section-heading"><div><span className="section-kicker">01 / BETTER TOGETHER</span><h2 id="workflow-title">From “I’m stuck”<br />to “I get it.”</h2></div><p>No need to figure everything out alone.<br />Start with one question and the right person.</p></div>
-        <Workflow />
-      </section>
-
-      <section className="landing-section" aria-labelledby="learning-title">
-        <div className="section-heading"><div><span className="section-kicker">02 / YOUR WAY TO LEARN</span><h2 id="learning-title">Different strengths.<br /><span className="text-muted">Common ground.</span></h2></div><p>A study circle that fits your subject,<br />your schedule and your way of learning.</p></div>
-        <div className="learning-grid">
-          <div className="learning-main">
-            <span className="section-kicker">START WITH WHAT YOU NEED</span>
-            <h3>Big subjects.<br />Small breakthroughs.</h3>
-            <p>Find someone who can explain that one concept. Search specific topics, then compare availability and study preferences.</p>
-            <div className="subject-cloud">{["Linear algebra", "Python", "Economics", "Chemistry", "Statistics", "Data structures"].map((topic, i) => <Link key={topic} href={`/peers?q=${encodeURIComponent(topic)}`} className={i === 5 ? "featured-subject" : ""}>{topic}<ArrowUpRight size={14} /></Link>)}</div>
-            <Link href="/peers" className="text-link">Explore peer discovery <ArrowRight size={15} /></Link>
-          </div>
-          <div className="learning-side">
-            <div className="privacy-feature"><div className="privacy-illustration" aria-hidden="true"><span className="privacy-ring" /><span><LockKeyhole size={26} strokeWidth={1.4} /></span><i /><i /><i /></div><h3>A connection.<br />On your terms.</h3><p>Contact unlocks after acceptance. Your personal details stay out of public profiles.</p></div>
-            <div className="study-mode-feature"><span><Globe2 size={19} /> Online</span><span className="mode-divider">or</span><span><MapPin size={19} /> On campus</span><p>Your study session. Your setting.</p></div>
-          </div>
+      <section id="features" className="marketing-zone features-zone" aria-labelledby="features-title"><div className="section-inner landing-section">
+        <div className="m-section-heading"><span className="m-kicker"><Zap size={12} /> MADE FOR THE WAY YOU LEARN</span><h2 id="features-title">Your kind of people.<br /><span>Your kind of progress.</span></h2><p>A fresh perspective, a useful resource, a shared “finally, I get it.”<br className="hidden sm:block" /> A little connection can make a big difference.</p></div>
+        <div className="m-feature-grid">
+          <div className="m-feature feature-discovery"><div><span className="m-feature-icon"><Search size={21} /></span><h3>Skip the spiral.<br />Find your person.</h3><p>Search specific topics, compare study preferences and find a peer whose strengths match your question.</p></div><div className="discovery-orbit" aria-hidden="true"><span className="discovery-ring ring-a" /><span className="discovery-ring ring-b" /><span className="orbit-center"><UsersRound size={32} /></span><span className="orbit-label label-a">Your question</span><span className="orbit-label label-b">Their strength</span><span className="orbit-dot dot-a" /><span className="orbit-dot dot-b" /></div><Link href={startHref} className="m-inline-link">Meet your study circle <ArrowUpRight size={15} /></Link></div>
+          <div className="m-feature feature-privacy"><div className="privacy-lock-art" aria-hidden="true"><span /><i /><i /><div><LockKeyhole size={40} strokeWidth={1.2} /></div></div><div><span className="m-small-label">GOOD CONNECTIONS. CLEAR BOUNDARIES.</span><h3>Your details.<br />Your decision.</h3><p>Contact stays private until a helper accepts. No personal contact details in discovery.</p></div></div>
+          <div className="m-feature feature-modes"><div><span className="m-small-label">A PLACE THAT WORKS FOR YOU</span><h3>Across campus.<br />Or across a screen.</h3></div><div className="mode-bridge" aria-hidden="true"><span><MapPin size={24} /></span><i /><span><Globe2 size={24} /></span></div><p>Choose online or on-campus study preferences. Arrange the details together after acceptance.</p></div>
+          <div className="m-feature feature-give"><div><span className="m-feature-icon"><Sparkles size={21} /></span><h3>You have something<br />to share, too.</h3><p>You don’t need to know everything. Just be the person who makes one thing a little clearer.</p></div><div className="exchange-art" aria-hidden="true"><span>LEARN</span><span className="exchange-arrow">↗</span><span>SHARE</span><span className="exchange-arrow">↙</span></div><Link href={startHref} className="m-inline-link">Share your strengths <ArrowUpRight size={15} /></Link></div>
         </div>
-      </section>
+      </div></section>
 
-      <section className="landing-section resources-feature" aria-labelledby="resources-title">
-        <div className="resource-copy"><span className="section-kicker">03 / KNOWLEDGE WORTH SHARING</span><h2 id="resources-title">Good notes<br />deserve company.</h2><p>A clear explanation. A useful problem set. That link you wish you’d found earlier. Explore resources shared by students, or add your own.</p><Link href="/resources" className="landing-button">Explore study resources <ArrowUpRight size={17} /></Link><span className="resource-footnote">Open to browse. No study request needed.</span></div>
-        <div className="resource-art" aria-hidden="true"><div className="resource-orbit" /><div className="note-sheet sheet-back"><span>PASS IT FORWARD</span><BookOpen size={36} strokeWidth={1} /></div><div className="note-sheet sheet-front"><span className="note-badge"><BookOpen size={15} /> A little clarity</span><strong>Everything makes<br />sense eventually.</strong><div className="note-rule" /><span className="note-equation">question + perspective</span><span className="note-answer">= a new understanding.</span><div className="note-bottom"><span>Made to be shared</span><ArrowUpRight size={18} /></div></div><span className="resource-star star-one">✳</span><span className="resource-star star-two">+</span></div>
-      </section>
+      <section id="how-it-works" className="marketing-zone workflow-zone" aria-labelledby="workflow-title"><div className="section-inner landing-section"><div className="m-section-heading"><span className="m-kicker"><MoveUpRight size={12} /> ONE QUESTION CAN START SOMETHING GOOD</span><h2 id="workflow-title">From “I’m stuck”<br /><span>to “I get it.”</span></h2><p>Get to know Peerly here. Sign in when you’re ready.<br className="hidden sm:block" /> Your study circle is waiting on the other side.</p></div><Workflow startHref={startHref} /><div className="workflow-signin-note"><LockKeyhole size={13} /> This is how connections work. Your actual requests and resources live in your signed-in workspace.</div></div></section>
 
-      <section className="landing-section" aria-labelledby="community-title">
-        <div className="section-heading"><div><span className="section-kicker">04 / FIND YOUR STUDY CIRCLE</span><h2 id="community-title">Someone gets it.<br />Find them here.</h2></div><Link href="/peers" className="text-link">Browse all peers <ArrowUpRight size={16} /></Link></div>
-        {recentResult.peers.length > 0 ? <div className="landing-peers">{recentResult.peers.slice(0, 3).map(peer => <Link href={`/peers/${peer.id}`} key={peer.id} className="landing-peer"><div className="peer-heading"><span className="peer-initial">{peer.name[0]?.toUpperCase() || "P"}</span><ArrowUpRight size={18} /></div><h3>{peer.name}</h3><span>{peer.university || "University student"}</span><p>{peer.bio || "Explore their subjects, availability and study preferences."}</p><div>{peer.topics.slice(0, 3).map(topic => <small key={topic}>{topic}</small>)}</div></Link>)}</div> : <div className="community-invitation"><span className="community-symbol"><Sparkles size={25} /></span><div><h3>{recentResult.unavailable ? "The study circle is taking a moment." : "Every study circle starts with someone."}</h3><p>{recentResult.unavailable ? "We couldn’t load the peer directory. Try discovery again shortly." : "Add your subjects and share what you know. Your next classmate can start with you."}</p></div><Link href={recentResult.unavailable ? "/peers" : offerHref} className="landing-button secondary">{recentResult.unavailable ? "Try discovery" : "Create your profile"}<ArrowRight size={16} /></Link></div>}
-      </section>
+      <section id="resources" className="marketing-zone resources-zone" aria-labelledby="resources-title"><div className="section-inner landing-section resource-zone-layout"><div className="resource-zone-copy"><span className="m-kicker"><BookOpen size={13} /> THE GOOD STUFF IS WORTH SHARING</span><h2 id="resources-title">Great notes.<br />New perspectives.<br /><span>Pass them on.</span></h2><p>That explanation you wish you’d found sooner. A problem set that made it click. Useful links from students who’ve been there.</p><p>Find them in your resource hub after signing in—or share something that helped you.</p><Link href={startHref} className="m-button">{session?.user ? "Open your workspace" : "Sign in to explore"}<ArrowUpRight size={18} /></Link><span className="resource-access-note"><LockKeyhole size={11} /> Resources are part of your Peerly workspace.</span></div><ResourceDeck /></div></section>
 
-      <section className="landing-section faq-section" id="questions" aria-labelledby="faq-title"><div><span className="section-kicker">A LITTLE MORE CLARITY</span><h2 id="faq-title">Good questions.<br />Straight answers.</h2><p>Still curious? Here’s how Peerly fits<br className="hidden sm:block" /> into your student life.</p></div><div className="faq-list">{faqs.map(([question, answer]) => <details key={question}><summary>{question}<Plus size={17} aria-hidden="true" /></summary><p>{answer}</p></details>)}</div></section>
+      <section className="marketing-zone questions-zone" id="questions" aria-labelledby="faq-title"><div className="section-inner landing-section m-faq-layout"><div><span className="m-kicker">A LITTLE MORE CLARITY</span><h2 id="faq-title">Curious?<br /><span>Good. Us too.</span></h2><p>Some answers before<br />your next breakthrough.</p><span className="faq-doodle" aria-hidden="true">?</span></div><div className="faq-list">{faqs.map(([question, answer]) => <details key={question}><summary>{question}<Plus size={17} aria-hidden="true" /></summary><p>{answer}</p></details>)}</div></div></section>
 
-      <section className="landing-section final-invitation" aria-labelledby="final-title"><span className="section-kicker">YOUR NEXT BREAKTHROUGH STARTS HERE</span><h2 id="final-title">You don’t have to<br />figure it out <span>alone.</span></h2><div><Link href="/peers" className="landing-button">Find your people <ArrowRight size={18} /></Link><Link href={offerHref} className="text-link">Share your strengths <ArrowUpRight size={16} /></Link></div><p><Check size={13} /> One account. A learner and a helper.</p></section>
+      <section className="marketing-zone invitation-zone" aria-labelledby="final-title"><div className="invitation-glow" aria-hidden="true" /><div className="section-inner landing-section"><span className="m-kicker"><Sparkles size={13} /> BETTER QUESTIONS. BRIGHTER CONNECTIONS.</span><h2 id="final-title">A little help.<br /><span>A whole new possibility.</span></h2><p>Your next “aha!” might start with hello.</p><Link href={startHref} className="m-button">{session?.user ? "Back to your workspace" : "Let’s find your people"}<ArrowUpRight size={19} /></Link><span className="hero-assurance"><Check size={12} /> Sign in with Google. Start with one question.</span></div></section>
     </LandingMotion>
   );
 }

@@ -11,7 +11,7 @@ const steps = [
   { title: "Learn. Then pass it on.", text: "Both of you confirm completion. Leave an honest review, and help someone with your own strengths.", Icon: BookOpen },
 ];
 
-export function Workflow() {
+export function Workflow({ startHref = "/login" }: { startHref?: string }) {
   const [active, setActive] = useState(0);
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
   function navigate(event: KeyboardEvent<HTMLButtonElement>, index: number) {
@@ -44,7 +44,7 @@ export function Workflow() {
           {active === 1 && <><div className="preview-message">“I understand arrays, but I’m stuck on how to traverse a binary tree. Could we work through an example?”</div><div className="preview-state"><span className="state-dot" /> Pending · your peer decides</div></>}
           {active === 2 && <><div className="preview-state accepted"><Check size={15} /> After your helper accepts</div><div className="preview-contact"><LockKeyhole size={20} /><div><strong>Contact unlocks privately</strong><span>Use the contact method your helper shared.</span></div></div></>}
           {active === 3 && <><div className="completion-row"><span><Check size={14} /> You confirm</span><span><Check size={14} /> Your peer confirms</span></div><div className="preview-contact"><BookOpen size={22} /><div><strong>Leave a helpful review</strong><span>Feedback opens after both confirmations.</span></div></div></>}
-          <div className="preview-footer"><span><LockKeyhole size={12} /> Contact stays out of public profiles</span><Link href="/peers" aria-label="Discover peers and start a study request">Find a peer <ArrowRight size={13} /></Link></div>
+          <div className="preview-footer"><span><LockKeyhole size={12} /> Contact stays out of public profiles</span><Link href={startHref} aria-label="Sign in and start a study request">Find a peer <ArrowRight size={13} /></Link></div>
         </div>
       </div>
     </div>

@@ -78,16 +78,21 @@ This is a **Next.js Node application**, not a static export. It requires a serve
 
 No payment processing, hosted calls, file uploads, email delivery or AI answers. A paid preference is informational; users arrange any terms directly. Use public campus spaces for physical sessions. Dashboard updates appear after actions or refresh; there are no email/push notifications.
 
-## Visual design
+## Visual design and entry flow
 
-Peerly uses a default dark theme throughout the landing page, discovery, forms,
-requests and moderation screens. Shared semantic colours live in `src/app/globals.css`.
-Manrope is served locally with its OFL license in `src/app/fonts/`.
+Visitors see one marketing page. Its Features, How it works and Resources navigation
+links scroll to sections on that page. Calls to action open login; Google sign-in
+returns to `/dashboard`. Existing members can open their workspace directly.
+Peer discovery, peer details, resources, profile editing and requests require login.
+The landing page does not query or expose member profiles or resource collections.
 
-The landing's topic search and subject links open real discovery results. Its
-workflow illustration is explanatory; community cards come from persisted public
-profiles. Connecting paths and one-time section entrances respect reduced-motion
-preferences. Scroll entrances progressively enhance visible server-rendered content.
+The landing uses purple/blue/sky gradients, floating visuals, pointer-responsive
+product artwork, a keyboard-controlled subject dock, selectable resource cards,
+workflow tabs and native FAQs. An explicit pause control and system reduced-motion
+preferences stop decorative motion. The workspace retains a dark navy theme.
+Manrope and its OFL license are served locally from `src/app/fonts/`.
+
+Illustrative topic/resource cards are examples, not real activity or testimonials.
 No third-party animation runtime or external font request is needed.
 
 ## Important rules
