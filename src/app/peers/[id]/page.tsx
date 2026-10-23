@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { InitialsAvatar } from "@/components/InitialsAvatar";
 import { notFound, redirect } from "next/navigation";
 import mongoose from "mongoose";
 import {
@@ -142,19 +143,7 @@ export default async function PeerDetailPage(props: PeerDetailPageProps) {
         {/* Header Profile Identity */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-6 border-b border-line">
           <div className="flex items-start sm:items-center gap-4">
-            {peer.image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={peer.image}
-                alt=""
-                className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border border-line shrink-0"
-                aria-hidden="true"
-              />
-            ) : (
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-accent/15 text-accent flex items-center justify-center font-bold text-2xl shrink-0">
-                {peer.name[0]?.toUpperCase() || "P"}
-              </div>
-            )}
+            <InitialsAvatar name={peer.name} className="w-16 h-16 sm:w-20 sm:h-20 rounded-full text-2xl" />
             <div className="space-y-1.5">
               <div className="flex items-center gap-2.5 flex-wrap">
                 <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-ink">

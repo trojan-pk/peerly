@@ -89,9 +89,6 @@ export async function authSignInCallback({
       if (!userByGoogleId.name && user.name) {
         userByGoogleId.name = user.name.trim();
       }
-      if (user.image && !userByGoogleId.image && !userByGoogleId.avatarUpdated) {
-        userByGoogleId.image = user.image;
-      }
       userByGoogleId.role = isAdmin ? "admin" : "student";
       await userByGoogleId.save();
     } else if (userByEmail) {
@@ -99,9 +96,6 @@ export async function authSignInCallback({
       userByEmail.googleId = googleId;
       if (!userByEmail.name && user.name) {
         userByEmail.name = user.name.trim();
-      }
-      if (user.image && !userByEmail.image && !userByEmail.avatarUpdated) {
-        userByEmail.image = user.image;
       }
       userByEmail.role = isAdmin ? "admin" : "student";
       await userByEmail.save();
@@ -111,7 +105,6 @@ export async function authSignInCallback({
         googleId,
         email: normalizedEmail,
         name: (user.name || "Peerly Student").trim(),
-        image: user.image || "",
         role: isAdmin ? "admin" : "student",
         isProfileComplete: false,
       });

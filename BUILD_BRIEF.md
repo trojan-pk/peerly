@@ -29,12 +29,12 @@ Include basic reporting of a peer/resource by signed-in users; store reports for
 - One public marketing landing with Features, How it works and Resources sections. CTAs go to login, then dashboard.
 - Signed-in peer search/list with filters and member-visible peer details.
 - Signed-in resources hub with searchable topic resource links.
-- Google sign-in and onboarding/profile settings, including editable name and profile photo.
+- Google sign-in and onboarding/profile settings, including editable name and initials avatars.
 - Authenticated dashboard: incoming/outgoing requests, status, accept/reject/cancel, authorized contact, completion confirmations and review form.
 - Manage own resources and profile.
 - Minimal moderation page for configured admin emails if implemented.
 
-Design: colourful animated marketing page with purple, electric blue and sky gradients, a floating navigation capsule, interactive subject dock, resource deck and workflow sections. All marketing navigation stays on the same page. Use a dark navy workspace after login. Respect reduced-motion preferences; do not show a floating pause control. Strong typography and spacing, rounded cards, clear useful information, desktop sidebar and mobile navigation. Accessible form labels, keyboard navigation, loading/error/pending states, mobile layouts. English UI. No decorative fake users, fake counts, fake reviews, fabricated successful actions or pretend functionality. Empty database should show honest onboarding/empty states.
+Design: colourful animated marketing page with purple, electric blue and sky gradients, a floating navigation capsule, interactive subject dock, resource deck and workflow sections. All marketing navigation stays on the same page. The workspace settings gear links directly to /settings with no dropdown or repeated settings-page shortcuts; the workspace logo returns to /dashboard. Use a dark navy workspace after login. Respect reduced-motion preferences; do not show a floating pause control. Strong typography and spacing, rounded cards, clear useful information, desktop sidebar and mobile navigation. Accessible form labels, keyboard navigation, loading/error/pending states, mobile layouts. English UI. No decorative fake users, fake counts, fake reviews, fabricated successful actions or pretend functionality. Empty database should show honest onboarding/empty states.
 
 ## Configuration and security
 
@@ -42,7 +42,7 @@ Provide `.env.example` with MONGODB_URI, AUTH_SECRET, AUTH_GOOGLE_ID, AUTH_GOOGL
 
 ## Excluded
 
-AI helper, payments, full chat, video calling, maps/live location, subscription tiers, resource file upload. Profile-photo uploads are supported separately, with validation and a bounded private avatar endpoint. Paid is a profile preference only. Google OAuth setup and external production deployment depend on owner accounts; do not claim those have been verified without credentials.
+AI helper, payments, full chat, video calling, maps/live location, subscription tiers, resource file upload. Profile-photo uploads are excluded; avatars derive from saved names. Paid is a profile preference only. Google OAuth setup and external production deployment depend on owner accounts; do not claim those have been verified without credentials.
 
 ## Verification and handoff
 

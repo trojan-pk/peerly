@@ -176,15 +176,16 @@ This opt-in command loads your ignored environment file and runs the configured 
 
 ## Account settings and request history
 
-The header settings control opens your profile, sent/received requests, archives,
-shared resources and logout. `/settings` contains the profile editor, private
-account information and photo controls; `/profile` remains available too. Edited
-names and photos update the workspace and remain saved across future sign-ins.
+The header gear links directly to `/settings`, which contains the profile editor,
+private account information and confirmed logout. There is no account dropdown or
+repeated activity navigation in settings; `/profile` remains compatible. The
+workspace logo returns to the dashboard, replacing the extra Dashboard header link.
 
-Photos support still JPG/PNG/WebP files up to 2 MB. They are validated on the server,
-resized to 256×256 JPEG, stripped of metadata and stored in MongoDB. No separate
-storage service or new environment key is needed. Image bytes are excluded from
-normal user queries; `/api/avatars/[id]` requires an active member account.
+Avatars use name initials throughout the workspace and update after a saved name
+change. Profile photo upload and the avatar-serving endpoint have been removed;
+Google photos are no longer imported into user records. Existing stored image data
+is left untouched and is not displayed or served by the app. No avatar storage
+service or environment key is needed.
 
 Dashboard status filters apply before pagination. Cancel a pending sent request;
 archive a finished request to remove it from your current list. Archiving is

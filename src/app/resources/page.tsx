@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { InitialsAvatar } from "@/components/InitialsAvatar";
 import {
   BookOpen,
   ArrowRight,
@@ -127,19 +128,7 @@ export default async function ResourcesPage(props: ResourcesPageProps) {
                     </span>
 
                     <div className="flex items-center gap-1.5 text-right">
-                      {res.contributor.image ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={res.contributor.image}
-                          alt=""
-                          className="w-5 h-5 rounded-full object-cover border border-line"
-                          aria-hidden="true"
-                        />
-                      ) : (
-                        <div className="w-5 h-5 rounded-full bg-raised text-muted flex items-center justify-center font-bold text-[10px]">
-                          {res.contributor.name[0]?.toUpperCase() || "S"}
-                        </div>
-                      )}
+                      <InitialsAvatar name={res.contributor.name} className="w-6 h-6 rounded-full text-[10px]" />
                       <span className="text-[11px] font-medium text-muted truncate max-w-[120px]">
                         {res.contributor.name}
                       </span>

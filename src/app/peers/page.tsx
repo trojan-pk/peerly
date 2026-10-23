@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { InitialsAvatar } from "@/components/InitialsAvatar";
 import { Search, AlertCircle, AlertTriangle, ArrowRight, Clock, ChevronLeft, ChevronRight, User as UserIcon, Zap } from "lucide-react";
 import { auth } from "@/auth";
 import { queryPeers } from "@/lib/peers";
@@ -84,19 +85,7 @@ export default async function PeersPage(props: PeersPageProps) {
                 <div className="space-y-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      {peer.image ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={peer.image}
-                          alt=""
-                          className="w-11 h-11 rounded-full object-cover border border-line"
-                          aria-hidden="true"
-                        />
-                      ) : (
-                        <div className="w-11 h-11 rounded-full bg-accent/15 text-accent flex items-center justify-center font-bold text-sm">
-                          {peer.name[0]?.toUpperCase() || "P"}
-                        </div>
-                      )}
+                      <InitialsAvatar name={peer.name} className="w-11 h-11 rounded-full text-sm" />
                       <div>
                         <h2 className="text-sm font-bold text-ink">{peer.name}</h2>
                         <p className="text-xs text-muted">

@@ -246,3 +246,39 @@ Browser fixtures used a temporary test database; the owner's data was not seeded
 
 No pause control is present in the current source. The owner's unfinished pause
 reference remains an optional clarification about which other control they mean.
+
+
+## Initials avatars and direct settings navigation
+
+The owner subsequently replaced profile photos with initials. A shared avatar now
+renders saved-name initials on settings, request cards, peer lists/detail pages
+and resource contributors. The upload UI, upload action and avatar-serving route
+have been retired. Google sign-in no longer imports photos into user records.
+Legacy image records remain untouched; they are not rendered or served. The five
+retired upload tests were removed and the auth regression now checks that Google
+photos are not imported. The remaining 186 unit/integration tests pass.
+
+The header has a gear-only link directly to `/settings`, with no photo, name or
+account dropdown. The extra Dashboard navigation label is removed; the workspace
+logo returns to `/dashboard`. Settings omit the gear self-link, activity shortcuts
+and workspace footer while preserving the full editor and confirmed logout.
+
+Browser checks exposed two real interaction races: an interactive Suspense header
+fallback could lose an opened mobile menu when replaced, and overlapping history
+navigation could apply a status to the previous archive view. The fallback menu
+is now disabled until the account header is ready. Dashboard navigation uses a
+pending transition and disables conflicting controls until it finishes. A separate
+test assumption counted only new requests despite a prior workflow sharing the
+temporary database; assertions now account for the existing records without
+removing them.
+
+Final validation: all 8 browser scenarios passed together on the final application
+build, including saved name/initials after reload, direct desktop/mobile settings
+navigation, no upload inputs or duplicate settings links, ignored legacy photos,
+retired avatar endpoint returning 404, request filtering/cancellation/archive and
+restore, resource focus boundaries, private route guards and confirmed logout.
+Settings and resource layouts were checked for overflow at 320, 390, 768 and
+1440 pixels. Desktop dashboard/settings and mobile settings screenshots were
+visually reviewed. Production build, TypeScript and ESLint passed. Tests used
+only a temporary MongoDB database; no owner records were changed. The production
+server was restarted on localhost:3000 and the public landing returned HTTP 200.

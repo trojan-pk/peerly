@@ -4,6 +4,7 @@ import { safeAction } from "@/lib/client-action";
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
+import { InitialsAvatar } from "@/components/InitialsAvatar";
 import { useRouter } from "next/navigation";
 import {
   Archive,
@@ -76,7 +77,7 @@ export default function DashboardView({
     setActiveTab(newTab);
     setActionError(null);
     setActionSuccess(null);
-    router.push(`/dashboard?tab=${newTab}&incomingPage=${incomingPage}&outgoingPage=${outgoingPage}&status=${statusFilter}${archivedView ? "&view=archived" : ""}`);
+    startTransition(() => router.push(`/dashboard?tab=${newTab}&incomingPage=${incomingPage}&outgoingPage=${outgoingPage}&status=${statusFilter}${archivedView ? "&view=archived" : ""}`));
   };
 
   const handleTransitionAction = (requestId: string, action: "accept" | "reject" | "cancel") => {
@@ -148,7 +149,7 @@ export default function DashboardView({
     const params = new URLSearchParams({ tab: activeTab, status: statusFilter });
     if (archivedView) params.set("view", "archived");
     if (value) params.set(key, value); else params.delete(key);
-    router.push(`/dashboard?${params.toString()}`);
+    startTransition(() => router.push(`/dashboard?${params.toString()}`));
   }
   function handleArchive(requestId: string) {
     setActionError(null); setActionSuccess(null);
@@ -207,6 +208,7 @@ export default function DashboardView({
         <button
           type="button"
           role="tab"
+          disabled={isPending}
           aria-selected={activeTab === "incoming"}
           onClick={() => handleTabChange("incoming")}
           className={`flex items-center gap-2 px-5 py-3 text-xs font-semibold border-b-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
@@ -231,6 +233,7 @@ export default function DashboardView({
         <button
           type="button"
           role="tab"
+          disabled={isPending}
           aria-selected={activeTab === "outgoing"}
           onClick={() => handleTabChange("outgoing")}
           className={`flex items-center gap-2 px-5 py-3 text-xs font-semibold border-b-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
@@ -253,7 +256,7 @@ export default function DashboardView({
         </button>
       </div>
 
-      <div className="request-filter-bar"><label htmlFor="request-status">Request status<select id="request-status" value={statusFilter} onChange={event => changeFilter("status", event.target.value)}><option value="all">All statuses</option>{[["PENDING","Pending"],["ACCEPTED","Accepted"],["REJECTED","Declined"],["CANCELLED","Cancelled"],["COMPLETED","Completed"],["REVIEWED","Reviewed"]].map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label><div className="history-toggle" aria-label="Request history view"><button type="button" aria-pressed={!archivedView} onClick={() => changeFilter("view", "")}>Current</button><button type="button" aria-pressed={archivedView} onClick={() => changeFilter("view", "archived")}><Archive size={15} />Archived</button></div></div>
+      <div className="request-filter-bar" aria-busy={isPending}><label htmlFor="request-status">Request status<select id="request-status" disabled={isPending} value={statusFilter} onChange={event => changeFilter("status", event.target.value)}><option value="all">All statuses</option>{[["PENDING","Pending"],["ACCEPTED","Accepted"],["REJECTED","Declined"],["CANCELLED","Cancelled"],["COMPLETED","Completed"],["REVIEWED","Reviewed"]].map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label><div className="history-toggle" aria-label="Request history view"><button type="button" disabled={isPending} aria-pressed={!archivedView} onClick={() => changeFilter("view", "")}>Current</button><button type="button" disabled={isPending} aria-pressed={archivedView} onClick={() => changeFilter("view", "archived")}><Archive size={15} />Archived</button></div></div>
       {archivedView && <p className="text-sm text-muted">Archived requests are hidden from your current list. You can restore them at any time.</p>}
       {/* Request Cards List */}
       {currentList.items.length > 0 ? (
@@ -270,19 +273,7 @@ export default function DashboardView({
                 {/* Header: Participant & Status */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-line pb-3">
                   <div className="flex items-center gap-3">
-                    {participant.image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={participant.image}
-                        alt=""
-                        className="w-10 h-10 rounded-full object-cover border border-line"
-                        aria-hidden="true"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-accent/15 text-accent flex items-center justify-center font-bold text-sm">
-                        {participant.name[0]?.toUpperCase() || "S"}
-                      </div>
-                    )}
+                    <InitialsAvatar name={participant.name} className="w-10 h-10 rounded-full text-sm" />
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-bold text-ink">

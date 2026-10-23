@@ -238,8 +238,9 @@ test("workspace footer is absent and logout requires confirmation on desktop and
       await expect(page.locator("footer.site-footer")).toHaveCount(0);
     }
     await page.goto("/dashboard");
-    await page.getByRole("button", { name: "Open account settings", exact: true }).click();
-    const trigger = page.getByRole("button", { name: "Sign out of Peerly", exact: true });
+    await page.getByRole("link", { name: "Open account settings", exact: true }).click();
+    await expect(page).toHaveURL(/\/settings$/);
+    const trigger = page.getByRole("button", { name: "Log out", exact: true });
     await trigger.click();
     const confirmation = page.getByRole("alertdialog", { name: "Log out of Peerly?" });
     await expect(confirmation).toBeVisible();
@@ -252,7 +253,7 @@ test("workspace footer is absent and logout requires confirmation on desktop and
     await page.keyboard.press("Escape");
     await expect(confirmation).not.toBeVisible();
     await expect(trigger).toBeFocused();
-    await expect(page).toHaveURL(/\/dashboard$/);
+    await expect(page).toHaveURL(/\/settings$/);
     expect((await (await context.request.get("/api/auth/session")).json()).user).toBeTruthy();
     await trigger.click();
     await page.screenshot({ path: testInfo.outputPath("logout-desktop.png") });

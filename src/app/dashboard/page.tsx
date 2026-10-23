@@ -6,7 +6,7 @@ import type { RequestStatus } from "@/models/StudyRequest";
 import { isDatabaseConfigured } from "@/lib/db";
 import { getDashboardRequests } from "@/lib/study-requests";
 import DashboardView from "./DashboardView";
-import { LayoutDashboard, Settings, AlertTriangle, BookOpen } from "lucide-react";
+import { LayoutDashboard, AlertTriangle, BookOpen } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -86,13 +86,6 @@ export default async function DashboardPage(props: DashboardPageProps) {
           >
             <BookOpen className="w-3.5 h-3.5 text-muted" aria-hidden="true" />
             <span>My Resources</span>
-          </Link>
-          <Link
-            href="/settings"
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-edge hover:bg-panel text-ink text-xs font-semibold transition-colors min-h-[40px]"
-          >
-            <Settings className="w-3.5 h-3.5 text-muted" aria-hidden="true" />
-            <span>Settings</span>
           </Link>
         </div>
       </div>

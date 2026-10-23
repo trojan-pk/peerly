@@ -51,7 +51,7 @@ async function DynamicNavbar() {
 
   return (
     <Navbar
-      user={session?.user ? { ...session.user, name: dbContext?.user.name ?? session.user.name, image: dbContext?.user.image ?? session.user.image } : undefined}
+      user={session?.user ? { id: session.user.id } : undefined}
       isAdmin={dbContext?.isAdmin ?? false}
       isAuthConfigured={authStatus.isConfigured}
     />
@@ -68,7 +68,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={manrope.variable} data-theme="dark">
       <body className="flex flex-col min-h-screen bg-canvas text-ink antialiased">
-        <Suspense fallback={<Navbar user={null} isAdmin={false} isAuthConfigured={authStatus.isConfigured} />}>
+        <Suspense fallback={<Navbar user={null} isAdmin={false} isAuthConfigured={authStatus.isConfigured} loading />}>
           <DynamicNavbar />
         </Suspense>
         <main id="main-content" tabIndex={-1} className="flex-1 w-full px-4 sm:px-6 lg:px-8 outline-none">

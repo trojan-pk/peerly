@@ -1,11 +1,11 @@
-import { AvatarEditor } from "@/components/AvatarEditor";
+import { InitialsAvatar } from "@/components/InitialsAvatar";
 import { LogoutButton } from "@/components/LogoutButton";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/auth";
 import { isDatabaseConfigured, connectToDatabase } from "@/lib/db";
 import { User } from "@/models/User";
-import { Mail, AlertTriangle, AlertCircle, Send, Inbox, Archive, BookOpen, LogOut } from "lucide-react";
+import { Mail, AlertTriangle, AlertCircle, LogOut } from "lucide-react";
 import ProfileForm, { ProfileFormData } from "./ProfileForm";
 import { LearningMode, PricingPreference, ContactMethod } from "@/types/user";
 
@@ -73,7 +73,7 @@ export default async function ProfilePage() {
           </div>
           <div className="pt-2">
             <Link
-              href="/profile"
+              href="/settings"
               className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-red-700 hover:bg-red-800 text-white text-xs font-semibold transition-colors min-h-[44px]"
             >
               Retry
@@ -112,20 +112,13 @@ export default async function ProfilePage() {
           Profile &amp; settings
         </h1>
         <p className="text-sm text-muted mt-1">
-          Your name, photo, study preferences and private contact details.
+          Your name, study preferences and private contact details.
         </p>
       </div>
 
-      <nav className="settings-shortcuts" aria-label="Your account activity">
-        <Link href="/dashboard?tab=outgoing"><Send size={17} />Sent requests</Link>
-        <Link href="/dashboard?tab=incoming"><Inbox size={17} />Received requests</Link>
-        <Link href="/dashboard?tab=outgoing&view=archived"><Archive size={17} />Archived</Link>
-        <Link href="/resources/manage"><BookOpen size={17} />My resources</Link>
-      </nav>
       <section className="settings-account" aria-labelledby="account-title">
-        <div className="settings-section-heading"><div><h2 id="account-title">Your account</h2><p>Your photo and name appear on your peer profile.</p></div><LogoutButton className="workspace-secondary-button"><LogOut size={16} />Log out</LogoutButton></div>
-        <AvatarEditor image={dbUser.image || ""} name={name} />
-        <div className="settings-identity"><strong>{name}</strong><span><Mail size={15} />{email}<small>Private sign-in email</small></span></div>
+        <div className="settings-section-heading"><div><h2 id="account-title">Your account</h2><p>Your avatar uses your name’s initials and updates when you save a new name.</p></div><LogoutButton className="workspace-secondary-button"><LogOut size={16} aria-hidden="true" />Log out</LogoutButton></div>
+        <div className="settings-person"><InitialsAvatar name={name} decorative={false} className="settings-initials" /><div className="settings-identity"><strong>{name}</strong><span><Mail size={15} aria-hidden="true" />{email}</span><small>Private sign-in email</small></div></div>
       </section>
 
       {/* Profile Form */}
