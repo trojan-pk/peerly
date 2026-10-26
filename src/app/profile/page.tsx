@@ -8,6 +8,7 @@ import { UniversityEmailSection } from "@/components/settings/UniversityEmailSec
 import { getVerificationStatus, listCourses, listUniversities } from "@/lib/courses";
 import { requireAuth } from "@/lib/auth-guards";
 import { PublicPageSection } from "@/components/settings/PublicPageSection";
+import { DangerZone } from "@/components/settings/DangerZone";
 import { appOrigin } from "@/lib/email";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -168,6 +169,11 @@ export default async function ProfilePage() {
 
       {/* Profile Form */}
       <ProfileForm initialData={initialFormData} />
+
+      <section className="settings-account" aria-labelledby="data-title">
+        <div className="settings-section-heading"><div><h2 id="data-title">Your data</h2><p>Export or permanently delete your account.</p></div></div>
+        <DangerZone />
+      </section>
     </div>
   );
 }

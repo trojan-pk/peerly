@@ -53,7 +53,7 @@ test("learner and helper complete a private request and publish one review", asy
     await helperPage.getByRole("article").filter({ hasText: "quicksort partitioning" }).getByRole("button", { name: "Accept Request", exact: true }).click();
     await expect(helperPage.getByRole("status", { name: "Notifications" })).toContainText(/accepted/i);
     await studentPage.goto("/dashboard?tab=outgoing");
-    await expect(studentPage.getByRole("link", { name: /WhatsApp/ })).toHaveAttribute("href", "https://wa.me/923001234567");
+    await expect(studentPage.getByRole("article").filter({ hasText: "quicksort partitioning" }).getByRole("link", { name: /WhatsApp/ })).toHaveAttribute("href", "https://wa.me/923001234567");
     await studentPage.screenshot({ path: testInfo.outputPath("dashboard-dark.png"), fullPage: true });
     await studentPage.getByRole("article").filter({ hasText: "quicksort partitioning" }).getByRole("button", { name: "Confirm Session Completed", exact: true }).click();
     await expect(studentPage.getByRole("status", { name: "Notifications" })).toContainText(/Waiting for the other participant/i);
@@ -61,12 +61,13 @@ test("learner and helper complete a private request and publish one review", asy
     await helperPage.getByRole("article").filter({ hasText: "quicksort partitioning" }).getByRole("button", { name: "Confirm Session Completed", exact: true }).click();
     await expect(helperPage.getByRole("status", { name: "Notifications" })).toContainText(/Both participants have confirmed/i);
     await studentPage.reload();
-    await studentPage.getByRole("button", { name: /Write.*Review|Leave.*Review/ }).click();
-    await studentPage.getByRole("button", { name: /5 star/i }).click();
-    await studentPage.locator('textarea[id^="review-comment-"]').fill("Clear explanations and helpful examples of partitioning.");
-    await studentPage.getByRole("button", { name: "Submit Review", exact: true }).click();
+    const reviewCard = studentPage.getByRole("article").filter({ hasText: "quicksort partitioning" });
+    await reviewCard.getByRole("button", { name: /Write.*Review|Leave.*Review/ }).click();
+    await reviewCard.getByRole("button", { name: /5 star/i }).click();
+    await reviewCard.locator('textarea[id^="review-comment-"]').fill("Clear explanations and helpful examples of partitioning.");
+    await reviewCard.getByRole("button", { name: "Submit Review", exact: true }).click();
     await expect(studentPage.getByRole("status", { name: "Notifications" })).toContainText(/published/i);
-    await expect(studentPage.getByRole("button", { name: "Submit Review", exact: true })).toHaveCount(0);
+    await expect(reviewCard.getByRole("button", { name: "Submit Review", exact: true })).toHaveCount(0);
     await studentPage.goto(`/peers/${app.ids.helper}`);
     await expect(studentPage.locator("main")).toContainText("Clear explanations and helpful examples");
     await expect(studentPage.locator("main")).not.toContainText("+923001234567");

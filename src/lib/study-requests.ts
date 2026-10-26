@@ -4,6 +4,8 @@ import { StudyRequest, RequestStatus, RequestMode, RequestUrgency, REQUEST_STATU
 import { backfillRequestPriority, expireAndNotify } from "@/lib/request-expiry";
 import { NORMAL_WINDOW_MS } from "@/lib/request-rules";
 import { meetingUrl } from "@/lib/session-rules";
+
+const DELETED_USER_NAME = "Deleted user";
 import { User } from "@/models/User";
 import { buildSafeUnlockedContact, SafeUnlockedContact } from "@/lib/contact-unlock";
 import { requireAuth } from "@/lib/auth-guards";
@@ -282,7 +284,7 @@ export async function getDashboardRequests(
     id: req._id.toString(),
     learner: {
       id: req.learner?._id ? req.learner._id.toString() : "",
-      name: req.learner?.name || "Student Learner",
+      name: req.learner ? req.learner.name || "Student" : DELETED_USER_NAME,
       image: req.learner?.image,
       university: req.learner?.university,
     },
@@ -344,7 +346,7 @@ export async function getDashboardRequests(
         },
         peer: {
           id: req.peer?._id ? req.peer._id.toString() : "",
-          name: req.peer?.name || "Peer Helper",
+          name: req.peer ? req.peer.name || "Student" : DELETED_USER_NAME,
           image: req.peer?.image,
           university: req.peer?.university,
         },
@@ -430,9 +432,9 @@ export async function getPublicPeerReviews(
     const rating = req.review?.rating;
     if (typeof rating !== "number" || !Number.isInteger(rating) || rating < 1 || rating > 5) return [];
     // First name plus last initial; a neutral fallback that does not claim verification.
-    const rawName = req.learner?.name?.trim() || "Student";
+    const rawName = req.learner ? req.learner.name?.trim() || "Student" : DELETED_USER_NAME;
     const nameParts = rawName.split(/\s+/);
-    const safeLearnerName = nameParts.length > 1 ? `${nameParts[0]} ${nameParts[1][0]}.` : rawName;
+    const safeLearnerName = req.learner && nameParts.length > 1 ? `${nameParts[0]} ${nameParts[1][0]}.` : rawName;
 
     return [{
       id: req._id.toString(),

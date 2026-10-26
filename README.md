@@ -60,7 +60,7 @@ When deploying, add the actual HTTPS origin and `https://YOUR-HOST/api/auth/call
 
 ### Cost and hosting
 
-There is no paid AI, email, payment, file-upload or video service in this MVP. Local development and Atlas Free can be used without a hosting subscription. Basic Google OAuth uses the credentials above; no paid identity platform or cloud-compute product is required for this setup.
+There is no paid AI, payment, file-upload or video service. Email is optional (Resend's free tier is enough to start); video calls use the free public meet.jit.si. Local development and Atlas Free can be used without a hosting subscription. Basic Google OAuth uses the credentials above; no paid identity platform or cloud-compute product is required for this setup.
 
 [Vercel Hobby](https://vercel.com/docs/plans/hobby) is free within its limits for personal, non-commercial projects. Its terms restrict commercial use; choose a suitable paid/alternative host for a commercial service. A custom domain is optional. Provider prices and quotas can change.
 
@@ -233,6 +233,27 @@ The fast-reply badge requires **at least three responses** averaging **≤ 2 hou
 
 `ADMIN_EMAILS` is checked server-side for admin reads/writes. Hiding a profile prevents discovery and new requests; existing participants retain authorized historical access. Owners cannot restore moderated resources by editing. Report resolution and hide/restore are independent.
 
+## Account data and security
+
+Settings → Your data offers **Download my data** (`/api/account/export`, JSON of your
+profile including private fields, requests, resources, votes, notifications and reports
+you filed; other people's private data is never included) and **Delete account** (type
+DELETE to confirm). Deletion removes your profile, resources and votes on them, your votes,
+notifications, reports you filed and pending verification codes; cancels your open
+requests; erases problem descriptions and review comments you wrote while keeping star
+ratings so helpers' averages don't change. Other participants keep their history, shown
+with "Deleted user". Signing in again later creates a new, empty account.
+
+Every HTML response carries a per-request nonce Content-Security-Policy from
+`src/proxy.ts` (`src/lib/csp.ts`): scripts only from this origin or with the nonce
+(`'strict-dynamic'`), no `unsafe-eval` in production, `frame-ancestors 'none'`,
+`object-src 'none'`, `base-uri 'self'`. All responses send `X-Content-Type-Options`,
+`X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy` and
+`Cross-Origin-Opener-Policy`; HSTS and `upgrade-insecure-requests` are added when
+`AUTH_URL` is HTTPS. The inline theme script carries the nonce. Styles allow inline
+attributes because React and Motion render `style` props. See [DEPLOYMENT.md](DEPLOYMENT.md)
+for a production checklist.
+
 ## Checks
 
 ```bash
@@ -268,7 +289,9 @@ This opt-in command loads your ignored environment file and runs the configured 
 ## Remaining limits
 
 - Atlas connectivity, public pages with the configured database, and the Google account-selection redirect were checked locally. Full Google consent/token exchange and external deployment remain unverified. See [verification notes](VERIFICATION.md) for the tested scope.
-- Search loads all matching candidates to rank before pagination. Returned pages are bounded; candidate memory is not. Move ranking into MongoDB before a large rollout.
+- Search ranking runs inside MongoDB (aggregation with a per-candidate `$lookup` of request stats), so only one page is loaded into the app. It is tested with 5,000 profiles; for much larger directories consider caching per-helper stats.
+- Real email delivery (alerts, university codes), importing `.ics` files into calendar apps and live Jitsi calls were not tested end to end.
+- Notifications already in other members' inboxes keep a deleted user's first name until they expire (90 days).
 - Free services have quotas/shared capacity and backup limitations. Establish backups and support before relying on the app for real users.
 - Dependency auditing flags an unpatched `braces` advisory through development-only ESLint glob tooling. User input never reaches that tooling. See [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm). Do not downgrade Next.js or force incompatible packages to silence it.
 
