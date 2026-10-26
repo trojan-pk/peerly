@@ -42,3 +42,9 @@ html[data-theme-switching] *, html[data-theme-switching] *::before, html[data-th
   html { scroll-behavior: auto; }
   body { transition: none; }
 }
+
+/* In Ink the text is light, so the highlighter sits under the words like an underline
+   stroke instead of behind them (keeps text contrast high). */
+[data-theme="ink"] .highlight-mark {
+  background-image: linear-gradient(transparent 82%, color-mix(in srgb, var(--pi-highlight) 90%, transparent) 82%, color-mix(in srgb, var(--pi-highlight) 90%, transparent) 96%, transparent 96%);
+}

@@ -39,13 +39,13 @@ test("learner and helper complete a private request and publish one review", asy
     await studentPage.screenshot({ path: testInfo.outputPath("profile-dark.png"), fullPage: true });
     await studentPage.getByLabel("Short Bio", { exact: false }).count().then(async (count) => {
       if (count) await studentPage.getByLabel("Short Bio", { exact: false }).fill("I enjoy learning algorithms with classmates.");
-      else await studentPage.locator("#bio").fill("I enjoy learning algorithms with classmates.");
+      else await studentPage.locator("#bio:visible").fill("I enjoy learning algorithms with classmates.");
     });
     await studentPage.getByRole("button", { name: /Save Profile/ }).click();
     await expect(studentPage.getByRole("main").getByRole("status")).toContainText(/saved successfully/i);
     await studentPage.goto(`/peers/${app.ids.helper}`);
     await expect(studentPage.locator("main")).not.toContainText("+923001234567");
-    await studentPage.locator("#problemDescription").fill("Please explain quicksort partitioning before my algorithms quiz.");
+    await studentPage.locator("#problemDescription:visible").fill("Please explain quicksort partitioning before my algorithms quiz.");
     await studentPage.getByRole("button", { name: /Send.*Request/ }).click();
     await expect(studentPage.getByRole("main").getByRole("status")).toContainText(/sent successfully/i);
     await helperPage.goto("/dashboard?tab=incoming");
@@ -81,18 +81,18 @@ test("resources, modal keyboard focus and admin hide/restore/resolve work throug
   try {
     await ownerPage.goto("/resources/manage");
     await ownerPage.getByRole("button", { name: "New Resource", exact: true }).click();
-    await ownerPage.locator("#create-title").fill("Sorting revision notes");
-    await ownerPage.locator("#create-topic").fill("C++ Sorting");
-    await ownerPage.locator("#create-url").fill("https://example.com/sorting-notes");
-    await ownerPage.locator("#create-desc").fill("My own revision notes about sorting algorithms and complexity.");
+    await ownerPage.locator("#create-title:visible").fill("Sorting revision notes");
+    await ownerPage.locator("#create-topic:visible").fill("C++ Sorting");
+    await ownerPage.locator("#create-url:visible").fill("https://example.com/sorting-notes");
+    await ownerPage.locator("#create-desc:visible").fill("My own revision notes about sorting algorithms and complexity.");
     await ownerPage.screenshot({ path: testInfo.outputPath("resource-form-dark.png"), fullPage: true });
     await ownerPage.getByRole("button", { name: "Publish Resource", exact: true }).click();
     await expect(ownerPage.getByRole("heading", { name: "Sorting revision notes", exact: true })).toBeVisible();
     await ownerPage.getByRole("button", { name: "Edit", exact: true }).click();
-    await ownerPage.locator("#edit-desc").fill("Updated personal sorting notes with a worked quicksort example.");
+    await ownerPage.locator("#edit-desc:visible").fill("Updated personal sorting notes with a worked quicksort example.");
     await ownerPage.getByRole("button", { name: "Save Changes", exact: true }).click();
     await expect(ownerPage.getByRole("main").getByRole("status")).toContainText(/updated successfully/i);
-    await expect(ownerPage.locator("#edit-desc")).toHaveCount(0);
+    await expect(ownerPage.locator("#edit-desc:visible")).toHaveCount(0);
     await expect(ownerPage.locator("main")).toContainText("Updated personal sorting notes");
     expect((await app.db.collection("resources").findOne({ title: "Sorting revision notes" }))?.description).toContain("Updated personal sorting notes");
     await reportPage.goto("/resources?q=Sorting");
@@ -106,8 +106,8 @@ test("resources, modal keyboard focus and admin hide/restore/resolve work throug
     await expect(dialog).toHaveCount(0);
     await expect(trigger).toBeFocused();
     await trigger.click();
-    await reportPage.locator("#report-reason").selectOption("broken_link");
-    await reportPage.locator("#report-explanation").fill("Please review this resource link for our class.");
+    await reportPage.locator("#report-reason:visible").selectOption("broken_link");
+    await reportPage.locator("#report-explanation:visible").fill("Please review this resource link for our class.");
     await dialog.getByRole("button", { name: "Submit Report", exact: true }).click();
     await expect(dialog).toContainText(/submitted/i);
     await reportPage.keyboard.press("Escape");
@@ -153,79 +153,6 @@ test("public mobile routes stay usable and signed-out visitors cannot open priva
   await page.getByRole("button", { name: "Open navigation menu" }).click();
   await expect(page.getByRole("navigation", { name: "Mobile Navigation" })).toBeVisible();
   expect(pageErrors).toEqual([]);
-});
-
-test("one-page landing keeps sections together and gates the workspace behind login", async ({ page }) => {
-  await page.goto("/");
-  const nav = page.getByRole("navigation", { name: "Main Navigation", exact: true });
-  for (const [label, hash] of [["Features", "features"], ["How it works", "how-it-works"], ["Resources", "resources"]]) {
-    await expect(nav.getByRole("link", { name: label, exact: true })).toHaveAttribute("href", `/#${hash}`);
-  }
-  await nav.getByRole("link", { name: "Resources", exact: true }).click();
-  await expect(page).toHaveURL(/\/#resources$/);
-  await expect(page.locator("#resources")).toBeVisible();
-  await page.locator(".deck-switcher").getByRole("button", { name: "Practice", exact: true }).click();
-  await expect(page.locator(".deck-practice")).toHaveClass(/is-front/);
-  await expect(page.locator(".resource-sample")).toContainText("Binary tree traversal exercises");
-  await expect(page.locator(".resource-sample")).toHaveCount(1);
-  await page.getByRole("button", { name: "After acceptance", exact: true }).click();
-  await expect(page.locator(".contact-boundary")).toContainText("Contact unlocks privately");
-  await page.getByRole("button", { name: "Before acceptance", exact: true }).click();
-  await expect(page.locator(".contact-boundary")).toContainText("Contact stays private");
-  await page.getByRole("button", { name: "On campus", exact: true }).click();
-  await expect(page.locator(".mode-description")).toContainText("public campus space");
-  await page.getByRole("tab", { name: "Mathematics", exact: true }).click();
-  await expect(page.locator("#subject-panel")).toContainText("Linear algebra");
-  const connect = page.getByRole("tab", { name: /03 Connect on your terms/ });
-  await connect.click();
-  await expect(page.locator("#workflow-panel")).toContainText("Contact unlocks privately");
-  await connect.press("ArrowDown");
-  await expect(page.getByRole("tab", { name: /04 Learn/ })).toBeFocused();
-  await expect(page.locator("#workflow-panel")).toContainText("Feedback opens after both confirmations");
-  const question = page.locator("summary", { hasText: "When are contact details shared?" });
-  await question.click();
-  await expect(question.locator("..")).toHaveAttribute("open", "");
-  const feature = page.locator(".m-feature").first();
-  await feature.scrollIntoViewIfNeeded();
-  const icon = feature.locator(".m-feature-icon");
-  await page.mouse.move(5, 100);
-  const relativePosition = () => icon.evaluate(el => {
-    const iconBox = el.getBoundingClientRect();
-    const cardBox = el.closest(".m-feature")!.getBoundingClientRect();
-    return { x: iconBox.x - cardBox.x, y: iconBox.y - cardBox.y };
-  });
-  const before = await relativePosition();
-  await feature.hover({ position: { x: 45, y: 45 } });
-  await expect(feature).toHaveAttribute("data-pointer", "active");
-  await expect.poll(async () => {
-    const after = await relativePosition();
-    return Math.max(Math.abs(after.x - before.x), Math.abs(after.y - before.y));
-  }).toBeLessThan(1);
-  expect(await icon.evaluate(el => getComputedStyle(el).transform)).toBe("none");
-  await expect(page.getByRole("button", { name: /Pause animations|Resume animations/ })).toHaveCount(0);
-  await expect(page.locator('main a[href="/peers"], main a[href="/resources"]')).toHaveCount(0);
-  // Default motion has no decorative infinite loops, including offscreen sections.
-  expect(await page.evaluate(() => document.getAnimations().filter(animation => animation.effect?.getTiming().iterations === Infinity).length)).toBe(0);
-  await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
-  expect(await page.locator(".aurora-field > i").first().evaluate(el => getComputedStyle(el).animationName)).toBe("none");
-  for (const width of [320, 390, 768, 1024, 1440]) {
-    await page.setViewportSize({ width, height: 900 });
-    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    // The preview logo must not force the adjacent title into a narrow column.
-    const toolbar = await page.locator(".studio-toolbar").boundingBox();
-    expect(toolbar!.height).toBeLessThan(80);
-    const stepNumber = await page.locator(".step-number").first().boundingBox();
-    expect(stepNumber!.height).toBeLessThanOrEqual(24);
-  }
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.getByRole("tab", { name: "Physics", exact: true }).click();
-  const selectorBox = await page.locator(".studio-subjects").boundingBox();
-  const resultBox = await page.locator(".studio-search").boundingBox();
-  expect(selectorBox).not.toBeNull(); expect(resultBox).not.toBeNull();
-  expect(resultBox!.y - (selectorBox!.y + selectorBox!.height)).toBeLessThan(30);
-  await expect(page.locator("#subject-panel")).toContainText("Mechanics");
-  await page.getByRole("link", { name: "Find your study circle", exact: true }).first().click();
-  await expect(page).toHaveURL(/\/login$/);
 });
 
 test("workspace footer is absent and logout requires confirmation on desktop and mobile", async ({ browser, app }, testInfo) => {

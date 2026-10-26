@@ -34,13 +34,13 @@ test("direct account settings persist a name and initials and request history su
     await page.getByRole("link", { name: "Open account settings", exact: true }).click();
     await expect(page).toHaveURL(/\/settings$/);
     await expect(page.locator("footer.site-footer")).toHaveCount(0);
-    await page.locator("#name").fill("Laila Updated");
+    await page.locator("#name:visible").fill("Laila Updated");
     await page.getByRole("button", { name: /Save Profile/ }).click();
     await expect(page.getByRole("main").getByRole("status")).toContainText(/saved successfully/i);
     const avatar = page.getByRole("img", { name: "Laila Updated avatar", exact: true });
     await expect(avatar).toHaveText("LU");
     await page.reload();
-    await expect(page.locator("#name")).toHaveValue("Laila Updated");
+    await expect(page.locator("#name:visible")).toHaveValue("Laila Updated");
     await expect(avatar).toHaveText("LU");
     await expect(page.locator('input[type="file"]')).toHaveCount(0);
     await expect(page.locator('a[href="/settings"]')).toHaveCount(0);
@@ -70,9 +70,9 @@ test("direct account settings persist a name and initials and request history su
 
     await page.goto("/resources/manage");
     await page.getByRole("button", { name: "New Resource", exact: true }).click();
-    await page.locator("#create-title").focus();
+    await page.locator("#create-title:visible").focus();
     await page.screenshot({ path: testInfo.outputPath("resources-focus-after.png"), fullPage: true });
-    console.log("Resource focus boundary", await page.locator("#create-title").evaluate(el => ({ outlineOffset: getComputedStyle(el).outlineOffset, boxShadow: getComputedStyle(el).boxShadow })));
+    console.log("Resource focus boundary", await page.locator("#create-title:visible").evaluate(el => ({ outlineOffset: getComputedStyle(el).outlineOffset, boxShadow: getComputedStyle(el).boxShadow })));
     for (const width of [320,390,768,1440]) {
       await page.setViewportSize({ width, height: 900 });
       await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);

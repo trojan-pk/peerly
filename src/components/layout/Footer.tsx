@@ -2,9 +2,9 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
 import { BrandMark, BrandWordmark } from "@/components/BrandMark";
 
+/** Marketing footer, shown on the landing and login pages only. */
 export function Footer() {
   const pathname = usePathname();
   const marketing = pathname === "/" || pathname === "/login";
@@ -12,10 +12,16 @@ export function Footer() {
   return (
     <footer className="site-footer marketing-footer">
       <div className="footer-main">
-        <div><Link href="/" className="brand-lockup" aria-label="Peerly Home"><BrandMark className="brand-symbol" /><BrandWordmark className="brand-wordmark" /></Link><p>A little help goes a long way.<br />A place to learn it. A place to share it.</p></div>
-        <div className="footer-links"><div><span>MEET PEERLY</span><Link href="/#features">Features <ArrowUpRight size={12} /></Link><Link href="/#how-it-works">How it works</Link><Link href="/#resources">Resources</Link></div><div><span>YOUR NEXT STEP</span><Link href="/login">Get started <ArrowUpRight size={12} /></Link><Link href="/login">Log in</Link><Link href="/#questions">Common questions</Link></div><div><span>BRIGHTER TOGETHER</span><p>Different strengths.<br />New perspectives.<br />A little help goes a long way.</p></div></div>
+        <div>
+          <Link href="/" className="brand-lockup" aria-label="Peerly Home"><BrandMark className="brand-symbol" /><BrandWordmark className="brand-wordmark" /></Link>
+          <p>Study help from students who’ve taken your course.</p>
+        </div>
+        <nav className="footer-links" aria-label="Footer">
+          <div><span>Peerly</span><Link href="/#how-it-works">How it works</Link><Link href="/#privacy">Privacy</Link><Link href="/#resources">Resources</Link></div>
+          <div><span>Get started</span><Link href="/login">Sign in with Google</Link><Link href="/#helpers">Become a helper</Link><Link href="/#questions">Questions</Link></div>
+        </nav>
       </div>
-      <div className="footer-bottom"><span>© {new Date().getFullYear()} Peerly</span><span>Different strengths. Better together.<span className="footer-dot" /></span></div>
+      <div className="footer-bottom"><span>© {new Date().getFullYear()} Peerly</span><span>No payments, no file uploads, no AI answers — just peers.</span></div>
     </footer>
   );
 }

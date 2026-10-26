@@ -22,10 +22,9 @@ const manrope = localFont({
 });
 
 const instrumentSerif = localFont({
-  src: [
-    { path: "./fonts/InstrumentSerif-Regular.woff2", weight: "400", style: "normal" },
-    { path: "./fonts/InstrumentSerif-Italic.woff2", weight: "400", style: "italic" },
-  ],
+  src: "./fonts/InstrumentSerif-Regular.woff2",
+  weight: "400",
+  style: "normal",
   variable: "--font-instrument-serif",
   display: "swap",
   adjustFontFallback: "Times New Roman",

@@ -27,7 +27,7 @@ test("urgent request with a deadline reaches the helper's bell, inbox and top of
     const helperBefore = await unread(helper);
 
     await learner.goto(`/peers/${app.ids.helper}`);
-    await learner.locator("#request-topic").fill(topic);
+    await learner.locator("#request-topic:visible").fill(topic);
     await learner.getByRole("radio", { name: /^Urgent/ }).check();
     const deadline = await learner.evaluate(() => {
       const d = new Date(Date.now() + 3 * 60 * 60 * 1000);
@@ -35,7 +35,7 @@ test("urgent request with a deadline reaches the helper's bell, inbox and top of
       return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
     });
     await learner.getByLabel(/Needed by/).fill(deadline);
-    await learner.locator("#problemDescription").fill("My pointer loop segfaults on the last element. Assignment due tonight.");
+    await learner.locator("#problemDescription:visible").fill("My pointer loop segfaults on the last element. Assignment due tonight.");
     await learner.getByRole("button", { name: /Send.*Request/ }).click();
     await expect(learner.getByRole("main").getByRole("status")).toContainText(/sent successfully/i);
 
@@ -85,8 +85,8 @@ test("an overdue request expires: the helper cannot accept it and the learner is
   const helper = await helperContext.newPage();
   try {
     await learner.goto(`/peers/${app.ids.helper}`);
-    await learner.locator("#request-topic").fill(topic);
-    await learner.locator("#problemDescription").fill("How do I pick the state for the knapsack recurrence?");
+    await learner.locator("#request-topic:visible").fill(topic);
+    await learner.locator("#problemDescription:visible").fill("How do I pick the state for the knapsack recurrence?");
     await learner.getByRole("button", { name: /Send.*Request/ }).click();
     await expect(learner.getByRole("main").getByRole("status")).toContainText(/sent successfully/i);
 
@@ -94,13 +94,13 @@ test("an overdue request expires: the helper cannot accept it and the learner is
     await app.db.collection("studyrequests").updateOne({ topic, learner: new ObjectId(app.ids.learner) }, { $set: { expiresAt: new Date(Date.now() - 60_000) } });
 
     await helper.goto("/dashboard?tab=incoming&status=EXPIRED");
-    const helperCard = helper.locator(".request-card").filter({ hasText: topic });
+    const helperCard = helper.getByRole("article").filter({ hasText: topic });
     await expect(helperCard).toHaveAttribute("data-status", "EXPIRED");
     await expect(helperCard.getByRole("button", { name: "Accept Request" })).toHaveCount(0);
     await expect(helperCard).toContainText("no longer counts toward your response time");
 
     await learner.goto("/dashboard?tab=outgoing&status=EXPIRED");
-    const learnerCard = learner.locator(".request-card").filter({ hasText: topic });
+    const learnerCard = learner.getByRole("article").filter({ hasText: topic });
     await expect(learnerCard.getByText("Expired", { exact: true })).toBeVisible();
     await expect(learnerCard.getByRole("link", { name: "Try another helper" })).toHaveAttribute("href", `/peers?topic=${encodeURIComponent(topic)}`);
     await learner.goto("/notifications");

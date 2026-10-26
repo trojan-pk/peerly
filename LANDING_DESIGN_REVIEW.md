@@ -79,3 +79,5 @@ implementation below carries out the approved recomposition.
 The landing → login → workspace flow stays intact. Landing examples never query
 or reveal real member/contact data. The request and resource controls explain
 product behaviour; they do not send requests or create resources.
+
+> Superseded (26 October 2026): the landing was rebuilt in the Paper & Ink system in Phase 3. See README "Visual design and entry flow" and VERIFICATION.md.
