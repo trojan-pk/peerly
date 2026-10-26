@@ -3,12 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, ArrowUpRight, LogOut, Settings } from "lucide-react";
+import { Menu, X, ArrowUpRight, LogOut, Settings, Search } from "lucide-react";
 import { LogoutButton } from "@/components/LogoutButton";
 import { BrandMark, BrandWordmark } from "@/components/BrandMark";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { NotificationBell } from "@/components/layout/NotificationBell";
+import { CommandPalette, PaletteButton, OPEN_PALETTE_EVENT } from "@/components/CommandPalette";
 
 interface NavbarProps {
   user?: { id?: string } | null;
@@ -48,12 +49,12 @@ function RouteNavbar({ user, isAdmin = false, loading = false, unreadCount = 0, 
         <nav aria-label="Main Navigation" className="hidden xl:flex items-center gap-1">{links.map(link => <Link key={link.href} href={link.href} aria-current={isActive(link.href) ? "page" : undefined} className={`nav-link ${isActive(link.href) ? "active" : ""}`}>{link.label}</Link>)}</nav>
         <div className="header-account-actions">
           <div className="hidden xl:block"><ThemeToggle compact /></div>
-          {marketing ? <div className="hidden xl:flex items-center gap-4"><Link href={startHref} className="nav-link">{user ? "Your workspace" : "Log in"}</Link><Link href={startHref} className="ui-button is-primary is-sm">{user ? "Open workspace" : "Get started"}<ArrowUpRight size={15} aria-hidden="true" /></Link></div> : user ? <>{!loading && <NotificationBell initialCount={unreadCount} current={pathname === "/notifications"} />}{!settings && <Link href="/settings" aria-label="Open account settings" title="Account settings" className="settings-link"><Settings size={19} aria-hidden="true" /></Link>}</> : <Link href="/login" className="nav-join hidden xl:flex">Sign in</Link>}
+          {marketing ? <div className="hidden xl:flex items-center gap-4"><Link href={startHref} className="nav-link">{user ? "Your workspace" : "Log in"}</Link><Link href={startHref} className="ui-button is-primary is-sm">{user ? "Open workspace" : "Get started"}<ArrowUpRight size={15} aria-hidden="true" /></Link></div> : user ? <>{!loading && <><span className="hidden xl:inline-flex"><PaletteButton /></span><span className="xl:hidden palette-compact"><PaletteButton compact /></span></>}{!loading && <NotificationBell initialCount={unreadCount} current={pathname === "/notifications"} />}{!settings && <Link href="/settings" aria-label="Open account settings" title="Account settings" className="settings-link"><Settings size={19} aria-hidden="true" /></Link>}</> : <Link href="/login" className="nav-join hidden xl:flex">Sign in</Link>}
           <button type="button" id="mobile-menu-toggle" className="mobile-menu-button xl:hidden" disabled={loading} aria-busy={loading || undefined} aria-controls="mobile-navigation" aria-expanded={isMobileMenuOpen} aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"} onClick={() => setIsMobileMenuOpen(open => !open)}>{isMobileMenuOpen ? <X size={23} /> : <Menu size={23} />}</button>
         </div>
       </div>
-      {isMobileMenuOpen && <nav id="mobile-navigation" aria-label="Mobile Navigation" className="mobile-navigation xl:hidden">{links.map(link => <Link key={link.href} href={link.href} className={`nav-link ${isActive(link.href) ? "active" : ""}`} onClick={() => setIsMobileMenuOpen(false)}>{link.label}<ArrowUpRight size={14} /></Link>)}<div className="mobile-user">{<div className="mobile-theme"><span>Theme</span><ThemeToggle compact /></div>}{user && !marketing ? <LogoutButton className="nav-link">Sign Out <LogOut size={15} /></LogoutButton> : <Link href={startHref} className="nav-join" onClick={() => setIsMobileMenuOpen(false)}>{user ? "Open platform" : "Get started"}<ArrowUpRight size={15} /></Link>}</div></nav>}
+      {isMobileMenuOpen && <nav id="mobile-navigation" aria-label="Mobile Navigation" className="mobile-navigation xl:hidden">{links.map(link => <Link key={link.href} href={link.href} className={`nav-link ${isActive(link.href) ? "active" : ""}`} onClick={() => setIsMobileMenuOpen(false)}>{link.label}<ArrowUpRight size={14} /></Link>)}<div className="mobile-user">{user && !marketing && <button type="button" className="nav-link w-full" onClick={() => { setIsMobileMenuOpen(false); window.dispatchEvent(new Event(OPEN_PALETTE_EVENT)); }}>Search Peerly <Search size={15} aria-hidden="true" /></button>}{<div className="mobile-theme"><span>Theme</span><ThemeToggle compact /></div>}{user && !marketing ? <LogoutButton className="nav-link">Sign Out <LogOut size={15} /></LogoutButton> : <Link href={startHref} className="nav-join" onClick={() => setIsMobileMenuOpen(false)}>{user ? "Open platform" : "Get started"}<ArrowUpRight size={15} /></Link>}</div></nav>}
     </header>
-    {user && !marketing && !loading && <BottomNav pathname={pathname} />}
+    {user && !marketing && !loading && <><BottomNav pathname={pathname} /><CommandPalette /></>}
   </>;
 }

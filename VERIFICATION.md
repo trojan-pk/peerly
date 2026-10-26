@@ -406,3 +406,25 @@ tested (no provider key); the HTTP request shape is covered with a mocked `fetch
   Id-based form locators now target visible elements because streamed Suspense content can
   briefly exist twice in the DOM. Results: 319 unit/integration tests and 16/16 browser
   scenarios on two consecutive runs; typecheck, lint and build passed.
+
+## Peerly v2 — Phase 4: workspace UX (26 October 2026)
+
+- Dashboard: `useOptimistic` for accept/decline/cancel/confirm/review with toast feedback
+  and automatic rollback; inline success/error banners replaced by the toast live regions.
+  Sections (Needs your response / Waiting for a reply, Active sessions, History) when no
+  filter or archive view is active. Cards are focusable articles named by their topic with
+  `aria-keyshortcuts`; A/R accept/decline a focused pending incoming request.
+- Command palette (Ctrl/⌘K, header button, mobile menu entry): ARIA combobox + listbox with
+  `aria-activedescendant`, debounced `searchWorkspace` server action (auth required,
+  60/min, 60-char limit, regex-escaped) returning discoverable peers' public fields, topics
+  and only the caller's requests. `?` opens shortcut help except while typing.
+
+Tests: 5 new integration tests (signed-out/short/non-string queries return nothing, own
+requests only, hidden profiles excluded, no contact/email in results, literal regex
+characters, helper-side tabs). Browser: sections render; an accept whose server call is
+held then aborted shows Accepted immediately, then reverts to Pending with an error toast
+and the database unchanged; keyboard A accepts and moves the card to Active sessions;
+palette keyboard search → Enter navigates to the request anchor, arrow selection, Escape,
+header trigger, `?` help, `?` typed in a field ignored. A 320px header overflow from the
+new search icon was fixed (icon moves into the mobile menu below 420px). Results: 324
+unit/integration tests and 18/18 browser scenarios on two consecutive runs.

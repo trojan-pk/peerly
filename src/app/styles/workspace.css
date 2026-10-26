@@ -97,3 +97,34 @@
 .ui-switch[aria-checked="true"] > span { transform: translateX(18px); }
 .ui-switch:focus-visible { outline: 2px solid var(--pi-accent); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { .ui-switch > span { transition: none; } }
+
+/* Phase 4: dashboard sections and keyboard-focusable request cards. */
+.request-section + .request-section { margin-top: 36px; }
+.request-section-title { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; color: var(--pi-ink); font-size: 15px; font-weight: 700; }
+.request-section-title span { min-width: 24px; padding: 1px 8px; border-radius: 999px; background: var(--pi-raised); color: var(--pi-muted); font-size: 12px; text-align: center; }
+.request-card:focus-visible { outline: 2px solid var(--pi-accent); outline-offset: 3px; }
+.request-card[aria-busy="true"] { opacity: .85; }
+.kbd { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 6px; border: 1px solid var(--pi-edge); border-bottom-width: 2px; border-radius: 6px; background: var(--pi-surface); color: var(--pi-ink); font: 600 12px/1 var(--font-geist-mono), ui-monospace, monospace; }
+
+/* Command palette */
+.palette-trigger { display: inline-flex; align-items: center; gap: 10px; min-height: 40px; padding: 6px 8px 6px 12px; border: 1px solid var(--pi-line); border-radius: 10px; background: var(--pi-panel); color: var(--pi-muted); font-size: 13px; }
+.palette-trigger:hover { border-color: var(--pi-edge); color: var(--pi-ink); }
+.palette-trigger.is-icon { width: 44px; height: 44px; justify-content: center; padding: 0; }
+.palette { padding: 0 !important; }
+.palette-input-row { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--pi-line); color: var(--pi-muted); }
+.palette-input-row input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--pi-ink); font-size: 16px; outline: none; }
+.palette-list { max-height: min(420px, 60dvh); overflow-y: auto; padding: 6px; }
+.palette-group { padding: 10px 10px 4px; color: var(--pi-faint); font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+.palette-option { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 9px; color: var(--pi-body); font-size: 14px; cursor: pointer; }
+.palette-option[aria-selected="true"] { background: color-mix(in srgb, var(--pi-accent) 12%, var(--pi-surface)); color: var(--pi-ink); }
+.palette-option svg { flex-shrink: 0; color: var(--pi-muted); }
+.palette-option small { margin-left: auto; color: var(--pi-muted); font-size: 12px; white-space: nowrap; }
+.palette-option span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.palette-empty { padding: 22px 12px; color: var(--pi-muted); font-size: 14px; text-align: center; }
+.palette-foot { display: flex; flex-wrap: wrap; gap: 14px; padding: 10px 16px; border-top: 1px solid var(--pi-line); color: var(--pi-muted); font-size: 12px; }
+.palette-foot span { display: inline-flex; align-items: center; gap: 6px; }
+.shortcut-list { display: grid; gap: 10px; }
+.shortcut-list div { display: flex; justify-content: space-between; align-items: center; gap: 16px; color: var(--pi-body); font-size: 14px; }
+.shortcut-list dd { display: flex; gap: 4px; }
+.ui-dialog:has(.palette) .ui-dialog-header { padding: 0; height: 0; overflow: hidden; }
+.ui-dialog:has(.palette) .ui-dialog-body { padding: 0; }

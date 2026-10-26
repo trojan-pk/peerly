@@ -68,3 +68,4 @@
   .nav-container { padding: 0 16px; }
   .brand-wordmark { width: 80px; height: 27px; }
 }
+@media (max-width: 420px) { .palette-compact { display: none; } }

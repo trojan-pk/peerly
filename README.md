@@ -146,6 +146,20 @@ be turned off in Settings → Notifications. Without both variables, email is sk
 everything else works. Check your provider's current free-tier limits. `pnpm check:env`
 reports these as optional. Real delivery has not been verified without a key.
 
+## Workspace speed and keyboard use
+
+Dashboard actions (accept, decline, cancel, confirm completion, review) update the card
+immediately with React's `useOptimistic`; if the server rejects the change or can't be
+reached, the card returns to its previous state and an error toast explains why. Results
+are announced through the toast live regions. With the "All statuses" filter, requests are
+grouped into **Needs your response / Waiting for a reply**, **Active sessions** and
+**History**, urgent requests first.
+
+Press **Ctrl K / ⌘K** (or the header Search button) for the command palette: pages,
+discoverable peers, topics and your own requests. It returns public peer fields only and
+is rate-limited. Press **?** for shortcut help. Tab to a pending request sent to you and
+press **A** to accept or **R** to decline.
+
 ## Open Page identity
 
 The approved Open Page symbol and outlined `peerly` wordmark appear in the header,
