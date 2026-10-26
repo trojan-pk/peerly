@@ -10,7 +10,7 @@ Build a real, local Next.js application in this repository, not a UI demo. Codex
 - MongoDB through Mongoose, Auth.js Google OAuth with secure server sessions/JWT.
 - Zod for input validation. Vitest for meaningful workflow/security tests.
 - One application, no separate Express service.
-- Use npm and a committed lockfile. Verify current APIs from package docs as needed.
+- Use pnpm and the committed `pnpm-lock.yaml`. Verify current APIs from package docs as needed.
 
 ## Product scope
 

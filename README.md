@@ -4,17 +4,17 @@ Find a classmate who can explain the topic you're stuck on, request a short stud
 
 ## Run locally
 
-Requires **Node.js 22.18+**, npm and a reachable MongoDB database.
+Requires **Node.js 22.18+**, **pnpm 11** (`corepack enable` activates the pinned version) and a reachable MongoDB database.
 
 ```bash
-npm ci
-npm run setup
+pnpm install --frozen-lockfile
+pnpm setup:env
 # Fill the three provider values in .env.local using the instructions below.
-npm run check:env -- --connect
-npm run dev
+pnpm check:env --connect
+pnpm dev
 ```
 
-Open **http://localhost:3000**. `npm run setup` creates an ignored `.env.local` with restrictive permissions and a cryptographically random `AUTH_SECRET`; it never overwrites an existing `.env.local` or `.env` file or prints the secret. The app builds and displays safe unavailable states without credentials. Sign-in and saved data require real configuration.
+Open **http://localhost:3000**. `pnpm setup:env` creates an ignored `.env.local` with restrictive permissions and a cryptographically random `AUTH_SECRET`; it never overwrites an existing `.env.local` or `.env` file or prints the secret. The app builds and displays safe unavailable states without credentials. Sign-in and saved data require real configuration.
 
 ## Environment: what to get and where
 
@@ -23,11 +23,11 @@ Open **http://localhost:3000**. `npm run setup` creates an ignored `.env.local` 
 | `MONGODB_URI` | Atlas → your cluster → Connect → Drivers | Database connection. Include the database name `peerly` in the URI. |
 | `AUTH_GOOGLE_ID` | Google Cloud → Google Auth Platform → Clients → Web application | Google OAuth client ID, usually ending in `.apps.googleusercontent.com`. |
 | `AUTH_GOOGLE_SECRET` | The same Google OAuth client's credentials | OAuth secret, not a Gemini API key. |
-| `AUTH_SECRET` | Generated locally by `npm run setup` | Encrypts session cookies. Different per environment; rotating it signs existing users out. |
+| `AUTH_SECRET` | Generated locally by `pnpm setup:env` | Encrypts session cookies. Different per environment; rotating it signs existing users out. |
 | `AUTH_URL` | Your app's base URL | `http://localhost:3000` locally; the exact HTTPS origin after deployment. |
 | `ADMIN_EMAILS` | Your chosen administrator Google email(s) | Optional comma-separated allowlist. |
 
-Put these in **`.env.local`** (an existing `.env` also works), never client code or `NEXT_PUBLIC_` variables. When deploying, set the same names in the host's environment settings. Restart after changes. `npm run check:env` prints only validation status; `--connect` additionally pings MongoDB. It does not validate your credentials against Google or prove login works.
+Put these in **`.env.local`** (an existing `.env` also works), never client code or `NEXT_PUBLIC_` variables. When deploying, set the same names in the host's environment settings. Restart after changes. `pnpm check:env` prints only validation status; `--connect` additionally pings MongoDB. It does not validate your credentials against Google or prove login works.
 
 ### MongoDB Atlas
 
@@ -35,7 +35,7 @@ Put these in **`.env.local`** (an existing `.env` also works), never client code
 2. In **Database Access**, create a database user. Its password is different from your Atlas account password.
 3. In **Network Access**, allow your current development IP. For hosting, configure access for the deployment's outbound network; do not blindly open the database to all addresses.
 4. Choose **Connect → Drivers**. Substitute the database username/password in the URI and add `/peerly` before its query string. URL-encode special characters. Save as `MONGODB_URI`.
-5. Run `npm run check:env -- --connect`.
+5. Run `pnpm check:env --connect`.
 
 Atlas offers a free tier with **512 MB** of shared storage. Capacity, connection and feature limits apply; automatic backups are not included in the free tier. See [current pricing](https://www.mongodb.com/pricing) and the [free cluster guide](https://www.mongodb.com/docs/atlas/tutorial/deploy-free-tier-cluster/).
 
@@ -64,7 +64,7 @@ There is no paid AI, email, payment, file-upload or video service in this MVP. L
 
 [Vercel Hobby](https://vercel.com/docs/plans/hobby) is free within its limits for personal, non-commercial projects. Its terms restrict commercial use; choose a suitable paid/alternative host for a commercial service. A custom domain is optional. Provider prices and quotas can change.
 
-This is a **Next.js Node application**, not a static export. It requires a server runtime with MongoDB connectivity. Build with `npm run build`, run with `npm start`. The repository has not been published or deployed by this setup.
+This is a **Next.js Node application**, not a static export. It requires a server runtime with MongoDB connectivity. Build with `pnpm build`, run with `pnpm start`. The repository has not been published or deployed by this setup.
 
 ## Features and boundaries
 
@@ -137,11 +137,11 @@ The fast-reply badge requires **at least three responses** averaging **≤ 2 hou
 ## Checks
 
 ```bash
-npm run typecheck
-npm test
-npm run lint
-npm run build
-npm run test:e2e
+pnpm typecheck
+pnpm test
+pnpm lint
+pnpm build
+pnpm test:e2e
 ```
 
 Integration tests use isolated `mongodb-memory-server` databases and synthetic users. The first run downloads a MongoDB executable. Browser tests require Google Chrome; alternatively set `PEERLY_CHROME_PATH` to a Chromium executable. They start production servers at `127.0.0.1:3101` and `127.0.0.1:3102`, so build first and keep those ports free.
@@ -151,7 +151,7 @@ Browser tests use encrypted, test-only Auth.js sessions and a temporary database
 To verify writes on your configured cluster as well, run:
 
 ```bash
-npm run test:e2e:atlas
+pnpm test:e2e:atlas
 ```
 
 This opt-in command loads your ignored environment file and runs the configured browser workflows against a fresh `peerly_e2e_<random>` database. The database is dropped after the run. Your database user needs permission to create/drop that temporary database and its indexes. Keep ports 3101/3102 free. This still uses test-only sessions, not Google's consent flow. A forcibly terminated run can leave a temporary database behind.
