@@ -5,7 +5,7 @@ import { loginWithGoogleAction } from "@/app/actions/auth";
 import { getAuthConfigStatus } from "@/lib/auth-config";
 import { isDatabaseConfigured } from "@/lib/db";
 import Link from "next/link";
-import { Shield, AlertTriangle, KeyRound, CheckCircle, Database } from "lucide-react";
+import { Shield, AlertTriangle, KeyRound, CheckCircle, Database, Clock, Lock, Star } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -25,18 +25,23 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const isDev = process.env.NODE_ENV === "development";
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-12 sm:py-16">
-      <div className="bg-surface rounded-2xl border border-line/90 shadow-sm p-6 sm:p-8 space-y-6">
+    <div className="login-page">
+      <section className="login-intro" aria-labelledby="login-intro-title">
+        <p className="lp-kicker">Peerly</p>
+        <h2 id="login-intro-title" className="lp-heading">Pick up where your course left off.</h2>
+        <ul className="login-points">
+          <li><Clock className="w-5 h-5" aria-hidden="true" /><span><strong>Urgent requests go first.</strong> Add your deadline; helpers see the countdown.</span></li>
+          <li><Lock className="w-5 h-5" aria-hidden="true" /><span><strong>Contact stays private.</strong> It unlocks only for a request a helper accepts.</span></li>
+          <li><Star className="w-5 h-5" aria-hidden="true" /><span><strong>Reviews are earned.</strong> Only completed sessions can be rated.</span></li>
+        </ul>
+      </section>
+      <div className="login-card space-y-6">
         {/* Header */}
-        <div className="space-y-2 text-center">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-accent/10 text-accent mx-auto">
-            <BrandMark className="w-8 h-8" />
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight text-ink">
-            Sign in to Peerly
-          </h1>
-          <p className="text-sm text-muted max-w-md mx-auto">
-            Sign in with your Google account to exchange academic help, share study materials, and connect with peers.
+        <div className="space-y-3">
+          <span className="login-mark" aria-hidden="true"><BrandMark className="w-8 h-8" /></span>
+          <h1 className="page-title">Sign in to Peerly</h1>
+          <p className="text-sm text-muted leading-relaxed">
+            Use your Google account to ask for help, offer it and share study links. You’ll set up your profile next.
           </p>
         </div>
 
@@ -58,7 +63,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             <div className="flex flex-col sm:flex-row gap-2 pt-2">
               <Link
                 href="/dashboard"
-                className="flex-1 inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-action text-white text-sm font-medium hover:bg-action-hover transition-colors min-h-[44px] focus-visible:ring-2 focus-visible:ring-accent"
+                className="ui-button is-primary is-md flex-1"
               >
                 Go to Dashboard
               </Link>
@@ -93,7 +98,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               <form action={loginWithGoogleAction} className="space-y-4">
                 <button
                   type="submit"
-                  className="w-full inline-flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-edge bg-surface hover:bg-panel text-ink text-sm font-semibold transition-colors shadow-xs min-h-[48px] focus-visible:ring-2 focus-visible:ring-accent cursor-pointer"
+                  className="ui-button is-secondary is-lg w-full"
                 >
                   <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
                     <path
@@ -191,10 +196,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         )}
 
         {/* Privacy Note */}
-        <div className="pt-4 border-t border-line flex items-start gap-2 text-xs text-muted">
+        <div className="pt-4 border-t border-line flex items-start gap-2 text-sm text-muted">
           <Shield className="w-4 h-4 text-accent shrink-0 mt-0.5" aria-hidden="true" />
           <p className="leading-relaxed">
-            <span className="font-medium text-body">Your contact stays private:</span> We use your Google account strictly for login and profile verification. Your email and direct contact details will never appear in public search results.
+            We use Google only to sign you in. Your email and contact details never appear in search results or public profiles.
           </p>
         </div>
       </div>

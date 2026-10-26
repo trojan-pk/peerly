@@ -34,12 +34,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={api}>
       {children}
       <div className="ui-toast-viewport">
-        <ol role="status" aria-live="polite" aria-label="Notifications" className="ui-toast-list">
-          <AnimatePresence initial={false}>{polite.map((t) => <ToastCard key={t.id} toast={t} onDismiss={dismiss} />)}</AnimatePresence>
-        </ol>
-        <ol role="alert" aria-live="assertive" aria-label="Errors" className="ui-toast-list">
-          <AnimatePresence initial={false}>{assertive.map((t) => <ToastCard key={t.id} toast={t} onDismiss={dismiss} />)}</AnimatePresence>
-        </ol>
+        <div role="status" aria-live="polite" aria-label="Notifications">
+          <ol className="ui-toast-list"><AnimatePresence initial={false}>{polite.map((t) => <ToastCard key={t.id} toast={t} onDismiss={dismiss} />)}</AnimatePresence></ol>
+        </div>
+        <div role="alert" aria-live="assertive" aria-label="Errors">
+          <ol className="ui-toast-list"><AnimatePresence initial={false}>{assertive.map((t) => <ToastCard key={t.id} toast={t} onDismiss={dismiss} />)}</AnimatePresence></ol>
+        </div>
       </div>
     </ToastContext.Provider>
   );

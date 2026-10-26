@@ -378,3 +378,31 @@ froze pages (`GPU process exited unexpectedly`). Tests now launch Chrome with
 `--disable-gpu`; two consecutive full runs then passed. Results: 319 unit/integration
 tests, typecheck, lint, build and 14/14 browser scenarios. Real email delivery was not
 tested (no provider key); the HTTP request shape is covered with a mocked `fetch`.
+
+## Peerly v2 — Phase 3: Paper & Ink landing and login (26 October 2026)
+
+- New landing (`src/app/page.tsx`, `src/components/landing/{HeroScene,HowItWorks,PrivacyReveal}`,
+  `src/app/styles/marketing.css`): hero with one Motion sequence (plays once, Replay,
+  final state under reduced motion), "11 PM problem", sticky scroll-driven How it works
+  with keyboard-selectable steps, privacy before/after toggle, link-only resource example,
+  helper section, FAQ with expiry/urgent answers, final CTA. Theme-aware; old purple
+  landing components and its 380-line stylesheet were removed. Login is a two-column
+  Paper & Ink page; signed-in, unconfigured and error states are unchanged.
+- Layout-shift fix: the root `loading.tsx` skeleton flashed before the landing (measured
+  CLS 0.35). Loading skeletons now live in workspace routes only, and the landing's calls
+  to action resolve the session inside their own Suspense boundaries with identical
+  labels, so nothing moves. Measured CLS 0.002, LCP 0.56–0.63 s (local, desktop).
+- Motion's DOM features now load asynchronously; the unused serif italic font was removed.
+- Lighthouse 12.8.2 (run via `pnpm dlx`, not a project dependency) on a local production
+  server: desktop preset Performance/Accessibility/Best practices/SEO 100/100/100/100
+  (LCP 0.8 s, CLS 0); mobile with DevTools throttling 92/100/100/100 (LCP 1.9 s, TBT
+  310 ms). Mobile with default simulated throttling scores 87 (simulated LCP 3.6 s while the
+  observed LCP in the same trace was 1.27 s). Found and fixed: `role` on `<ol>` toast
+  lists and a heading-order skip in the hero scene.
+- Browser tests: section anchors, hero sequence + Replay, privacy toggle (no number before
+  acceptance), keyboard step selection, FAQ, no workspace links or infinite animations, both
+  themes at 320/390/768/1024/1440 without overflow, login entry and layout, no console
+  errors; reduced motion; LCP < 2.5 s and CLS < 0.1. 320px header overflow (8 px) fixed.
+  Id-based form locators now target visible elements because streamed Suspense content can
+  briefly exist twice in the DOM. Results: 319 unit/integration tests and 16/16 browser
+  scenarios on two consecutive runs; typecheck, lint and build passed.

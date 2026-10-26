@@ -1,55 +1,155 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { auth } from "@/auth";
-import { ArrowUpRight, LockKeyhole, BookOpen, Check, Plus, ArrowRight } from "lucide-react";
-import { Workflow } from "@/components/landing/Workflow";
-import { LandingMotion } from "@/components/landing/LandingMotion";
-import { ProductStage } from "@/components/landing/ProductStage";
-import { ResourceDeck } from "@/components/landing/ResourceDeck";
-import { FeatureStories } from "@/components/landing/FeatureStories";
+import { ArrowRight, BellRing, BookOpen, Clock, ExternalLink, FileText, GraduationCap, HandHeart, MessagesSquare, ShieldCheck, Sparkles, Star, TimerOff } from "lucide-react";
+import { HeroScene } from "@/components/landing/HeroScene";
+import { HowItWorks } from "@/components/landing/HowItWorks";
+import { PrivacyReveal } from "@/components/landing/PrivacyReveal";
 
 export const dynamic = "force-dynamic";
 
-const faqs = [
-  ["How do I get started?", "Sign in with Google, add your university, subjects and availability, then explore your workspace. One account lets you ask for help, offer it and share resource links."],
-  ["Can I learn and help other people?", "Absolutely. Add the topics you're comfortable explaining to your profile, and find other peers when you need a hand. Your account does both."],
-  ["Is Peerly free to use?", "After signing in, you can explore peers, share resource links and send study requests without a platform fee. Helpers indicate whether they prefer free or paid sessions. Peerly does not process payments; agree on any terms directly before meeting."],
-  ["When are contact details shared?", "A helper's chosen contact details unlock to the learner only after the helper accepts the request. Your email, WhatsApp number and meeting links never appear in search results or profile listings."],
-  ["Are study sessions online or on campus?", "Both are possible. Filter by study preference, agree on a time after acceptance, and use your helper's shared contact method. For in-person sessions, choose a public campus space."],
-  ["How do reviews work?", "Both participants must confirm a session is complete before the learner can leave one review. These confirmations are self-reported, not independent proof of attendance."],
+const PROBLEMS = [
+  { Icon: Clock, title: "Office hours were yesterday", body: "The TA replies on Monday. Your deadline is tonight." },
+  { Icon: MessagesSquare, title: "The group chat has 400 unread messages", body: "Your question scrolls away under memes and “same”." },
+  { Icon: Sparkles, title: "The AI answer doesn’t fit your course", body: "It compiles somewhere — just not with the setup your instructor uses." },
 ];
 
-export default async function HomePage() {
+const FAQS: Array<[string, string]> = [
+  ["Is Peerly free?", "There’s no platform fee. Helpers say whether they help for free, prefer paid sessions, or either. Peerly doesn’t process payments — agree on any terms directly before you meet."],
+  ["How fast will someone answer?", "That depends on the helper. Urgent requests are shown to them first, the bell updates within about a minute, and helpers can turn on email alerts. If nobody responds within 6 hours (urgent), 3 days (normal) or your deadline, the request closes so you can try someone else."],
+  ["When are contact details shared?", "Only after a helper accepts your request, and only with you. Search results, profiles, notifications and emails never include phone numbers, meeting links or email addresses."],
+  ["Can I learn and help with the same account?", "Yes. List the topics you can explain and you’ll receive requests for them; search for help whenever you need it."],
+  ["Are sessions online or on campus?", "Either. Helpers set what they offer and you pick when you send the request. For in-person sessions, meet in a public campus space."],
+  ["How do reviews work?", "Both people confirm the session happened, then the learner can leave one review. Ratings and response badges are calculated from real sessions only. Confirmations are self-reported, not proof of attendance."],
+];
+
+/**
+ * Calls to action keep identical labels for visitors and members; only the
+ * destination changes. The page itself does not wait for the session, so it
+ * renders immediately (no loading skeleton or layout shift) and the links are
+ * filled in when the session check resolves.
+ */
+async function SessionLink({ member, visitor, className, children }: { member: string; visitor: string; className: string; children: React.ReactNode }) {
   const session = await auth();
-  const startHref = session?.user?.id ? "/dashboard" : "/login";
+  return <Link href={session?.user?.id ? member : visitor} className={className}>{children}</Link>;
+}
+
+function StartLink({ member = "/dashboard", className = "ui-button is-primary is-lg", children }: { member?: string; className?: string; children: React.ReactNode }) {
+  const link = <Link href="/login" className={className}>{children}</Link>;
+  return <Suspense fallback={link}><SessionLink member={member} visitor="/login" className={className}>{children}</SessionLink></Suspense>;
+}
+
+export default function HomePage() {
   return (
-    <LandingMotion>
-      <section className="m-hero" aria-labelledby="hero-title">
-        <div className="aurora-field" aria-hidden="true"><i /><i /></div>
-        <div className="hero-layout">
-          <div className="m-hero-copy">
-            <span className="m-eyebrow"><span className="connection-mark" aria-hidden="true" /> UNIVERSITY PEERS. SHARED UNDERSTANDING.</span>
-            <h1 id="hero-title">Study help.<br />From peers who<br /><span className="hero-gradient">get your topic.</span></h1>
-            <p>Find a university peer who can explain what has you stuck. Send a focused request, connect after they accept, and work through it together.</p>
-            <div className="m-hero-actions"><Link href={startHref} className="m-button">{session?.user ? "Open your workspace" : "Find your study circle"}<ArrowUpRight size={18} /></Link><Link href="#how-it-works" className="hero-secondary-link">How it works <ArrowRight size={16} /></Link></div>
-            <span className="hero-assurance"><Check size={15} /> One account to ask for help and offer it.</span>
-            <div className="hero-connection-legend" aria-label="Connection process"><span><b>01</b> Find a topic</span><i /><span><b>02</b> Send a request</span><i /><span><b>03</b> Connect</span></div>
+    <div className="landing">
+      <section className="lp-hero" aria-labelledby="hero-title">
+        <div className="lp-inner lp-hero-grid">
+          <div className="lp-hero-copy">
+            <p className="lp-eyebrow"><GraduationCap size={16} aria-hidden="true" />Peer help for university students</p>
+            <h1 id="hero-title" className="lp-display">Assignment due in three hours? Ask someone who’s <span className="highlight-mark" data-draw>already solved it.</span></h1>
+            <p className="lp-lead">Peerly connects you with students who’ve taken your course. Send one focused question, mark it urgent, and get a clear yes or no. Contact details unlock only when they accept.</p>
+            <div className="lp-actions">
+              <StartLink>Get help now<ArrowRight size={18} aria-hidden="true" /></StartLink>
+              <StartLink member="/settings" className="ui-button is-secondary is-lg">Offer help</StartLink>
+            </div>
+            <p className="lp-assurance"><ShieldCheck size={16} aria-hidden="true" />No platform fees. Sign in with Google.</p>
           </div>
-          <ProductStage startHref={startHref} />
+          <HeroScene />
         </div>
       </section>
 
-      <section id="features" className="marketing-zone features-zone" aria-labelledby="features-title"><div className="section-inner landing-section">
-        <div className="m-section-heading"><span className="m-kicker">BUILT AROUND THE CONNECTION</span><h2 id="features-title">Ask clearly.<br /><span>Connect comfortably.</span></h2><p>A useful study session starts with the right topic,<br className="hidden sm:block" /> a willing peer and a little context.</p></div>
-        <FeatureStories startHref={startHref} />
-      </div></section>
+      <section id="problem" className="lp-section" aria-labelledby="problem-title">
+        <div className="lp-inner">
+          <p className="lp-kicker tabular">11:04 PM</p>
+          <h2 id="problem-title" className="lp-heading">Being stuck is normal. <span className="lp-muted">Staying stuck shouldn’t be.</span></h2>
+          <ul className="lp-problems">
+            {PROBLEMS.map(({ Icon, title, body }) => (
+              <li key={title}><span className="lp-icon" aria-hidden="true"><Icon size={20} /></span><h3>{title}</h3><p>{body}</p></li>
+            ))}
+          </ul>
+          <p className="lp-answer">Peerly gives you <strong>someone in your course</strong>, a <strong>clear yes or no</strong>, and a <strong>deadline you both can see</strong>.</p>
+        </div>
+      </section>
 
-      <section id="how-it-works" className="marketing-zone workflow-zone" aria-labelledby="workflow-title"><div className="section-inner landing-section"><div className="m-section-heading"><span className="m-kicker">HOW PEERLY WORKS</span><h2 id="workflow-title">One question.<br /><span>Four clear steps.</span></h2><p>Explore the path from finding a peer to completing a session.</p></div><Workflow startHref={startHref} /><div className="workflow-signin-note"><LockKeyhole size={15} /> Illustrative workflow. Manage your actual requests in your signed-in workspace.</div></div></section>
+      <section id="how-it-works" className="lp-section lp-band" aria-labelledby="how-title">
+        <div className="lp-inner">
+          <p className="lp-kicker">How it works</p>
+          <h2 id="how-title" className="lp-heading">From stuck to sorted in four steps.</h2>
+          <HowItWorks />
+        </div>
+      </section>
 
-      <section id="resources" className="marketing-zone resources-zone" aria-labelledby="resources-title"><div className="section-inner landing-section resource-zone-layout"><div className="resource-zone-copy"><span className="m-kicker"><BookOpen size={15} /> THE RESOURCE HUB</span><h2 id="resources-title">An explanation<br />worth keeping.<br /><span>A link worth sharing.</span></h2><p>Browse student-shared links by topic. Find a set of notes, a practice worksheet or a guide—or share a resource that helped you understand.</p><Link href={startHref} className="m-button">{session?.user ? "Open your workspace" : "Sign in to explore"}<ArrowUpRight size={18} /></Link><span className="resource-access-note"><LockKeyhole size={14} /> Your resource hub is inside your workspace.</span></div><ResourceDeck startHref={startHref} /></div></section>
+      <section id="privacy" className="lp-section" aria-labelledby="privacy-title">
+        <div className="lp-inner lp-split">
+          <div>
+            <p className="lp-kicker">Privacy</p>
+            <h2 id="privacy-title" className="lp-heading">Your number isn’t a public profile field.</h2>
+            <p className="lp-body">Helpers add a WhatsApp number or meeting link privately. It’s shared with one person — the learner whose request they accepted — and nobody else. Declined, cancelled and expired requests never reveal it.</p>
+            <ul className="lp-checks">
+              <li><TimerOff size={17} aria-hidden="true" />Unanswered requests close automatically</li>
+              <li><BellRing size={17} aria-hidden="true" />Notifications carry a first name and topic only</li>
+            </ul>
+          </div>
+          <PrivacyReveal />
+        </div>
+      </section>
 
-      <section className="marketing-zone questions-zone" id="questions" aria-labelledby="faq-title"><div className="section-inner landing-section m-faq-layout"><div><span className="m-kicker">BEFORE YOU JOIN</span><h2 id="faq-title">A few useful<br /><span>answers.</span></h2><p>Accounts, sessions and privacy.<br />Here’s what to expect.</p></div><div className="faq-list">{faqs.map(([question, answer]) => <details key={question}><summary>{question}<Plus size={18} aria-hidden="true" /></summary><p>{answer}</p></details>)}</div></div></section>
+      <section id="resources" className="lp-section lp-band" aria-labelledby="resources-title">
+        <div className="lp-inner lp-split">
+          <div>
+            <p className="lp-kicker">Resources</p>
+            <h2 id="resources-title" className="lp-heading">Notes from people who sat the same exam.</h2>
+            <p className="lp-body">Students share links to notes, worked problems and guides they made or have permission to share, organised by topic. Peerly stores links, not files, and anyone can report a link that shouldn’t be there.</p>
+          </div>
+          <article className="lp-resource" aria-label="Example resource">
+            <div className="lp-resource-top"><span className="hero-scene-label">Illustrative example</span><span className="ui-badge is-accent"><FileText aria-hidden="true" />Notes</span></div>
+            <h3>Recursion: base cases and the call stack</h3>
+            <p>Hand-drawn stack diagrams for factorial, Fibonacci and merge sort, plus the three mistakes that cause stack overflows.</p>
+            <ol>
+              <li>Write the base case before the recursive call</li>
+              <li>Trace the stack for n = 3 by hand</li>
+              <li>Check every call moves toward the base case</li>
+            </ol>
+            <div className="lp-resource-foot"><span><BookOpen size={15} aria-hidden="true" />Topic: Recursion</span><span><ExternalLink size={15} aria-hidden="true" />Google Drive link</span></div>
+          </article>
+        </div>
+      </section>
 
-      <section className="marketing-zone invitation-zone" aria-labelledby="final-title"><div className="invitation-glow" aria-hidden="true" /><div className="section-inner landing-section"><span className="connection-mark" aria-hidden="true" /><h2 id="final-title">What are you<br /><span>working through?</span></h2><p>Start with a topic. Find a peer who can help.</p><Link href={startHref} className="m-button">{session?.user ? "Back to your workspace" : "Get started with Google"}<ArrowUpRight size={19} /></Link><span className="hero-assurance"><Check size={15} /> Set up your profile after signing in.</span></div></section>
-    </LandingMotion>
+      <section id="helpers" className="lp-section" aria-labelledby="helpers-title">
+        <div className="lp-inner">
+          <p className="lp-kicker">For helpers</p>
+          <h2 id="helpers-title" className="lp-heading">Explaining it is how you finally remember it.</h2>
+          <div className="lp-helper-grid">
+            <div><span className="lp-icon" aria-hidden="true"><HandHeart size={20} /></span><h3>Help on your terms</h3><p>List the topics you’re confident in, set your availability and decline anything that doesn’t fit. Free, paid or either — you decide.</p></div>
+            <div><span className="lp-icon" aria-hidden="true"><Star size={20} /></span><h3>A reputation that’s real</h3><p>Ratings come only from completed sessions. The fast-reply badge needs at least three responses averaging two hours or less.</p></div>
+            <div><span className="lp-icon" aria-hidden="true"><BellRing size={20} /></span><h3>Never miss an urgent ask</h3><p>Urgent requests come first with a countdown, and optional email alerts reach you when you’re away from the tab.</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="questions" className="lp-section lp-band" aria-labelledby="faq-title">
+        <div className="lp-inner lp-faq">
+          <div>
+            <p className="lp-kicker">Questions</p>
+            <h2 id="faq-title" className="lp-heading">Before you sign in.</h2>
+          </div>
+          <div className="lp-faq-list">
+            {FAQS.map(([q, a]) => (
+              <details key={q}><summary>{q}</summary><p>{a}</p></details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="lp-section lp-final" aria-labelledby="final-title">
+        <div className="lp-inner">
+          <h2 id="final-title" className="lp-display is-final">What are you stuck on <span className="highlight-mark">right now?</span></h2>
+          <div className="lp-actions is-centered">
+            <StartLink>Start with your question<ArrowRight size={18} aria-hidden="true" /></StartLink>
+          </div>
+          <p className="lp-assurance is-centered">Sign in with Google, then set up your profile. Already a member? This takes you to your workspace.</p>
+        </div>
+      </section>
+    </div>
   );
 }

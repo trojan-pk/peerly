@@ -80,26 +80,19 @@ No payment processing, hosted calls, resource file uploads or AI answers. A paid
 
 ## Visual design and entry flow
 
-Visitors see one marketing page. Its Features, How it works and Resources navigation
-links scroll to sections on that page. Calls to action open login; Google sign-in
-returns to `/dashboard`. Existing members can open their workspace directly.
-Peer discovery, peer details, resources, profile editing and requests require login.
-The landing page does not query or expose member profiles or resource collections.
+Visitors see one Paper & Ink marketing page that follows the chosen theme. Its
+navigation (How it works, Privacy, Resources, Questions) scrolls within the page.
+Calls to action go to the dashboard (signed-out visitors are sent to Google sign-in,
+which returns them there). The landing never queries member profiles or resources,
+and does not wait for the session check, so it renders without a loading skeleton.
 
-The marketing footer appears only on the landing and login pages. Workspace pages
-have no footer. Desktop, mobile and the signed-in login screen require a logout
-confirmation; Cancel or Escape keeps the session active.
+The hero plays one illustrative sequence — an urgent request, a helper accepting and
+contact unlocking — once, with a Replay button; reduced-motion visitors see the final
+state. "How it works" uses a sticky preview driven by normal scrolling (no scroll
+hijacking) and keyboard-selectable steps. Every example person, course and resource
+is labelled as illustrative; there are no testimonials, counters or invented ratings.
+The marketing footer appears only on the landing and login pages.
 
-The landing uses a purple/blue/sky palette with dark product scenes. Subject
-selection sits directly above its illustrative discovery result. A request scene
-explains pending versus accepted contact access; study preferences, resource
-categories and the keyboard-controlled workflow have explicit state controls.
-The feature layout combines one main story with two supporting sections.
-
-Icons and copy stay anchored on hover. Motion is limited to one-time connection
-lines, section entrances, state transitions and button feedback; there are no
-continuous decorative loops or floating pause control. System reduced-motion
-preferences are respected.
 Peerly uses Manrope (interface), Instrument Serif (display headlines) and Geist Mono
 (numbers, timers and course codes). All three are self-hosted Latin WOFF2 subsets
 in `src/app/fonts/` with their OFL licences; no external font request is made.
@@ -126,7 +119,6 @@ Shared primitives (Button, Card, Badge, Field/Input/Textarea/Select, Dialog, Toa
 Skeleton, EmptyState) are in `src/components/ui/`. A reference page is available
 at `/dev/ui` during development and returns 404 in production builds. Below the
 desktop breakpoint, signed-in pages show a bottom navigation bar.
-The marketing landing keeps its previous palette until its Paper & Ink redesign.
 
 ## Urgent help, expiry and notifications
 
