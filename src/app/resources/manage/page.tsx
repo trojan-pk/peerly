@@ -108,7 +108,7 @@ export default async function ManageResourcesPage(props: ManageResourcesPageProp
             <BookOpen className="w-4 h-4" aria-hidden="true" />
             <span>Resource Management</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-ink">
+          <h1 className="page-title">
             My Study Resources
           </h1>
           <p className="text-xs text-muted mt-0.5">

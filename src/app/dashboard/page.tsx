@@ -73,7 +73,7 @@ export default async function DashboardPage(props: DashboardPageProps) {
             <LayoutDashboard className="w-4 h-4" aria-hidden="true" />
             <span>Student Workspace</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-ink">
+          <h1 className="page-title">
             Your study workspace
           </h1>
           <p className="text-sm text-muted mt-2">{context?.user.name ? `${context.user.name}, track` : "Track"} your requests, responses and completed sessions.</p>

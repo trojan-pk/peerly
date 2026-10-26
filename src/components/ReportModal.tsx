@@ -237,7 +237,7 @@ export function ReportButton({
                   <button
                     type="button"
                     onClick={handleClose}
-                    className="px-5 py-2 rounded-xl bg-canvas hover:bg-canvas text-white text-xs font-semibold transition-colors"
+                    className="px-5 py-2 rounded-xl bg-canvas hover:bg-raised text-ink border border-line text-xs font-semibold transition-colors"
                   >
                     Done
                   </button>

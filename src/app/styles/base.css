@@ -1,0 +1,44 @@
+html { scroll-behavior: smooth; scroll-padding-top: 100px; }
+body {
+  background: var(--pi-canvas);
+  color: var(--pi-ink);
+  font-family: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "ss01", "cv11";
+  min-height: 100vh;
+  transition: background-color .2s ease, color .2s ease;
+}
+::selection { background: var(--pi-highlight); color: var(--pi-highlight-ink); }
+:focus-visible { outline: 2px solid var(--pi-accent); outline-offset: 4px; }
+main { overflow-wrap: anywhere; }
+button, input, textarea, select { font-family: inherit; }
+button:not(:disabled), summary { cursor: pointer; }
+a, button { -webkit-tap-highlight-color: transparent; }
+input::placeholder, textarea::placeholder { color: var(--pi-faint); }
+input, textarea, select { accent-color: var(--pi-accent); }
+[role="dialog"] > div { max-height: 90dvh; overflow-y: auto; }
+
+/* Typography roles. */
+.font-display { font-family: var(--font-instrument-serif), ui-serif, Georgia, serif; font-weight: 400; letter-spacing: -0.01em; }
+.tabular { font-family: var(--font-geist-mono), ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+
+/* A one-pass highlighter stroke behind a word. Static by default; animated where allowed. */
+.highlight-mark {
+  background-image: linear-gradient(transparent 58%, color-mix(in srgb, var(--pi-highlight) 85%, transparent) 58%, color-mix(in srgb, var(--pi-highlight) 85%, transparent) 92%, transparent 92%);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  padding-inline: .06em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .highlight-mark[data-draw] { background-size: 0% 100%; animation: highlighter-draw .9s cubic-bezier(.6, 0, .2, 1) .35s forwards; }
+}
+@keyframes highlighter-draw { to { background-size: 100% 100%; } }
+
+/* Theme changes should not animate on first paint. */
+html[data-theme-switching] *, html[data-theme-switching] *::before, html[data-theme-switching] *::after { transition: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  body { transition: none; }
+}

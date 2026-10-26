@@ -56,7 +56,7 @@ export default async function ResourcesPage(props: ResourcesPageProps) {
             <BookOpen className="w-4 h-4" aria-hidden="true" />
             <span>YOUR STUDY LIBRARY</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-ink">
+          <h1 className="page-title">
             Resource library
           </h1>
           <p className="text-xs sm:text-sm text-muted mt-0.5">
