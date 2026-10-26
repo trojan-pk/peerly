@@ -49,7 +49,7 @@ export const test = base.extend<object, { app: App }>({
       child = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", "3101"], {
         env: { ...process.env, NODE_ENV: "production", MONGODB_URI: testUri, AUTH_SECRET: secret,
           AUTH_URL: baseURL, AUTH_TRUST_HOST: "true", AUTH_GOOGLE_ID: "e2e-client.apps.googleusercontent.com",
-          AUTH_GOOGLE_SECRET: "e2e-private-client-value", ADMIN_EMAILS: "admin@peerly.example" },
+          AUTH_GOOGLE_SECRET: "e2e-private-client-value", ADMIN_EMAILS: "admin@peerly.example", PEERLY_UI_SHOWCASE: "1" },
         stdio: ["ignore", "pipe", "pipe"],
       });
       let serverOutput = "";

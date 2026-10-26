@@ -146,7 +146,7 @@ export default async function PeerDetailPage(props: PeerDetailPageProps) {
             <InitialsAvatar name={peer.name} className="w-16 h-16 sm:w-20 sm:h-20 rounded-full text-2xl" />
             <div className="space-y-1.5">
               <div className="flex items-center gap-2.5 flex-wrap">
-                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-ink">
+                <h1 className="page-title is-compact">
                   {peer.name}
                 </h1>
                 {/* Review Badge: Honest "New" badge when no reviews exist */}

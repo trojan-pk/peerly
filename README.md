@@ -99,12 +99,34 @@ The feature layout combines one main story with two supporting sections.
 Icons and copy stay anchored on hover. Motion is limited to one-time connection
 lines, section entrances, state transitions and button feedback; there are no
 continuous decorative loops or floating pause control. System reduced-motion
-preferences are respected. The workspace retains its dark navy theme.
-Manrope and its OFL license are served locally from `src/app/fonts/`.
+preferences are respected.
+Peerly uses Manrope (interface), Instrument Serif (display headlines) and Geist Mono
+(numbers, timers and course codes). All three are self-hosted Latin WOFF2 subsets
+in `src/app/fonts/` with their OFL licences; no external font request is made.
 
 Illustrative profiles and resources are labelled examples, not real activity,
 testimonials or fabricated ratings. Resource examples show link types, not uploads.
-No third-party animation runtime or external font request is needed.
+Motion (`motion`, pinned) is the only animation library. It loads through
+`LazyMotion` with the DOM feature set and `reducedMotion="user"`; no external font
+request is made.
+
+## Paper & Ink design system
+
+The workspace uses two themes: **Paper** (warm off-white, ink-navy text) and
+**Ink** (deep ink, paper-coloured text), with one fountain-pen blue accent and a
+highlighter yellow reserved for emphasis. Choose Light, Dark or System from the
+header or Settings → Appearance; the choice is stored in the browser and applied by
+a small inline script before first paint, so there is no theme flash. System
+follows live OS changes.
+
+Tokens live in `src/app/styles/tokens.css` in three layers: primitives, semantic
+`--pi-*` roles per theme, and Tailwind colour utilities mapped to those roles.
+`src/tests/design-tokens.test.ts` checks every text/background pair against WCAG AA.
+Shared primitives (Button, Card, Badge, Field/Input/Textarea/Select, Dialog, Toast,
+Skeleton, EmptyState) are in `src/components/ui/`. A reference page is available
+at `/dev/ui` during development and returns 404 in production builds. Below the
+desktop breakpoint, signed-in pages show a bottom navigation bar.
+The marketing landing keeps its previous palette until its Paper & Ink redesign.
 
 ## Open Page identity
 

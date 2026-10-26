@@ -43,7 +43,7 @@ export default async function AdminReportsPage(props: AdminReportsPageProps) {
             <div className="pt-2">
               <Link
                 href="/dashboard"
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-canvas hover:bg-canvas text-white text-xs font-semibold transition-colors"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-canvas hover:bg-raised text-ink border border-line text-xs font-semibold transition-colors"
               >
                 <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" />
                 <span>Return to Dashboard</span>
@@ -71,7 +71,7 @@ export default async function AdminReportsPage(props: AdminReportsPageProps) {
             <ShieldAlert className="w-4 h-4" aria-hidden="true" />
             <span>Administrator Moderation Console</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-ink">
+          <h1 className="page-title">
             Safety &amp; Content Reports
           </h1>
           <p className="text-xs sm:text-sm text-muted mt-0.5">

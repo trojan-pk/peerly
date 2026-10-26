@@ -1,0 +1,151 @@
+/*
+ * Paper & Ink design tokens.
+ *
+ * Layer 1 — primitives: raw, theme-independent colour values. Never used by components.
+ * Layer 2 — semantic:   `--pi-*` roles, defined once per theme ([data-theme=paper|ink]).
+ * Layer 3 — utilities:  Tailwind colour names (`bg-surface`, `text-muted`, …) mapped to
+ *                       the semantic roles, so every utility follows the active theme.
+ *
+ * Every text/background pair is checked against WCAG AA in src/tests/design-tokens.test.ts.
+ * Change a value here, then run `pnpm test design-tokens`.
+ */
+
+:root {
+  /* Paper */
+  --paper-50: #fffdf8;
+  --paper-100: #f7f4ec;
+  --paper-150: #f0ece1;
+  --paper-200: #eae5d9;
+  --paper-300: #dcd5c5;
+  --paper-500: #8f8673;
+  --paper-600: #6f6757;
+  /* Ink */
+  --ink-950: #0e1420;
+  --ink-925: #121929;
+  --ink-900: #161e2e;
+  --ink-850: #1f2840;
+  --ink-800: #2a3550;
+  --ink-600: #5e6c8c;
+  --ink-500: #7d8aa8;
+  --ink-text: #141b2d;
+  --ink-text-2: #2e3546;
+  --ink-text-3: #4c5366;
+  --ink-text-4: #5d6371;
+  --paper-text: #eee9dd;
+  --paper-text-2: #d3d0c6;
+  --paper-text-3: #b0b5c1;
+  --paper-text-4: #959cad;
+  /* Fountain-pen blue */
+  --pen-700: #22388f;
+  --pen-600: #2c46b1;
+  --pen-500: #4361e0;
+  --pen-450: #3550c4;
+  --pen-300: #a9bbff;
+  --pen-200: #c6d2ff;
+  /* Highlighter */
+  --highlighter-paper: #e6f25a;
+  --highlighter-ink: #dceb4b;
+  /* Status */
+  --red-700: #a8261c;
+  --red-200: #ffa7a7;
+  --amber-800: #7a4b00;
+  --amber-200: #f5cf88;
+  --blue-700: #1c5a9e;
+  --blue-200: #9dcaff;
+  --violet-700: #6a4aa6;
+  --violet-200: #c7b4ee;
+  --green-700: #1d6e45;
+  --green-200: #9fe0bf;
+}
+
+:root,
+[data-theme="paper"] {
+  color-scheme: light;
+  --pi-canvas: var(--paper-100);
+  --pi-panel: var(--paper-150);
+  --pi-surface: var(--paper-50);
+  --pi-raised: var(--paper-200);
+  --pi-line: var(--paper-300);
+  --pi-edge: var(--paper-500);
+  --pi-edge-hover: var(--paper-600);
+  --pi-ink: var(--ink-text);
+  --pi-body: var(--ink-text-2);
+  --pi-muted: var(--ink-text-3);
+  --pi-faint: var(--ink-text-4);
+  --pi-accent: var(--pen-600);
+  --pi-accent-hover: var(--pen-700);
+  --pi-accent-ink: var(--paper-50);
+  --pi-action: var(--pen-600);
+  --pi-action-hover: var(--pen-700);
+  --pi-on-action: #ffffff;
+  --pi-highlight: var(--highlighter-paper);
+  --pi-highlight-ink: var(--ink-text);
+  --pi-danger: var(--red-700);
+  --pi-warning: var(--amber-800);
+  --pi-info: var(--blue-700);
+  --pi-lilac: var(--violet-700);
+  --pi-success: var(--green-700);
+  --pi-scrim: #1a1d2699;
+  --pi-shadow: #2a24151f;
+  --pi-paper-grain: 0.035;
+}
+
+[data-theme="ink"] {
+  color-scheme: dark;
+  --pi-canvas: var(--ink-950);
+  --pi-panel: var(--ink-925);
+  --pi-surface: var(--ink-900);
+  --pi-raised: var(--ink-850);
+  --pi-line: var(--ink-800);
+  --pi-edge: var(--ink-600);
+  --pi-edge-hover: var(--ink-500);
+  --pi-ink: var(--paper-text);
+  --pi-body: var(--paper-text-2);
+  --pi-muted: var(--paper-text-3);
+  --pi-faint: var(--paper-text-4);
+  --pi-accent: var(--pen-300);
+  --pi-accent-hover: var(--pen-200);
+  --pi-accent-ink: #101629;
+  --pi-action: var(--pen-500);
+  --pi-action-hover: var(--pen-450);
+  --pi-on-action: #ffffff;
+  --pi-highlight: var(--highlighter-ink);
+  --pi-highlight-ink: #10151f;
+  --pi-danger: var(--red-200);
+  --pi-warning: var(--amber-200);
+  --pi-info: var(--blue-200);
+  --pi-lilac: var(--violet-200);
+  --pi-success: var(--green-200);
+  --pi-scrim: #03050bcc;
+  --pi-shadow: #00000070;
+  --pi-paper-grain: 0.02;
+}
+
+@theme inline {
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument-serif), ui-serif, Georgia, serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+
+  --color-canvas: var(--pi-canvas);
+  --color-surface: var(--pi-surface);
+  --color-panel: var(--pi-panel);
+  --color-raised: var(--pi-raised);
+  --color-line: var(--pi-line);
+  --color-edge: var(--pi-edge);
+  --color-ink: var(--pi-ink);
+  --color-body: var(--pi-body);
+  --color-muted: var(--pi-muted);
+  --color-faint: var(--pi-faint);
+  --color-accent: var(--pi-accent);
+  --color-accent-ink: var(--pi-accent-ink);
+  --color-action: var(--pi-action);
+  --color-action-hover: var(--pi-action-hover);
+  --color-on-action: var(--pi-on-action);
+  --color-highlight: var(--pi-highlight);
+  --color-highlight-ink: var(--pi-highlight-ink);
+  --color-danger: var(--pi-danger);
+  --color-warning: var(--pi-warning);
+  --color-info: var(--pi-info);
+  --color-lilac: var(--pi-lilac);
+  --color-success: var(--pi-success);
+}

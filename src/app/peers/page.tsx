@@ -47,7 +47,7 @@ export default async function PeersPage(props: PeersPageProps) {
   return (
     <div className="max-w-5xl mx-auto space-y-8 py-6">
       <div className="space-y-2 border-b border-line/80 pb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-ink">
+        <h1 className="page-title">
           Discover Peer Helpers
         </h1>
         <p className="text-sm text-muted">

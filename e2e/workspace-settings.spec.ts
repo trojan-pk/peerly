@@ -36,7 +36,7 @@ test("direct account settings persist a name and initials and request history su
     await expect(page.locator("footer.site-footer")).toHaveCount(0);
     await page.locator("#name").fill("Laila Updated");
     await page.getByRole("button", { name: /Save Profile/ }).click();
-    await expect(page.getByRole("status")).toContainText(/saved successfully/i);
+    await expect(page.getByRole("main").getByRole("status")).toContainText(/saved successfully/i);
     const avatar = page.getByRole("img", { name: "Laila Updated avatar", exact: true });
     await expect(avatar).toHaveText("LU");
     await page.reload();
@@ -63,7 +63,7 @@ test("direct account settings persist a name and initials and request history su
     await expect(page.getByRole("heading", { name: "Declined calculus question", exact: true })).toBeVisible();
     await page.getByRole("combobox", { name: "Request status", exact: true }).selectOption("PENDING");
     await page.getByRole("button", { name: "Cancel Request", exact: true }).click();
-    await expect(page.getByRole("status")).toContainText(/cancelled/i);
+    await expect(page.getByRole("main").getByRole("status")).toContainText(/cancelled/i);
     await page.getByRole("combobox", { name: "Request status", exact: true }).selectOption("CANCELLED");
     await expect(page.getByRole("heading", { name: "Pending calculus question", exact: true })).toBeVisible();
     expect(await app.db.collection("studyrequests").countDocuments({ learner: new ObjectId(app.ids.learner) })).toBe(existingRequests + requests.length);

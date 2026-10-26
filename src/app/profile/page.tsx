@@ -1,5 +1,6 @@
 import { InitialsAvatar } from "@/components/InitialsAvatar";
 import { LogoutButton } from "@/components/LogoutButton";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/auth";
@@ -108,7 +109,7 @@ export default async function ProfilePage() {
   return (
     <div className="workspace-page settings-page max-w-4xl mx-auto space-y-8 py-8">
       <div className="border-b border-line/80 pb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-ink">
+        <h1 className="page-title">
           Profile &amp; settings
         </h1>
         <p className="text-sm text-muted mt-1">
@@ -119,6 +120,11 @@ export default async function ProfilePage() {
       <section className="settings-account" aria-labelledby="account-title">
         <div className="settings-section-heading"><div><h2 id="account-title">Your account</h2><p>Your avatar uses your name’s initials and updates when you save a new name.</p></div><LogoutButton className="workspace-secondary-button"><LogOut size={16} aria-hidden="true" />Log out</LogoutButton></div>
         <div className="settings-person"><InitialsAvatar name={name} decorative={false} className="settings-initials" /><div className="settings-identity"><strong>{name}</strong><span><Mail size={15} aria-hidden="true" />{email}</span><small>Private sign-in email</small></div></div>
+      </section>
+
+      <section className="settings-account" aria-labelledby="appearance-title">
+        <div className="settings-section-heading"><div><h2 id="appearance-title">Appearance</h2><p>Paper is the light theme and Ink is the dark one. System follows your device setting. Your choice is saved in this browser.</p></div></div>
+        <ThemeToggle />
       </section>
 
       {/* Profile Form */}

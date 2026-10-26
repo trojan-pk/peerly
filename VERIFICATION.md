@@ -314,3 +314,36 @@ imported `@auth/core/jwt`, a transitive dependency. They now use the identical
 allows only `mongodb-memory-server`'s install script (pre-downloads the test
 MongoDB binary); others stay blocked. After a clean `pnpm install
 --frozen-lockfile`: typecheck, lint, 190 tests, build and 8/8 browser tests passed.
+
+## Peerly v2 — Phase 1: Paper & Ink design system (26 October 2026)
+
+- `globals.css` (one 544-line file) split into tokens → base → chrome → components
+  → workspace → legacy landing layers. Chrome and workspace hard-coded colours were
+  mapped to semantic `--pi-*` roles; Tailwind colour utilities resolve to those
+  roles, so existing workspace markup follows the active theme without rewrites.
+- Light (Paper), Dark (Ink) and System themes with a no-flash inline script and an
+  ARIA radio-group toggle in the header, mobile menu and Settings → Appearance.
+- Fonts: Manrope, Instrument Serif (page titles) and Geist Mono as self-hosted Latin
+  WOFF2 subsets (≈100 KB total vs. 165 KB for the previous Manrope TTF alone), each
+  with its OFL licence. Geist Mono is not preloaded.
+- `motion@14.6.0` pinned. Primitives: Button, Card, Badge, Field controls, native
+  `<dialog>` Dialog, Toast (polite/assertive live regions, pause on hover/focus),
+  Skeleton, EmptyState. `/dev/ui` showcase 404s in production (browser tests enable
+  it with `PEERLY_UI_SHOWCASE=1`). Mobile bottom navigation; current tab is not a link.
+
+Tests: 95 new unit checks — WCAG AA contrast for every text role on every surface in
+both themes, action/accent/highlighter text, 3:1 input borders, matching role sets,
+theme resolution and the pre-paint script (stored, invalid, blocked storage, live
+OS changes). New browser checks: theme persists and is set before `<body>` exists,
+System follows emulated OS changes, keyboard radio navigation, header/settings
+toggles stay in sync; six workspace pages in both themes at 320/390/768/1024/1440
+without overflow; bottom navigation; dialog focus entry, Tab wrap, Escape and focus
+return; toast announcements and dismissal; reduced motion stops the highlighter.
+
+Two issues found and fixed during verification: unlayered component CSS overrode
+Tailwind's `hidden` (the header toggle showed on mobile and caused overflow), and the
+dialog focused the first input instead of the marked default action. Existing tests
+now scope status assertions to page content because the toast region is a global
+`status` landmark. Results: 285 unit/integration tests, typecheck, lint, build and
+11/11 browser scenarios passed. Desktop and mobile screenshots of both themes were
+reviewed.
