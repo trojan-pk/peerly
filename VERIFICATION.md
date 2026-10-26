@@ -456,3 +456,33 @@ exposed ambiguous locators in older tests (now scoped to the specific request ca
 the palette shortcut test now waits for hydration. Results: 357 unit/integration tests and
 20/20 browser scenarios on two consecutive runs. Real verification email delivery was not
 tested (no provider key).
+
+## Peerly v2 — Phase 6: sessions, helpful votes and public helper pages (26 October 2026)
+
+- Scheduling fields on requests (`proposedSlots`, `proposedBy`, `sessionDurationMinutes`,
+  `scheduledAt`, `scheduleSequence`, private `meetingRoom`), `SESSION_PROPOSED` /
+  `SESSION_SCHEDULED` notifications with the recipient's dashboard tab, `SessionPlanner`
+  on dashboard cards, `/api/requests/[id]/ics` route, `lib/ics.ts` writer.
+- Jitsi link: `peerly-` + 32 hex characters (128 bits from `crypto.randomBytes`), set once
+  with a conditional update so concurrent clicks share one room.
+- `ResourceVote` (unique user+resource) and `Resource.upvoteCount`; Most helpful sort.
+- Opt-in `/h/[slug]` page with `next/og` share image; `publicPageEnabled`/`publicSlug`
+  (partial unique index); slug kept when turned off so links stay stable.
+
+Tests: 18 new — ICS date format, text escaping, 75-octet UTF-8-safe folding, CRLF and
+single-event structure; propose/choose with notifications to the right person and tab,
+proposer can't pick own time, unknown slot refused, input validation (count, past, >60 days,
+duplicates, no timezone, bad length), non-participant/pending/signed-out refusal,
+exactly one of two concurrent picks, re-proposal clears and sequence increments; ICS route
+200 with UTC start/end, UID, sequence, meeting link and no contact/email/problem text; 404
+for non-participants/unscheduled/invalid ids and 401 signed out; one shared room under
+concurrency, distinct per request, visible only on participants' dashboards; votes once per
+member, owner refused, undo, counter equals vote rows under concurrent toggles, hidden
+resources refused, sort order and viewer flag; public page off by default, stable slug,
+404 when off/hidden/invalid, derived stats ignoring cached counters, no secrets, complete
+profile required. Browser: two users schedule a session, both see the same Jitsi link,
+`.ics` downloads for a participant, 404 for another member and 401 signed out; helpful
+vote persists and reorders; public page toggled on, viewed signed-out (noindex, OG image
+returns PNG, no contact), toggled off → 404. Results: 375 unit/integration tests and 23/23
+browser scenarios on two consecutive runs. Calendar import into real Google/Apple
+Calendar apps and joining a live Jitsi call were not tested.

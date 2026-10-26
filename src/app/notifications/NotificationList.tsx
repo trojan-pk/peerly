@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, CheckCheck, Clock, Inbox, Send, Star, XCircle, CheckCircle2 } from "lucide-react";
+import { AlertTriangle, CalendarCheck, CalendarClock, CheckCheck, Clock, Inbox, Send, Star, XCircle, CheckCircle2 } from "lucide-react";
 import type { NotificationDTO } from "@/lib/notifications";
 import type { NotificationType } from "@/models/Notification";
 import { Badge, Button } from "@/components/ui";
@@ -18,6 +18,8 @@ const ICONS: Record<NotificationType, typeof Inbox> = {
   SESSION_COMPLETED: CheckCheck,
   REVIEW_RECEIVED: Star,
   REQUEST_EXPIRED: Clock,
+  SESSION_PROPOSED: CalendarClock,
+  SESSION_SCHEDULED: CalendarCheck,
 };
 
 function relativeTime(iso: string): string {

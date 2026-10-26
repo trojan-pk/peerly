@@ -22,6 +22,8 @@ export interface NotificationEvent {
   urgent?: boolean;
   /** Learner deadline, included in helper emails when present. */
   neededBy?: Date | null;
+  /** Dashboard tab for events that can reach either participant. */
+  tab?: "incoming" | "outgoing";
 }
 
 export function firstName(name?: string | null): string {
@@ -47,18 +49,24 @@ export function notificationCopy(type: NotificationType, actorFirstName: string,
       return { title: `New review: ${topic}`, body: `${who} reviewed your session.` };
     case "REQUEST_EXPIRED":
       return { title: `No response in time: ${topic}`, body: "Your request expired before the helper responded. Try another helper." };
+    case "SESSION_PROPOSED":
+      return { title: `Pick a time: ${topic}`, body: `${who} suggested times for your session. Choose one that works.` };
+    case "SESSION_SCHEDULED":
+      return { title: `Session scheduled: ${topic}`, body: `${who} picked a time. Add it to your calendar from the dashboard.` };
   }
 }
 
 /** Where a notification leads: the dashboard tab where the recipient sees the request. */
-export function notificationHref(type: NotificationType, requestId: string): string {
+export function notificationHref(type: NotificationType, requestId: string, explicitTab?: "incoming" | "outgoing" | null): string {
   const helperSide: NotificationType[] = ["REQUEST_RECEIVED", "REVIEW_RECEIVED"];
-  const tab = helperSide.includes(type) ? "incoming" : "outgoing";
+  const tab = explicitTab ?? (helperSide.includes(type) ? "incoming" : "outgoing");
   return `/dashboard?tab=${tab}#request-${requestId}`;
 }
 
 function eventKey(event: NotificationEvent): string {
-  return `${event.type}:${String(event.requestId)}`;
+  // Scheduling can happen more than once per request; key it by time so each round notifies.
+  const round = event.type === "SESSION_PROPOSED" || event.type === "SESSION_SCHEDULED" ? `:${Date.now()}` : "";
+  return `${event.type}:${String(event.requestId)}${round}`;
 }
 
 /**
@@ -70,14 +78,16 @@ export async function notify(events: NotificationEvent[]): Promise<void> {
   if (events.length === 0 || !isDatabaseConfigured()) return;
   try {
     await connectToDatabase();
-    const docs = events.map((event) => ({
+    const keys = events.map(eventKey);
+    const docs = events.map((event, i) => ({
       recipient: new mongoose.Types.ObjectId(String(event.recipientId)),
       type: event.type,
       request: new mongoose.Types.ObjectId(String(event.requestId)),
       actorFirstName: firstName(event.actorName),
       topic: event.topic.slice(0, 100),
       urgent: Boolean(event.urgent),
-      eventKey: eventKey(event),
+      tab: event.tab ?? null,
+      eventKey: keys[i],
       readAt: null,
       createdAt: new Date(),
     }));
@@ -91,7 +101,7 @@ export async function notify(events: NotificationEvent[]): Promise<void> {
       if (!onlyDuplicates) throw error;
       for (const doc of bulk.insertedDocs ?? []) inserted.add(doc.eventKey + String(doc.recipient));
     }
-    const emailEvents = events.filter((e) => EMAIL_TYPES.has(e.type) && inserted.has(eventKey(e) + String(e.recipientId)));
+    const emailEvents = events.filter((e, i) => EMAIL_TYPES.has(e.type) && inserted.has(keys[i] + String(e.recipientId)));
     if (emailEvents.length > 0 && isEmailConfigured()) {
       runAfterResponse(() => deliverNotificationEmails(emailEvents));
     }
@@ -167,7 +177,7 @@ export async function listNotificationsFor(userId: mongoose.Types.ObjectId, page
     .lean();
   const items: NotificationDTO[] = rows.map((row) => {
     const copy = notificationCopy(row.type, row.actorFirstName, row.topic, row.urgent);
-    return { id: String(row._id), type: row.type, ...copy, href: notificationHref(row.type, String(row.request)), urgent: row.urgent, read: Boolean(row.readAt), createdAt: row.createdAt.toISOString() };
+    return { id: String(row._id), type: row.type, ...copy, href: notificationHref(row.type, String(row.request), row.tab), urgent: row.urgent, read: Boolean(row.readAt), createdAt: row.createdAt.toISOString() };
   });
   const unread = await Notification.countDocuments({ recipient: userId, readAt: null });
   return { items, total, unread, page: current, totalPages };

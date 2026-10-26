@@ -8,6 +8,8 @@ export const NOTIFICATION_TYPES = [
   "SESSION_COMPLETED",
   "REVIEW_RECEIVED",
   "REQUEST_EXPIRED",
+  "SESSION_PROPOSED",
+  "SESSION_SCHEDULED",
 ] as const;
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
 
@@ -26,6 +28,8 @@ export interface INotificationDocument extends Document {
   actorFirstName: string;
   topic: string;
   urgent: boolean;
+  /** Dashboard tab where the recipient sees the request. */
+  tab?: "incoming" | "outgoing" | null;
   /** Identifies the event; unique per recipient so retries never duplicate it. */
   eventKey: string;
   readAt: Date | null;
@@ -40,6 +44,7 @@ const NotificationSchema = new Schema<INotificationDocument>(
     actorFirstName: { type: String, default: "", trim: true, maxlength: 60 },
     topic: { type: String, required: true, trim: true, maxlength: 100 },
     urgent: { type: Boolean, default: false },
+    tab: { type: String, enum: ["incoming", "outgoing", null], default: null },
     eventKey: { type: String, required: true, maxlength: 120 },
     readAt: { type: Date, default: null },
     createdAt: { type: Date, default: Date.now },

@@ -3,6 +3,7 @@ import { connectToDatabase, isDatabaseConfigured } from "@/lib/db";
 import { StudyRequest, RequestStatus, RequestMode, RequestUrgency, REQUEST_STATUSES } from "@/models/StudyRequest";
 import { backfillRequestPriority, expireAndNotify } from "@/lib/request-expiry";
 import { NORMAL_WINDOW_MS } from "@/lib/request-rules";
+import { meetingUrl } from "@/lib/session-rules";
 import { User } from "@/models/User";
 import { buildSafeUnlockedContact, SafeUnlockedContact } from "@/lib/contact-unlock";
 import { requireAuth } from "@/lib/auth-guards";
@@ -25,6 +26,11 @@ interface RawPopulatedStudyRequest {
   urgency?: RequestUrgency;
   courseCode?: string;
   neededBy?: Date | null;
+  proposedSlots?: Date[];
+  proposedBy?: mongoose.Types.ObjectId | string | null;
+  sessionDurationMinutes?: number;
+  scheduledAt?: Date | null;
+  meetingRoom?: string | null;
   expiresAt?: Date | null;
   respondedAt?: Date | null;
   learnerConfirmedAt?: Date | null;
@@ -66,6 +72,15 @@ export interface StudyRequestDTO {
   neededBy: string | null;
   /** When a pending request stops accepting responses. */
   expiresAt: string | null;
+  /** Session planning (accepted requests). */
+  session: {
+    proposedSlots: string[];
+    proposedByMe: boolean;
+    durationMinutes: number;
+    scheduledAt: string | null;
+    /** Jitsi link, only once a participant created it. */
+    meetingUrl: string | null;
+  };
   respondedAt?: string | null;
   learnerConfirmedAt?: string | null;
   peerConfirmedAt?: string | null;
@@ -103,6 +118,18 @@ export interface PublicPeerReviewsResult {
   total: number;
   page: number;
   totalPages: number;
+}
+
+function sessionFields(req: RawPopulatedStudyRequest, me: string) {
+  return {
+    session: {
+      proposedSlots: (req.proposedSlots ?? []).map((d) => new Date(d).toISOString()),
+      proposedByMe: req.proposedBy ? String(req.proposedBy) === me : false,
+      durationMinutes: req.sessionDurationMinutes ?? 60,
+      scheduledAt: req.scheduledAt ? new Date(req.scheduledAt).toISOString() : null,
+      meetingUrl: req.meetingRoom && isContactUnlockedStatus(req.status) ? meetingUrl(req.meetingRoom) : null,
+    },
+  };
 }
 
 function timingFields(req: RawPopulatedStudyRequest) {
@@ -230,6 +257,7 @@ export async function getDashboardRequests(
 
   const rawIncoming = await StudyRequest.find({ peer: userObjectId, ...filters })
     .populate("learner", "name image university")
+    .select("+meetingRoom")
     .sort({ priority: -1, createdAt: -1, _id: -1 })
     .skip(incomingSkip)
     .limit(boundedPageSize)
@@ -243,6 +271,7 @@ export async function getDashboardRequests(
 
   const rawOutgoing = await StudyRequest.find({ learner: userObjectId, ...filters })
     .populate("peer", "name image university")
+    .select("+meetingRoom")
     .sort({ priority: -1, createdAt: -1, _id: -1 })
     .skip(outgoingSkip)
     .limit(boundedPageSize)
@@ -266,6 +295,7 @@ export async function getDashboardRequests(
     mode: req.mode,
     status: req.status,
     ...timingFields(req),
+    ...sessionFields(req, userIdStr),
     respondedAt: req.respondedAt ? new Date(req.respondedAt).toISOString() : null,
     learnerConfirmedAt: req.learnerConfirmedAt ? new Date(req.learnerConfirmedAt).toISOString() : null,
     peerConfirmedAt: req.peerConfirmedAt ? new Date(req.peerConfirmedAt).toISOString() : null,
@@ -323,6 +353,7 @@ export async function getDashboardRequests(
         mode: req.mode,
         status: req.status,
         ...timingFields(req),
+        ...sessionFields(req, userIdStr),
         respondedAt: req.respondedAt ? new Date(req.respondedAt).toISOString() : null,
         learnerConfirmedAt: req.learnerConfirmedAt ? new Date(req.learnerConfirmedAt).toISOString() : null,
         peerConfirmedAt: req.peerConfirmedAt ? new Date(req.peerConfirmedAt).toISOString() : null,

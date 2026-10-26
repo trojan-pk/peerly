@@ -48,6 +48,9 @@ export interface IUserDocument extends Document {
   universityEmailVerifiedAt: Date | null;
   verifiedUniversity: Types.ObjectId | null;
   verifiedUniversityName: string;
+  /** Opt-in public helper page at /h/[publicSlug]. Off by default. */
+  publicPageEnabled: boolean;
+  publicSlug?: string | null;
   reviewCount: number;
   averageRating: number;
   responseCount: number;
@@ -187,6 +190,8 @@ const UserSchema = new Schema<IUserDocument>(
     universityEmailVerifiedAt: { type: Date, default: null },
     verifiedUniversity: { type: Schema.Types.ObjectId, ref: "University", default: null },
     verifiedUniversityName: { type: String, default: "", trim: true, maxlength: 120 },
+    publicPageEnabled: { type: Boolean, default: false },
+    publicSlug: { type: String, default: null, trim: true, lowercase: true, maxlength: 60 },
     reviewCount: {
       type: Number,
       default: 0,
@@ -250,6 +255,7 @@ const UserSchema = new Schema<IUserDocument>(
 );
 
 UserSchema.index({ "moderation.isHidden": 1, isProfileComplete: 1 });
+UserSchema.index({ publicSlug: 1 }, { unique: true, partialFilterExpression: { publicSlug: { $type: "string" } } });
 // One verified account per university address.
 UserSchema.index({ universityEmail: 1 }, { unique: true, partialFilterExpression: { universityEmail: { $type: "string" } } });
 

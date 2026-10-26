@@ -88,6 +88,7 @@ export async function ensureDatabaseIndexes(): Promise<void> {
   const { Report } = await import("@/models/Report");
   const { Notification } = await import("@/models/Notification");
   const { University, Course, EmailVerification } = await import("@/models/Course");
+  const { ResourceVote } = await import("@/models/ResourceVote");
 
   await Promise.all([
     User.init(),
@@ -99,6 +100,7 @@ export async function ensureDatabaseIndexes(): Promise<void> {
     University.init(),
     Course.init(),
     EmailVerification.init(),
+    ResourceVote.init(),
   ]);
 
   indexesEnsured = true;

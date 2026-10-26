@@ -4,6 +4,7 @@ import { Resource } from "@/models/Resource";
 import { escapeRegex, normalizeTags } from "@/lib/validations/user";
 import { requireAuth } from "@/lib/auth-guards";
 import { normalizeCourseCode } from "@/lib/course-rules";
+import { viewerVotes } from "@/lib/resource-votes";
 
 export interface PublicResourceDTO {
   id: string;
@@ -12,6 +13,9 @@ export interface PublicResourceDTO {
   topic: string;
   /** Catalogue course code, when the owner tagged one. */
   courseCode: string;
+  upvoteCount: number;
+  /** Set when listing for a signed-in viewer. */
+  viewerUpvoted?: boolean;
   url: string;
   createdAt: string;
   updatedAt: string;
@@ -48,6 +52,10 @@ export interface UserResourcesResult {
 }
 
 export interface ResourceSearchParams {
+  /** "helpful" sorts by upvotes; default is newest. */
+  sort?: string;
+  /** Signed-in viewer, used to mark which resources they upvoted. */
+  viewerId?: string;
   q?: string;
   topic?: string;
   page?: string | number;
@@ -87,6 +95,7 @@ interface RawPopulatedResource {
   description: string;
   topic: string;
   courseCode?: string;
+  upvoteCount?: number;
   course?: mongoose.Types.ObjectId | string | null;
   url: string;
   moderation?: {
@@ -113,6 +122,7 @@ export function toPublicResourceDTO(raw: RawPopulatedResource, includeModeration
     description: raw.description,
     topic: raw.topic,
     courseCode: raw.courseCode ?? "",
+    upvoteCount: typeof raw.upvoteCount === "number" ? raw.upvoteCount : 0,
     url: raw.url,
     createdAt: new Date(raw.createdAt).toISOString(),
     updatedAt: new Date(raw.updatedAt).toISOString(),
@@ -204,9 +214,10 @@ export async function queryResources(
     const skip = (validPage - 1) * PAGE_SIZE;
 
     // 5. Bounded query with stable sort and populate safe owner fields
+    const sort: Record<string, 1 | -1> = params.sort === "helpful" ? { upvoteCount: -1, createdAt: -1, _id: -1 } : { createdAt: -1, _id: -1 };
     const rawDocs = await Resource.find(query)
       .populate("owner", "name university image")
-      .sort({ createdAt: -1, _id: -1 })
+      .sort(sort)
       .skip(skip)
       .limit(PAGE_SIZE)
       .lean();
@@ -214,6 +225,10 @@ export async function queryResources(
     const resources = (rawDocs as unknown as RawPopulatedResource[]).map((doc) =>
       toPublicResourceDTO(doc)
     );
+    if (params.viewerId && mongoose.Types.ObjectId.isValid(params.viewerId)) {
+      const voted = await viewerVotes(params.viewerId, resources.map((r) => r.id));
+      for (const r of resources) r.viewerUpvoted = voted.has(r.id);
+    }
 
     return {
       state: "success",
