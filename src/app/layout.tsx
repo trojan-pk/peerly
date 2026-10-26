@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Suspense } from "react";
+import { headers } from "next/headers";
 import { auth } from "@/auth";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -88,12 +89,14 @@ async function DynamicNavbar() {
   );
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const authStatus = getAuthConfigStatus();
+  // Nonce from src/proxy.ts so the pre-paint theme script passes the CSP.
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
 
   return (
     <html
@@ -105,7 +108,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <script id="peerly-theme-init" dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <script id="peerly-theme-init" nonce={nonce} dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
       <body className="flex flex-col min-h-screen bg-canvas text-ink antialiased">
         <MotionSafe>

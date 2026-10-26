@@ -83,6 +83,7 @@ test("members mark resources helpful and sort by most helpful", async ({ page, c
   await expect(page.getByRole("article").first()).toContainText(`Voted notes ${suffix}`);
   await page.reload();
   await expect(page.getByRole("article").filter({ hasText: `Voted notes ${suffix}` }).getByRole("button", { name: /as helpful/ })).toHaveAttribute("aria-pressed", "true");
+  await app.db.collection("resources").deleteMany({ title: { $in: [`Voted notes ${suffix}`, `Fresh notes ${suffix}`] } });
 });
 
 test("public helper page is opt-in, public, and shows no contact details", async ({ browser, page, context, app }, testInfo) => {

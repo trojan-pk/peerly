@@ -12,6 +12,8 @@ type App = {
   db: ReturnType<MongoClient["db"]>;
   ids: Record<Actor, string>;
   signIn: (context: BrowserContext, actor: Actor) => Promise<void>;
+  /** Signs in as any user id already inserted into the test database. */
+  signInUser: (context: BrowserContext, user: { id: string; email: string; name: string }) => Promise<void>;
 };
 
 // Test-only encrypted sessions exercise the real Auth.js session boundary and
@@ -63,13 +65,17 @@ export const test = base.extend<object, { app: App }>({
         await new Promise((resolve) => setTimeout(resolve, 200));
       }
       if (!ready) throw new Error(`Test server failed to start: ${serverOutput}`);
-      await runWithApp({ db, ids, signIn: async (context, actor) => {
-        const token = await encode({ secret, salt: "authjs.session-token", token: {
+      const issue = async (context: BrowserContext, claims: Record<string, unknown>) => {
+        const token = await encode({ secret, salt: "authjs.session-token", token: claims });
+        await context.addCookies([{ name: "authjs.session-token", value: token, url: baseURL, httpOnly: true, sameSite: "Lax" }]);
+      };
+      await runWithApp({ db, ids,
+        signIn: (context, actor) => issue(context, {
           userId: ids[actor], sub: `e2e-${actor}`, email: `${actor}@peerly.example`, name: names[actor],
           role: actor === "admin" ? "admin" : "student", isProfileComplete: true,
-        } });
-        await context.addCookies([{ name: "authjs.session-token", value: token, url: baseURL, httpOnly: true, sameSite: "Lax" }]);
-      } });
+        }),
+        signInUser: (context, user) => issue(context, { userId: user.id, sub: `e2e-${user.id}`, email: user.email, name: user.name, role: "student", isProfileComplete: true }),
+      });
     } finally {
       if (child && child.exitCode === null) {
         child.kill("SIGTERM");

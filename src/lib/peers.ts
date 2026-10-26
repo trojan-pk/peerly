@@ -7,6 +7,7 @@ import { escapeRegex, normalizeTags } from "@/lib/validations/user";
 import { getPeerRatingStatsBatch } from "@/lib/peer-reviews";
 import { getPeerResponseStatsBatch } from "@/lib/peer-responses";
 import { calculatePeerMatchScore } from "@/lib/peer-matching";
+import { rankingStages } from "@/lib/peer-ranking";
 
 export interface PeerSearchParams {
   /** Catalogue course id. */
@@ -45,7 +46,7 @@ const PAGE_SIZE = 12;
  *
  * Rules:
  * - Bounded input lengths and validated pagination.
- * - Entire candidate set is scored and ranked BEFORE pagination.
+ * - The entire candidate set is scored and ranked in MongoDB BEFORE pagination.
  * - Global deterministic tie-breakers (matchScore -> rating -> reviews -> createdAt -> _id).
  * - Topic-based match scores are calculated and displayed only when search/topic is supplied.
  * - Default discovery preserves recency ordering without search.
@@ -167,12 +168,18 @@ export async function queryPeers(params: PeerSearchParams = {}): Promise<PeersQu
 
     // 5. Query candidate set
     if (isSearchActive) {
-      // IMPORTANT: Rank the entire filtered candidate set BEFORE pagination!
-      const rawCandidates = await User.find(query)
-        .sort({ createdAt: -1, _id: -1 })
-        .lean();
-
-      const candidateIds = rawCandidates.map((u) => u._id);
+      // Rank the whole filtered set inside MongoDB, then load only this page's users.
+      const ranked = await User.aggregate<{ _id: mongoose.Types.ObjectId }>([
+        { $match: query },
+        ...rankingStages({ q: safeQ, topic: safeTopic, subject: safeSubject, mode: safeMode, course: safeCourse }),
+        { $skip: skip },
+        { $limit: PAGE_SIZE },
+        { $project: { _id: 1 } },
+      ]);
+      const candidateIds = ranked.map((r) => r._id);
+      const order = new Map(candidateIds.map((id, i) => [String(id), i]));
+      const rawCandidates = (await User.find({ _id: { $in: candidateIds } }).lean())
+        .sort((a, b) => (order.get(String(a._id)) ?? 0) - (order.get(String(b._id)) ?? 0));
 
       // Batched authoritative queries for review aggregates and response stats
       const [statsMap, responseStatsMap] = await Promise.all([
@@ -225,30 +232,8 @@ export async function queryPeers(params: PeerSearchParams = {}): Promise<PeersQu
         };
       });
 
-      // Global deterministic ranking across all candidates BEFORE slicing:
-      scoredCandidates.sort((a, b) => {
-        // 1. Match score DESC
-        const scoreDiff = (b.matchScore ?? 0) - (a.matchScore ?? 0);
-        if (scoreDiff !== 0) return scoreDiff;
-
-        // 2. Authoritative rating DESC
-        const ratingDiff = b.averageRating - a.averageRating;
-        if (ratingDiff !== 0) return ratingDiff;
-
-        // 3. Review count DESC
-        const reviewDiff = b.reviewCount - a.reviewCount;
-        if (reviewDiff !== 0) return reviewDiff;
-
-        // 4. Creation date DESC
-        const timeDiff = new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        if (timeDiff !== 0) return timeDiff;
-
-        // 5. Deterministic ID tie-breaker
-        return b.id.localeCompare(a.id);
-      });
-
-      // Slice the globally ranked candidate list for the current page
-      const peers = scoredCandidates.slice(skip, skip + PAGE_SIZE);
+      // Already in database rank order and limited to this page.
+      const peers = scoredCandidates;
 
       return {
         state: "success",

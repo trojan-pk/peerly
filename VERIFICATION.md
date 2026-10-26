@@ -486,3 +486,48 @@ vote persists and reorders; public page toggled on, viewed signed-out (noindex, 
 returns PNG, no contact), toggled off → 404. Results: 375 unit/integration tests and 23/23
 browser scenarios on two consecutive runs. Calendar import into real Google/Apple
 Calendar apps and joining a live Jitsi call were not tested.
+
+## Peerly v2 — Phase 7: hardening and launch readiness (26 October 2026)
+
+- **Search in MongoDB:** `src/lib/peer-ranking.ts` computes the match score, rating,
+  review count and fast-reply badge in an aggregation (`$lookup` of request stats,
+  `$regexMatch` normalised tag equality, half-up rounding to match `Math.round`), sorts
+  with the documented tie-breakers and applies `$skip/$limit` in the database. Only the
+  page's ≤12 users are loaded; breakdowns are still computed with `calculatePeerMatchScore`.
+- **Account:** JSON export route, typed-confirmation deletion that anonymises
+  counterparts' records ("Deleted user"), redacts text the deleted person wrote, keeps
+  ratings, cancels open requests and keeps vote counters consistent.
+- **Security:** nonce CSP via `src/proxy.ts`, nonce on the theme script, COOP and an
+  extended Permissions-Policy, HSTS/`upgrade-insecure-requests` only for HTTPS `AUTH_URL`.
+  `pnpm audit` (prod and dev): no known vulnerabilities on 26 October 2026.
+
+Security checklist for new server entry points (Phases 2–7):
+
+| Entry point | Auth | Ownership / role | Validation | Rate limit |
+| --- | --- | --- | --- | --- |
+| notifications: unread, mark, mark all, email alerts | requireAuth | recipient only | ObjectId, boolean | 120/20/10 per min |
+| palette search | requireAuth | own requests; public peer fields | ≤60 chars, regex-escaped | 60/min |
+| courses: list, add, save | requireAuth | own profile; visible own-university courses | code/domain normalisers | 60/min, 10/h add, 10/min save |
+| catalogue admin actions | requireAdmin (ADMIN_EMAILS) | admin | domains, names | 60/min |
+| university email send / confirm / remove | requireAuth | self | allowlisted domain; 6 digits | 3/10 min + 5/h per address; 10/10 min; 5 attempts |
+| sessions: propose, choose, meeting | requireAuth | participant, ACCEPTED (meeting: accepted/completed) | ISO with offset, 10 min–60 days, set durations | 10/10/20 per min |
+| `/api/requests/[id]/ics` | requireAuth (401) | participant else 404 | ObjectId | — (read-only) |
+| resource upvote | requireAuth | not own, visible resource | ObjectId, boolean | 30/min |
+| public page toggle / `/h/[slug]` | requireAuth / public | self; page 404 unless enabled & visible | slug pattern | 10/min |
+| account export / delete | requireAuth | self only (no id accepted) | literal "DELETE" | 5/h, 3/h |
+
+Tests: 18 new unit/integration — ranking parity with the in-memory reference on a
+seeded 150-profile dataset (8 query shapes incl. mode, subject, course filter, course-code
+query and whitespace normalisation; shared timestamps exercise the `_id` tie-breaker),
+non-overlapping pages, 5,000 candidates ranked with a single 12-id user fetch (~1.8 s
+locally); CSP directives; export contents and privacy, export route auth/headers; typed
+confirmation and self-only deletion; no residual personal data; counterpart history,
+ratings and reviews intact; idempotent deletion. Browser: headers and a unique nonce on
+seven pages, nonce on the theme script, client interactions with no CSP violations, an
+injected nonce-less inline script is blocked; export → delete → signed out → helper still
+sees the review as "Deleted user" without the deleted text; full journey (urgent request,
+bell, accept, scheduling, Jitsi, `.ics`, completion, review, helpful vote, verified badge,
+public page) with the learner in Ink at 1280px and the helper in Paper at 390px. Two
+suites left records for the shared helper and broke older locators; the journey and
+helpful-vote tests now remove what they create. Results: 393 unit/integration tests and
+26/26 browser scenarios on two consecutive runs; typecheck, lint and build passed.
