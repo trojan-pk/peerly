@@ -1,7 +1,7 @@
 import { test as base, expect, type BrowserContext } from "@playwright/test";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { MongoClient, ObjectId } from "mongodb";
-import { encode } from "@auth/core/jwt";
+import { encode } from "next-auth/jwt";
 import { randomBytes } from "node:crypto";
 import { spawn } from "node:child_process";
 import { once } from "node:events";

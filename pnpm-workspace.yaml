@@ -1,0 +1,7 @@
+# pnpm blocks dependency install scripts unless explicitly allowed.
+# - mongodb-memory-server: postinstall pre-downloads the MongoDB binary used by
+#   integration tests, so test hooks do not time out on a first download.
+# - unrs-resolver: postinstall is only a fallback for missing native prebuilds.
+allowBuilds:
+  mongodb-memory-server: true
+  unrs-resolver: false

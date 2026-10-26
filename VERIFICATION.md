@@ -85,14 +85,14 @@ topic orbits and resource artwork were also constrained at narrow widths.
 ## Reproduce
 
 ```bash
-npm run check:env -- --connect
-npm run typecheck
-npm run lint
-npm test
-npm run build
-npm run test:e2e
-npm run test:e2e:atlas
-npm start
+pnpm check:env --connect
+pnpm typecheck
+pnpm lint
+pnpm test
+pnpm build
+pnpm test:e2e
+pnpm test:e2e:atlas
+pnpm start
 ```
 
 The Atlas check creates a random `peerly_e2e_<random>` database and removes it on
@@ -303,3 +303,14 @@ Tests added: malformed review exclusion, neutral fallback name, batched-contact
 parity with the single-request resolver across all six statuses (no `findById`
 calls), and no contact for unrelated users. Result: 190 tests, lint, typecheck,
 build and 8/8 browser scenarios passed.
+
+## Package manager: pnpm (26 October 2026)
+
+The owner asked for pnpm. `pnpm import` converted the npm lockfile to the same
+resolved versions; `package-lock.json` is removed and `packageManager` pins
+pnpm 11.8.0. pnpm's strict layout exposed one phantom import: browser fixtures
+imported `@auth/core/jwt`, a transitive dependency. They now use the identical
+`next-auth/jwt` re-export, so no dependency was added. `pnpm-workspace.yaml`
+allows only `mongodb-memory-server`'s install script (pre-downloads the test
+MongoDB binary); others stay blocked. After a clean `pnpm install
+--frozen-lockfile`: typecheck, lint, 190 tests, build and 8/8 browser tests passed.
