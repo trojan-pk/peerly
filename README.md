@@ -160,6 +160,26 @@ discoverable peers, topics and your own requests. It returns public peer fields 
 is rate-limited. Press **?** for shortcut help. Tab to a pending request sent to you and
 press **A** to accept or **R** to decline.
 
+## Universities, courses and university email
+
+Admins (`ADMIN_EMAILS`) manage universities and their email domains at
+`/admin/universities` (Catalogue). In Settings, members choose their university and the
+courses they can help with, or add a missing course: codes are normalised (`cs 101` →
+`CS-101`), unique per university and rate-limited. Admins can hide courses or merge a
+duplicate into another; helpers, requests and resources move to the target. Peer search
+has a Course filter, and a query that is a course code (e.g. `CS101`) matches it. A course
+match earns the same 50 points as an exact topic match. Requests and resources can
+optionally carry a course, which must be one the helper/owner lists. Free-text topics,
+subjects and existing profiles keep working.
+
+**University email verification** (needs the optional email settings): a member enters an
+address on an allowlisted domain (or subdomain) and receives a 6-digit code. Codes are
+stored as salted SHA-256 hashes, expire after 10 minutes, allow 5 attempts, are single-use
+and rate-limited; one account per address. Profiles then show **"University email
+verified"** with the university name — never the address. It shows control of an address
+on that domain, not current enrolment. Without email configured the section explains that
+it's unavailable.
+
 ## Open Page identity
 
 The approved Open Page symbol and outlined `peerly` wordmark appear in the header,

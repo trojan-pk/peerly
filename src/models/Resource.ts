@@ -8,6 +8,8 @@ export interface IResourceDocument extends Document {
   topic: string;
   normalizedTopic: string;
   url: string;
+  course?: Types.ObjectId | null;
+  courseCode?: string;
   moderation?: IModerationInfo;
   createdAt: Date;
   updatedAt: Date;
@@ -55,6 +57,8 @@ const ResourceSchema = new Schema<IResourceDocument>(
       trim: true,
       maxlength: [500, "URL cannot exceed 500 characters"],
     },
+    course: { type: Schema.Types.ObjectId, ref: "Course", default: null, index: true },
+    courseCode: { type: String, default: "", maxlength: 12 },
     moderation: {
       isHidden: {
         type: Boolean,

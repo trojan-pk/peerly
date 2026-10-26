@@ -1,5 +1,7 @@
 "use server";
 
+import { Course } from "@/models/Course";
+
 import mongoose from "mongoose";
 import { revalidatePath } from "next/cache";
 import { requireAuth, UnauthorizedError } from "@/lib/auth-guards";
@@ -20,6 +22,14 @@ export interface ResourceActionResult {
   conflict?: boolean;
   rateLimited?: boolean;
   errors?: Record<string, string>;
+}
+
+/** Resolves an optional course id that must be one of the caller's own catalogue courses. */
+async function resolveOwnCourse(user: { courses?: unknown[] }, courseId: string | null): Promise<{ ok: true; course: mongoose.Types.ObjectId | null; code: string } | { ok: false }> {
+  if (!courseId) return { ok: true, course: null, code: "" };
+  if (!(user.courses ?? []).map(String).includes(courseId)) return { ok: false };
+  const course = await Course.findOne({ _id: courseId, isHidden: false, mergedInto: null }).select("code").lean();
+  return course ? { ok: true, course: course._id as mongoose.Types.ObjectId, code: course.code } : { ok: false };
 }
 
 /**
@@ -98,8 +108,12 @@ export async function createResource(rawInput: unknown): Promise<ResourceActionR
     await ensureDatabaseIndexes();
 
     const normalizedTopic = data.topic.trim().toLowerCase();
+    const course = await resolveOwnCourse(authContext.user, data.course);
+    if (!course.ok) return { success: false, message: "Choose one of your own courses, or leave the course empty.", errors: { course: "Not one of your courses" } };
 
     const newDoc = await Resource.create({
+      course: course.course,
+      courseCode: course.code,
       owner: authContext.user._id,
       title: data.title.trim(),
       description: data.description.trim(),
@@ -210,6 +224,8 @@ export async function updateResource(rawInput: unknown): Promise<ResourceActionR
     await ensureDatabaseIndexes();
 
     const normalizedTopic = data.topic.trim().toLowerCase();
+    const course = await resolveOwnCourse(authContext.user, data.course);
+    if (!course.ok) return { success: false, message: "Choose one of your own courses, or leave the course empty.", errors: { course: "Not one of your courses" } };
 
     // Atomic update strictly filtering by resource ID AND authenticated owner!
     const updated = await Resource.findOneAndUpdate(
@@ -223,6 +239,8 @@ export async function updateResource(rawInput: unknown): Promise<ResourceActionR
           description: data.description.trim(),
           topic: data.topic.trim(),
           normalizedTopic,
+          course: course.course,
+          courseCode: course.code,
           url: urlCheck.normalizedUrl,
         },
       },

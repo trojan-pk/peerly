@@ -128,3 +128,18 @@
 .shortcut-list dd { display: flex; gap: 4px; }
 .ui-dialog:has(.palette) .ui-dialog-header { padding: 0; height: 0; overflow: hidden; }
 .ui-dialog:has(.palette) .ui-dialog-body { padding: 0; }
+
+/* Phase 5: courses and verification. */
+.course-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.course-chips li { padding: 2px 8px; border-radius: 6px; border: 1px solid color-mix(in srgb, var(--pi-accent) 30%, var(--pi-line)); background: color-mix(in srgb, var(--pi-accent) 7%, var(--pi-surface)); color: var(--pi-accent); font-size: 12px; font-weight: 600; }
+.verified-badge { display: inline-flex; align-items: center; gap: 4px; margin-top: 3px; color: var(--pi-success); font-size: 12px; font-weight: 600; }
+.course-picker { display: grid; gap: 8px; }
+.course-picker label.course-option { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 1px solid var(--pi-line); border-radius: 9px; background: var(--pi-surface); font-size: 14px; color: var(--pi-body); cursor: pointer; }
+.course-picker label.course-option:has(input:checked) { border-color: var(--pi-accent); box-shadow: inset 0 0 0 1px var(--pi-accent); color: var(--pi-ink); }
+.course-picker .course-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; max-height: 320px; overflow-y: auto; }
+.inline-form { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: flex-start; }
+.inline-form > .ui-button { margin-top: 27px; }
+.inline-form > .ui-field { flex: 1 1 160px; }
+.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.admin-table th { text-align: left; padding: 8px 10px; color: var(--pi-muted); font-size: 12px; font-weight: 700; border-bottom: 1px solid var(--pi-line); }
+.admin-table td { padding: 10px; border-bottom: 1px solid var(--pi-line); color: var(--pi-body); vertical-align: middle; }

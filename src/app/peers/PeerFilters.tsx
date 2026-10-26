@@ -6,11 +6,13 @@ import { Search, X, Filter } from "lucide-react";
 interface PeerFiltersProps {
   availableTopics: string[];
   availableSubjects: string[];
+  availableCourses?: Array<{ id: string; label: string }>;
 }
 
 export default function PeerFilters({
   availableTopics,
   availableSubjects,
+  availableCourses = [],
 }: PeerFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -20,9 +22,10 @@ export default function PeerFilters({
   const currentSubject = searchParams.get("subject") || "";
   const currentMode = searchParams.get("mode") || "";
   const currentPricing = searchParams.get("pricing") || "";
+  const currentCourse = searchParams.get("course") || "";
 
   const hasActiveFilters = Boolean(
-    currentQ || currentTopic || currentSubject || currentMode || currentPricing
+    currentCourse || currentQ || currentTopic || currentSubject || currentMode || currentPricing
   );
 
   const handleClearFilters = () => {
@@ -65,7 +68,7 @@ export default function PeerFilters({
           id="peer-search-input"
           name="q"
           defaultValue={currentQ}
-          placeholder="Search by topic, university, subject, or student name..."
+          placeholder="Search by course code, topic, university or name…"
           className="w-full pl-10 pr-24 py-2.5 rounded-xl border border-edge text-sm text-ink bg-panel/50 focus:bg-surface focus:outline-none focus:ring-2 focus:ring-accent transition-colors"
         />
         <button
@@ -77,7 +80,22 @@ export default function PeerFilters({
       </div>
 
       {/* Filter Dropdowns Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
+      <div className={`grid grid-cols-1 sm:grid-cols-2 ${availableCourses.length ? "lg:grid-cols-5" : "lg:grid-cols-4"} gap-3 pt-1`}>
+        {availableCourses.length > 0 && (
+          <div className="space-y-1">
+            <label htmlFor="filter-course" className="block text-[11px] font-semibold text-body">Course</label>
+            <select
+              id="filter-course"
+              name="course"
+              defaultValue={currentCourse}
+              onChange={(e) => { e.currentTarget.form?.requestSubmit(); }}
+              className="w-full px-3 py-2 rounded-lg border border-edge text-xs text-ink bg-panel/50 focus:bg-surface focus:outline-none focus:ring-2 focus:ring-accent transition-colors"
+            >
+              <option value="">All courses</option>
+              {availableCourses.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+            </select>
+          </div>
+        )}
         {/* Topic filter */}
         <div className="space-y-1">
           <label htmlFor="filter-topic" className="block text-[11px] font-semibold text-body">

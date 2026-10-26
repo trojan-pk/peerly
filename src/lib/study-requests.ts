@@ -23,6 +23,7 @@ interface RawPopulatedStudyRequest {
   mode: RequestMode;
   status: RequestStatus;
   urgency?: RequestUrgency;
+  courseCode?: string;
   neededBy?: Date | null;
   expiresAt?: Date | null;
   respondedAt?: Date | null;
@@ -59,6 +60,8 @@ export interface StudyRequestDTO {
   mode: RequestMode;
   status: RequestStatus;
   urgency: RequestUrgency;
+  /** Catalogue course code, when the learner picked one. */
+  courseCode: string;
   /** Learner's own deadline, if they gave one. */
   neededBy: string | null;
   /** When a pending request stops accepting responses. */
@@ -109,6 +112,7 @@ function timingFields(req: RawPopulatedStudyRequest) {
     : req.createdAt ? new Date(new Date(req.createdAt).getTime() + NORMAL_WINDOW_MS) : null;
   return {
     urgency: (req.urgency ?? "normal") as RequestUrgency,
+    courseCode: req.courseCode ?? "",
     neededBy: req.neededBy ? new Date(req.neededBy).toISOString() : null,
     expiresAt: expires ? expires.toISOString() : null,
   };

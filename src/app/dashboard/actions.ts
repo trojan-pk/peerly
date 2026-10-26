@@ -16,6 +16,7 @@ import {
 import { computeExpiresAt } from "@/lib/request-rules";
 import { expireAndNotify, expiredPendingFilter, stillOpenFilter } from "@/lib/request-expiry";
 import { notify } from "@/lib/notifications";
+import { Course } from "@/models/Course";
 
 export interface RequestActionResult {
   success: boolean;
@@ -133,6 +134,14 @@ export async function createStudyRequest(rawInput: unknown): Promise<RequestActi
 
     const normalizedTopic = data.topic.toLowerCase().trim();
 
+    let courseCode = "";
+    if (data.course) {
+      const helperCourses = ((peerUser as { courses?: unknown[] }).courses ?? []).map(String);
+      const course = helperCourses.includes(data.course) ? await Course.findOne({ _id: data.course, isHidden: false, mergedInto: null }).lean() : null;
+      if (!course) return { success: false, message: "Choose one of this helper's courses, or leave the course empty.", errors: { course: "Not one of this helper's courses" } };
+      courseCode = course.code;
+    }
+
     // An overdue pending request to this helper must not block a fresh one.
     await expireAndNotify({ learner: authContext.user._id, peer: peerUser._id });
 
@@ -147,6 +156,8 @@ export async function createStudyRequest(rawInput: unknown): Promise<RequestActi
       mode: data.mode,
       status: "PENDING",
       urgency: data.urgency,
+      course: data.course,
+      courseCode,
       neededBy: data.neededBy,
       expiresAt: computeExpiresAt(createdAt, data.urgency, data.neededBy),
       createdAt,

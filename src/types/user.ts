@@ -21,6 +21,8 @@ export interface PeerResponseStatsDTO {
 }
 
 export interface MatchScoreBreakdown {
+  /** Present when a course filter was applied. */
+  courseMatched?: boolean;
   totalScore: number;
   topicPoints: number;
   topicMatchReason: string;
@@ -50,6 +52,10 @@ export interface PublicUserProfile {
   availability: string;
   pricingPreference: PricingPreference;
   isProfileComplete: boolean;
+  /** Catalogue course codes the person helps with, e.g. "CS-101". */
+  courseCodes: string[];
+  /** Set only when the person verified an address on this university's domain. */
+  verifiedUniversityName: string | null;
   reviewCount: number;
   averageRating: number;
   responseCount: number;

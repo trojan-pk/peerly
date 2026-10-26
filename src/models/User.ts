@@ -38,6 +38,16 @@ export interface IUserDocument extends Document {
   isProfileComplete: boolean;
   /** Email alerts for request events (only sent when email is configured). */
   emailAlerts: boolean;
+  /** Catalogue university chosen in settings (the free-text `university` mirrors its name). */
+  universityRef: Types.ObjectId | null;
+  /** Catalogue courses this person can help with, plus their codes for search/display. */
+  courses: Types.ObjectId[];
+  courseCodes: string[];
+  /** Private: verified university address. Never public. */
+  universityEmail?: string | null;
+  universityEmailVerifiedAt: Date | null;
+  verifiedUniversity: Types.ObjectId | null;
+  verifiedUniversityName: string;
   reviewCount: number;
   averageRating: number;
   responseCount: number;
@@ -170,6 +180,13 @@ const UserSchema = new Schema<IUserDocument>(
       index: true,
     },
     emailAlerts: { type: Boolean, default: true },
+    universityRef: { type: Schema.Types.ObjectId, ref: "University", default: null },
+    courses: { type: [Schema.Types.ObjectId], ref: "Course", default: [], index: true },
+    courseCodes: { type: [String], default: [] },
+    universityEmail: { type: String, default: null, lowercase: true, trim: true, select: false },
+    universityEmailVerifiedAt: { type: Date, default: null },
+    verifiedUniversity: { type: Schema.Types.ObjectId, ref: "University", default: null },
+    verifiedUniversityName: { type: String, default: "", trim: true, maxlength: 120 },
     reviewCount: {
       type: Number,
       default: 0,
@@ -233,6 +250,8 @@ const UserSchema = new Schema<IUserDocument>(
 );
 
 UserSchema.index({ "moderation.isHidden": 1, isProfileComplete: 1 });
+// One verified account per university address.
+UserSchema.index({ universityEmail: 1 }, { unique: true, partialFilterExpression: { universityEmail: { $type: "string" } } });
 
 /**
  * Strict DTO transformer for public profiles.
@@ -255,6 +274,11 @@ export function toPublicProfile(user: IUserDocument | Record<string, unknown>): 
     availability: typeof user.availability === "string" ? user.availability : "",
     pricingPreference: (user.pricingPreference as PricingPreference) || "free",
     isProfileComplete: Boolean(user.isProfileComplete),
+    courseCodes: Array.isArray(user.courseCodes) ? (user.courseCodes as string[]) : [],
+    verifiedUniversityName:
+      user.universityEmailVerifiedAt && typeof user.verifiedUniversityName === "string" && user.verifiedUniversityName
+        ? user.verifiedUniversityName
+        : null,
     reviewCount: typeof user.reviewCount === "number" ? user.reviewCount : 0,
     averageRating: typeof user.averageRating === "number" ? user.averageRating : 0,
     responseCount: typeof user.responseCount === "number" ? user.responseCount : 0,

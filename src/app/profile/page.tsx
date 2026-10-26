@@ -3,6 +3,10 @@ import { LogoutButton } from "@/components/LogoutButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { EmailAlertsToggle } from "@/components/EmailAlertsToggle";
 import { isEmailConfigured } from "@/lib/email";
+import { CoursesSection } from "@/components/settings/CoursesSection";
+import { UniversityEmailSection } from "@/components/settings/UniversityEmailSection";
+import { getVerificationStatus, listCourses, listUniversities } from "@/lib/courses";
+import { requireAuth } from "@/lib/auth-guards";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/auth";
@@ -87,6 +91,15 @@ export default async function ProfilePage() {
     );
   }
 
+  const context = await requireAuth().catch(() => null);
+  const [universities, verification] = await Promise.all([
+    listUniversities().catch(() => []),
+    context ? getVerificationStatus(context.user).catch(() => null) : Promise.resolve(null),
+  ]);
+  const universityId = dbUser?.universityRef ? String(dbUser.universityRef) : null;
+  const universityCourses = universityId ? await listCourses(universityId).catch(() => []) : [];
+  const selectedCourses = (dbUser?.courses ?? []).map(String);
+
   const name = dbUser?.name || session.user.name || "Student";
   const email = dbUser?.email || session.user.email || "";
 
@@ -128,6 +141,18 @@ export default async function ProfilePage() {
         <div className="settings-section-heading"><div><h2 id="appearance-title">Appearance</h2><p>Paper is the light theme and Ink is the dark one. System follows your device setting. Your choice is saved in this browser.</p></div></div>
         <ThemeToggle />
       </section>
+
+      <section className="settings-account" aria-labelledby="courses-title">
+        <div className="settings-section-heading"><div><h2 id="courses-title">University and courses</h2><p>Students searching for a course code find helpers who list it. Topics below still work for anything not in the catalogue.</p></div></div>
+        <CoursesSection universities={universities} initialUniversityId={universityId} initialCourses={universityCourses} initialSelected={selectedCourses} />
+      </section>
+
+      {verification && (
+        <section className="settings-account" aria-labelledby="verify-title">
+          <div className="settings-section-heading"><div><h2 id="verify-title">University email</h2><p>Optional. Adds a “University email verified” badge to your profile.</p></div></div>
+          <UniversityEmailSection status={verification} />
+        </section>
+      )}
 
       <section className="settings-account" aria-labelledby="notifications-title">
         <div className="settings-section-heading"><div><h2 id="notifications-title">Notifications</h2><p>Request updates always appear under the bell in the header.</p></div></div>

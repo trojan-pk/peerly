@@ -5,6 +5,9 @@ import { Search, AlertCircle, AlertTriangle, ArrowRight, Clock, ChevronLeft, Che
 import { auth } from "@/auth";
 import { queryPeers } from "@/lib/peers";
 import PeerFilters from "./PeerFilters";
+import { isDatabaseConfigured } from "@/lib/db";
+import { listCoursesWithHelpers } from "@/lib/courses";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +19,7 @@ interface PeersPageProps {
     mode?: string;
     pricing?: string;
     page?: string;
+    course?: string;
   }>;
 }
 
@@ -30,8 +34,13 @@ export default async function PeersPage(props: PeersPageProps) {
   const mode = typeof searchParams.mode === "string" ? searchParams.mode : undefined;
   const pricing = typeof searchParams.pricing === "string" ? searchParams.pricing : undefined;
   const page = typeof searchParams.page === "string" ? searchParams.page : undefined;
+  const course = typeof searchParams.course === "string" ? searchParams.course : undefined;
 
-  const result = await queryPeers({ q, topic, subject, mode, pricing, page });
+  const [result, catalogue] = await Promise.all([
+    queryPeers({ q, topic, subject, mode, pricing, page, course }),
+    isDatabaseConfigured() ? listCoursesWithHelpers().catch(() => []) : Promise.resolve([]),
+  ]);
+  const availableCourses = catalogue.map((c) => ({ id: c.id, label: `${c.code}${c.title ? ` · ${c.title}` : ""} (${c.universityName})` }));
 
   const buildPaginationUrl = (newPage: number) => {
     const params = new URLSearchParams();
@@ -60,6 +69,7 @@ export default async function PeersPage(props: PeersPageProps) {
         <PeerFilters
           availableTopics={result.availableTopics}
           availableSubjects={result.availableSubjects}
+          availableCourses={availableCourses}
         />
       )}
 
@@ -91,6 +101,7 @@ export default async function PeersPage(props: PeersPageProps) {
                         <p className="text-xs text-muted">
                           {peer.university || "University Student"}
                         </p>
+                        {peer.verifiedUniversityName && <VerifiedBadge university={peer.verifiedUniversityName} />}
                       </div>
                     </div>
 
@@ -170,6 +181,13 @@ export default async function PeersPage(props: PeersPageProps) {
                         : "Free or Paid"}
                     </span>
                   </div>
+
+                  {peer.courseCodes.length > 0 && (
+                    <ul className="course-chips" aria-label="Courses">
+                      {peer.courseCodes.slice(0, 5).map((code) => <li key={code} className="tabular">{code}</li>)}
+                      {peer.courseCodes.length > 5 && <li>+{peer.courseCodes.length - 5}</li>}
+                    </ul>
+                  )}
 
                   {/* Topics Pills */}
                   {peer.topics.length > 0 && (

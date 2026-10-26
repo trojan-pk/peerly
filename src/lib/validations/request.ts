@@ -18,6 +18,8 @@ export const CreateStudyRequestSchema = z
       error: "Study mode must be online or campus",
     }),
     urgency: z.enum(["normal", "urgent"], { error: "Urgency must be normal or urgent" }).default("normal"),
+    /** Optional catalogue course id; must be one the helper lists. */
+    course: z.union([z.string().regex(/^[a-f\d]{24}$/i, "Invalid course"), z.literal(""), z.null()]).optional().transform((v) => v || null),
     /** ISO-8601 instant. Must be at least 15 minutes ahead and within 14 days. */
     neededBy: z
       .union([z.iso.datetime({ offset: true, error: "Enter a valid date and time" }), z.literal(""), z.null()])
