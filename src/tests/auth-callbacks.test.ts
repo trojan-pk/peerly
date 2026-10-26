@@ -136,7 +136,7 @@ describe("Authentication Callbacks, Identity Safety & Session Issuance", () => {
     });
 
     it("preserves an edited name on the next Google sign-in", async () => {
-      const existing = { _id: "existing", googleId: "gid-edited", email: "edited@uni.edu", name: "Edited Name", image: "", avatarUpdated: true, role: "student", save: vi.fn().mockResolvedValue(true) };
+      const existing = { _id: "existing", googleId: "gid-edited", email: "edited@uni.edu", name: "Edited Name", image: "", role: "student", save: vi.fn().mockResolvedValue(true) };
       vi.spyOn(User, "findOne").mockReturnValue({ select: vi.fn().mockResolvedValue(existing) } as any);
       expect(await authSignInCallback({ user: { email: "edited@uni.edu", name: "Google Name", image: "https://photo.url" }, account: { provider: "google", providerAccountId: "gid-edited" } as any, profile: { email_verified: true } })).toBe(true);
       expect(existing.name).toBe("Edited Name"); expect(existing.image).toBe("");

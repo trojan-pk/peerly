@@ -23,8 +23,8 @@ export interface IUserDocument extends Document {
   email: string;
   name: string;
   image: string;
+  /** Retired photo-upload bytes; never selected, displayed or served. */
   avatarData?: Buffer | null;
-  avatarUpdated?: boolean;
   role: UserRole;
   bio: string;
   university: string;
@@ -95,8 +95,9 @@ const UserSchema = new Schema<IUserDocument>(
       type: String,
       default: "",
     },
-    avatarData: { type: Buffer, default: null, select: false },
-    avatarUpdated: { type: Boolean, default: false },
+    // Legacy uploaded-photo bytes from a retired feature. Never read or served; kept in the
+    // schema solely so `select: false` stops old records' bytes entering ordinary queries.
+    avatarData: { type: Buffer, select: false },
     role: {
       type: String,
       enum: ["student", "admin"],

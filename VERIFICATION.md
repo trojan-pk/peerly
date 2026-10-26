@@ -282,3 +282,24 @@ Settings and resource layouts were checked for overflow at 320, 390, 768 and
 visually reviewed. Production build, TypeScript and ESLint passed. Tests used
 only a temporary MongoDB database; no owner records were changed. The production
 server was restarted on localhost:3000 and the public landing returned HTTP 200.
+
+## Peerly v2 — Phase 0: baseline and honesty fixes (26 October 2026)
+
+Baseline before changes: TypeScript, ESLint, 186 unit/integration tests and the
+production build passed. In the first full browser run the landing scenario timed
+out once while resizing the viewport; a focused rerun and the subsequent full run
+passed (8/8). It is recorded as intermittent; that landing is replaced in Phase 3.
+
+- Public reviews no longer default a missing rating to five stars. Records without
+  a genuine 1–5 rating are excluded from both the list and the count. The learner
+  fallback name is "Student", not "Verified Student".
+- Dashboard contact for accepted/completed/reviewed outgoing requests is resolved
+  in one batched user lookup rather than two queries per row. The query already
+  restricts rows to the signed-in learner, so authorization is unchanged.
+- The empty retired avatar route directory and `avatarUpdated` field were removed.
+  Legacy `avatarData` stays declared only as `select: false` so old bytes never load.
+
+Tests added: malformed review exclusion, neutral fallback name, batched-contact
+parity with the single-request resolver across all six statuses (no `findById`
+calls), and no contact for unrelated users. Result: 190 tests, lint, typecheck,
+build and 8/8 browser scenarios passed.

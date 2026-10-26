@@ -92,6 +92,11 @@ export interface PublicPeerReviewsResult {
   totalPages: number;
 }
 
+/** Statuses in which an accepted helper's contact is available to the learner. */
+export function isContactUnlockedStatus(status: RequestStatus): boolean {
+  return status === "ACCEPTED" || status === "COMPLETED" || status === "REVIEWED";
+}
+
 /**
  * Internal private helper that resolves contact given verified ObjectId.
  * Kept private to protect against caller-supplied ID spoofing.
@@ -124,12 +129,7 @@ async function resolveRequestContactInternal(
 
   // Learner can ONLY access contact if request is ACCEPTED, COMPLETED, or REVIEWED
   if (isLearner) {
-    const isContactUnlocked =
-      request.status === "ACCEPTED" ||
-      request.status === "COMPLETED" ||
-      request.status === "REVIEWED";
-
-    if (!isContactUnlocked) {
+    if (!isContactUnlockedStatus(request.status)) {
       return null;
     }
   }
@@ -250,17 +250,30 @@ export async function getDashboardRequests(
     unlockedContact: null,
   }));
 
-  // 4. Transform outgoing items (learner view) & resolve unlocked contact for ACCEPTED/COMPLETED/REVIEWED
-  const outgoingItems: StudyRequestDTO[] = await Promise.all(
-    (rawOutgoing as unknown as RawPopulatedStudyRequest[]).map(async (req) => {
-      let unlockedContact: SafeUnlockedContact | null = null;
-      if (
-        req.status === "ACCEPTED" ||
-        req.status === "COMPLETED" ||
-        req.status === "REVIEWED"
-      ) {
-        unlockedContact = await resolveRequestContactInternal(req._id.toString(), userObjectId);
-      }
+  // 4. Transform outgoing items (learner view). Contact unlocks only for the learner of
+  // ACCEPTED/COMPLETED/REVIEWED requests. Every row here was loaded with
+  // `learner: userObjectId`, so participant authorization is already enforced by the
+  // query; peer contacts are then resolved in one batched lookup instead of per row.
+  const rawOutgoingRows = rawOutgoing as unknown as RawPopulatedStudyRequest[];
+  const unlockedPeerIds = Array.from(new Set(
+    rawOutgoingRows
+      .filter((req) => isContactUnlockedStatus(req.status) && req.peer?._id)
+      .map((req) => req.peer!._id!.toString())
+  ));
+  const contactByPeer = new Map<string, SafeUnlockedContact>();
+  if (unlockedPeerIds.length > 0) {
+    const peers = await User.find({ _id: { $in: unlockedPeerIds } })
+      .select("+contact +email")
+      .lean();
+    for (const peerUser of peers) {
+      contactByPeer.set(peerUser._id.toString(), buildSafeUnlockedContact(peerUser));
+    }
+  }
+
+  const outgoingItems: StudyRequestDTO[] = rawOutgoingRows.map((req) => {
+      const peerIdStr = req.peer?._id ? req.peer._id.toString() : "";
+      const unlockedContact: SafeUnlockedContact | null =
+        isContactUnlockedStatus(req.status) ? contactByPeer.get(peerIdStr) ?? null : null;
 
       return {
         id: req._id.toString(),
@@ -292,8 +305,7 @@ export async function getDashboardRequests(
         updatedAt: req.updatedAt ? new Date(req.updatedAt).toISOString() : new Date().toISOString(),
         unlockedContact,
       };
-    })
-  );
+    });
 
   return {
     incoming: {
@@ -331,10 +343,12 @@ export async function getPublicPeerReviews(
   const parsedPage = typeof page === "number" ? page : parseInt(String(page || "1"), 10);
   const safePage = Math.max(1, Math.min(isNaN(parsedPage) ? 1 : parsedPage, 10000));
 
+  // Only genuine 1–5 integer ratings are shown; records without a rating are excluded
+  // rather than displayed with an invented default.
   const query = {
     peer: peerObjectId,
     status: "REVIEWED" as const,
-    "review.rating": { $exists: true },
+    "review.rating": { $gte: 1, $lte: 5 },
   };
 
   const total = await StudyRequest.countDocuments(query);
@@ -349,21 +363,23 @@ export async function getPublicPeerReviews(
     .limit(boundedPageSize)
     .lean();
 
-  const reviews: PublicReviewDTO[] = (rawReviewed as unknown as RawPopulatedStudyRequest[]).map((req) => {
-    // Generate clean safe learner name (e.g. first name or verified student)
-    const rawName = req.learner?.name?.trim() || "Verified Student";
-    const nameParts = rawName.split(" ");
+  const reviews: PublicReviewDTO[] = (rawReviewed as unknown as RawPopulatedStudyRequest[]).flatMap((req) => {
+    const rating = req.review?.rating;
+    if (typeof rating !== "number" || !Number.isInteger(rating) || rating < 1 || rating > 5) return [];
+    // First name plus last initial; a neutral fallback that does not claim verification.
+    const rawName = req.learner?.name?.trim() || "Student";
+    const nameParts = rawName.split(/\s+/);
     const safeLearnerName = nameParts.length > 1 ? `${nameParts[0]} ${nameParts[1][0]}.` : rawName;
 
-    return {
+    return [{
       id: req._id.toString(),
-      rating: req.review?.rating || 5,
+      rating,
       comment: req.review?.comment || "",
       createdAt: req.review?.createdAt
         ? new Date(req.review.createdAt).toISOString()
         : new Date().toISOString(),
       learnerName: safeLearnerName,
-    };
+    }];
   });
 
   return {

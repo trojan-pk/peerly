@@ -1264,4 +1264,57 @@ describe("Study Requests, Atomic Completion, Reviews & Rate Limiter (MongoDB Int
       expect(learnerDashboard.incoming.total).toBe(0);
     });
   });
+
+  describe("Honest public reviews and batched dashboard contact", () => {
+    function asActor(user: any) { vi.spyOn(authGuards, "requireAuth").mockResolvedValue({ user, session: {} as any, isAdmin: false }); }
+    const base = { problemDescription: "A sufficiently detailed question about calculus.", mode: "online" as const };
+
+    it("excludes reviewed records without a genuine rating instead of inventing five stars", async () => {
+      await StudyRequest.create({ ...base, learner: learnerUser._id, peer: peerUser._id, topic: "a", normalizedTopic: "a", status: "REVIEWED", review: { rating: 3, comment: "ok" } });
+      // A malformed legacy record written around schema validation.
+      await StudyRequest.collection.insertOne({ ...base, learner: learnerUser._id, peer: peerUser._id, topic: "b", normalizedTopic: "b", status: "REVIEWED", review: { comment: "no rating" }, createdAt: new Date(), updatedAt: new Date() });
+      const result = await getPublicPeerReviews(String(peerUser._id));
+      expect(result.total).toBe(1);
+      expect(result.reviews.map(r => r.rating)).toEqual([3]);
+    });
+
+    it("uses a neutral fallback name that does not claim verification", async () => {
+      const nameless = await User.collection.insertOne({ googleId: "nameless", email: "nameless@x.edu", name: "", isProfileComplete: true });
+      await StudyRequest.create({ ...base, learner: nameless.insertedId, peer: peerUser._id, topic: "c", normalizedTopic: "c", status: "REVIEWED", review: { rating: 4, comment: "" } });
+      const [review] = (await getPublicPeerReviews(String(peerUser._id))).reviews;
+      expect(review.learnerName).toBe("Student");
+    });
+
+    it("batches contacts for unlocked outgoing requests and matches the single-request resolver", async () => {
+      const statuses: RequestStatus[] = ["PENDING", "ACCEPTED", "COMPLETED", "REVIEWED", "REJECTED", "CANCELLED"];
+      const created = [];
+      for (const [i, status] of statuses.entries()) {
+        created.push(await StudyRequest.create({ ...base, learner: learnerUser._id, peer: peerUser._id, topic: `t${i}`, normalizedTopic: `t${i}`, status, ...(status === "REVIEWED" ? { review: { rating: 5, comment: "" } } : {}) }));
+      }
+      asActor(learnerUser);
+      const findSpy = vi.spyOn(User, "find");
+      const findByIdSpy = vi.spyOn(User, "findById");
+      const dashboard = await getDashboardRequests(1, 1, 10);
+      // Previously each unlocked row issued findById lookups (N+1). Now: the populate
+      // query plus one batched contact lookup, regardless of how many rows unlock.
+      expect(findByIdSpy).not.toHaveBeenCalled();
+      expect(findSpy).toHaveBeenCalledTimes(2);
+      findByIdSpy.mockRestore();
+      for (const item of dashboard.outgoing.items) {
+        const expected = await getAuthorizedRequestContact(item.id);
+        expect(item.unlockedContact ?? null).toEqual(expected);
+        expect(Boolean(item.unlockedContact)).toBe(["ACCEPTED", "COMPLETED", "REVIEWED"].includes(item.status));
+      }
+      expect(created).toHaveLength(6);
+    });
+
+    it("never gives an unrelated user any contact through the dashboard", async () => {
+      await StudyRequest.create({ ...base, learner: learnerUser._id, peer: peerUser._id, topic: "x", normalizedTopic: "x", status: "ACCEPTED" });
+      asActor(thirdPartyUser);
+      const dashboard = await getDashboardRequests();
+      expect(dashboard.outgoing.total).toBe(0);
+      expect(dashboard.incoming.total).toBe(0);
+      expect(JSON.stringify(dashboard)).not.toContain("5552345678");
+    });
+  });
 });
