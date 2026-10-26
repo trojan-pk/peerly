@@ -7,6 +7,8 @@ import { CoursesSection } from "@/components/settings/CoursesSection";
 import { UniversityEmailSection } from "@/components/settings/UniversityEmailSection";
 import { getVerificationStatus, listCourses, listUniversities } from "@/lib/courses";
 import { requireAuth } from "@/lib/auth-guards";
+import { PublicPageSection } from "@/components/settings/PublicPageSection";
+import { appOrigin } from "@/lib/email";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/auth";
@@ -153,6 +155,11 @@ export default async function ProfilePage() {
           <UniversityEmailSection status={verification} />
         </section>
       )}
+
+      <section className="settings-account" aria-labelledby="public-page-title">
+        <div className="settings-section-heading"><div><h2 id="public-page-title">Shareable helper page</h2><p>A link you can add to your CV or LinkedIn. Off until you turn it on.</p></div></div>
+        <PublicPageSection initialEnabled={Boolean(dbUser?.publicPageEnabled)} initialSlug={dbUser?.publicSlug ?? null} origin={appOrigin()} />
+      </section>
 
       <section className="settings-account" aria-labelledby="notifications-title">
         <div className="settings-section-heading"><div><h2 id="notifications-title">Notifications</h2><p>Request updates always appear under the bell in the header.</p></div></div>

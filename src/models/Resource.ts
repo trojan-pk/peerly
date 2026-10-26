@@ -10,6 +10,8 @@ export interface IResourceDocument extends Document {
   url: string;
   course?: Types.ObjectId | null;
   courseCode?: string;
+  /** Number of members who found this helpful (maintained with ResourceVote). */
+  upvoteCount: number;
   moderation?: IModerationInfo;
   createdAt: Date;
   updatedAt: Date;
@@ -59,6 +61,7 @@ const ResourceSchema = new Schema<IResourceDocument>(
     },
     course: { type: Schema.Types.ObjectId, ref: "Course", default: null, index: true },
     courseCode: { type: String, default: "", maxlength: 12 },
+    upvoteCount: { type: Number, default: 0, min: 0 },
     moderation: {
       isHidden: {
         type: Boolean,
@@ -106,6 +109,7 @@ ResourceSchema.index({ owner: 1, createdAt: -1 });
 ResourceSchema.index({ normalizedTopic: 1, createdAt: -1 });
 ResourceSchema.index({ createdAt: -1, _id: -1 });
 ResourceSchema.index({ "moderation.isHidden": 1, createdAt: -1 });
+ResourceSchema.index({ "moderation.isHidden": 1, upvoteCount: -1, createdAt: -1 });
 
 export const Resource: Model<IResourceDocument> =
   mongoose.models.Resource ||

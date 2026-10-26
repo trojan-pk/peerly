@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { StudyRequestDTO } from "@/lib/study-requests";
 import { Countdown } from "@/components/Countdown";
+import { SessionPlanner } from "@/components/SessionPlanner";
 import { Badge } from "@/components/ui";
 import { useToast } from "@/components/ui/Toast";
 import type { RequestStatus } from "@/models/StudyRequest";
@@ -296,6 +297,10 @@ export default function DashboardView({
               )}
             </div>
           )}
+
+        {(req.status === "ACCEPTED" || ((req.status === "COMPLETED" || req.status === "REVIEWED") && req.session.scheduledAt)) && (
+          <SessionPlanner req={req} otherName={participant.name} />
+        )}
 
         {/* Completion Confirmation Notice (when ACCEPTED) */}
         {req.status === "ACCEPTED" && (

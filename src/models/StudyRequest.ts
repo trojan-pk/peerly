@@ -37,6 +37,15 @@ export interface IStudyRequestDocument extends Document {
   urgency: RequestUrgency;
   course?: Types.ObjectId | null;
   courseCode?: string;
+  /** Up to three proposed start times from one participant, awaiting the other's choice. */
+  proposedSlots?: Date[];
+  proposedBy?: Types.ObjectId | null;
+  sessionDurationMinutes?: number;
+  scheduledAt?: Date | null;
+  /** Incremented on every schedule change so calendar apps update the same event. */
+  scheduleSequence?: number;
+  /** Unguessable Jitsi room name, created on demand for an accepted session. */
+  meetingRoom?: string | null;
   /** Optional learner deadline; never later than expiresAt. */
   neededBy?: Date | null;
   /** When a PENDING request stops accepting responses. Legacy records may lack it. */
@@ -126,6 +135,12 @@ const StudyRequestSchema = new Schema<IStudyRequestDocument>(
     urgency: { type: String, enum: ["normal", "urgent"], default: "normal" },
     course: { type: Schema.Types.ObjectId, ref: "Course", default: null },
     courseCode: { type: String, default: "", maxlength: 12 },
+    proposedSlots: { type: [Date], default: [] },
+    proposedBy: { type: Schema.Types.ObjectId, ref: "User", default: null },
+    sessionDurationMinutes: { type: Number, default: 60, min: 15, max: 240 },
+    scheduledAt: { type: Date, default: null },
+    scheduleSequence: { type: Number, default: 0 },
+    meetingRoom: { type: String, default: null, select: false },
     neededBy: { type: Date, default: null },
     expiresAt: { type: Date, default: null },
     priority: {

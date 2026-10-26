@@ -16,6 +16,7 @@ import {
 import { auth } from "@/auth";
 import { queryResources } from "@/lib/resources";
 import ResourceFilters from "./ResourceFilters";
+import { UpvoteButton } from "@/components/UpvoteButton";
 import { ReportButton } from "@/components/ReportModal";
 
 export const dynamic = "force-dynamic";
@@ -25,6 +26,7 @@ interface ResourcesPageProps {
     q?: string;
     topic?: string;
     page?: string;
+    sort?: string;
   }>;
 }
 
@@ -36,13 +38,15 @@ export default async function ResourcesPage(props: ResourcesPageProps) {
   const q = typeof searchParams.q === "string" ? searchParams.q : undefined;
   const topic = typeof searchParams.topic === "string" ? searchParams.topic : undefined;
   const page = typeof searchParams.page === "string" ? searchParams.page : undefined;
+  const sort = searchParams.sort === "helpful" ? "helpful" : undefined;
 
-  const result = await queryResources({ q, topic, page });
+  const result = await queryResources({ q, topic, page, sort, viewerId: session.user.id });
 
   const buildPaginationUrl = (newPage: number) => {
     const params = new URLSearchParams();
     if (q) params.set("q", q);
     if (topic) params.set("topic", topic);
+    if (sort) params.set("sort", sort);
     params.set("page", String(newPage));
     return `/resources?${params.toString()}`;
   };
@@ -156,6 +160,7 @@ export default async function ResourcesPage(props: ResourcesPageProps) {
                       <Clock className="w-3 h-3" aria-hidden="true" />
                       <span>{new Date(res.createdAt).toLocaleDateString()}</span>
                     </div>
+                    <UpvoteButton resourceId={res.id} title={res.title} count={res.upvoteCount} upvoted={Boolean(res.viewerUpvoted)} isOwner={session?.user?.id === res.contributor.id} />
                     <ReportButton
                       targetType="resource"
                       targetId={res.id}

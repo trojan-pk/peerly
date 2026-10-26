@@ -143,3 +143,18 @@
 .admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .admin-table th { text-align: left; padding: 8px 10px; color: var(--pi-muted); font-size: 12px; font-weight: 700; border-bottom: 1px solid var(--pi-line); }
 .admin-table td { padding: 10px; border-bottom: 1px solid var(--pi-line); color: var(--pi-body); vertical-align: middle; }
+
+/* Phase 6: sessions, upvotes, public helper page. */
+.session-planner { display: grid; gap: 12px; padding: 14px; border: 1px solid var(--pi-line); border-radius: 12px; background: var(--pi-panel); }
+.session-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; color: var(--pi-body); font-size: 14px; }
+.session-row p { flex: 1 1 220px; }
+.upvote-button { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 6px 12px; border: 1px solid var(--pi-line); border-radius: 999px; background: var(--pi-surface); color: var(--pi-body); font-size: 13px; font-weight: 600; }
+.upvote-button:hover:not(:disabled) { border-color: var(--pi-edge); color: var(--pi-ink); }
+.upvote-button[aria-pressed="true"] { border-color: var(--pi-accent); color: var(--pi-accent); background: color-mix(in srgb, var(--pi-accent) 8%, var(--pi-surface)); }
+.upvote-button:disabled { opacity: .7; cursor: default; }
+.helper-page { max-width: 820px; margin: 0 auto; padding: 48px 0 80px; }
+.helper-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-top: 28px; }
+.helper-stats > div { padding: 18px; border: 1px solid var(--pi-line); border-radius: 14px; background: var(--pi-surface); }
+.helper-stats dt { color: var(--pi-muted); font-size: 13px; font-weight: 600; }
+.helper-stats dd { margin-top: 6px; color: var(--pi-ink); font-size: 26px; font-weight: 700; }
+.helper-stats dd small { display: block; margin-top: 2px; color: var(--pi-muted); font: 500 13px/1.4 var(--font-manrope), ui-sans-serif, system-ui, sans-serif; }

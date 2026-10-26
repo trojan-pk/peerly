@@ -76,7 +76,7 @@ This is a **Next.js Node application**, not a static export. It requires a serve
 - Reports and `/admin/reports` with reversible moderation.
 - Server validation, private/public DTO separation and database-backed write throttling.
 
-No payment processing, hosted calls, resource file uploads or AI answers. A paid preference is informational; users arrange any terms directly. Use public campus spaces for physical sessions.
+No payment processing, hosted video service, resource file uploads or AI answers. A paid preference is informational; users arrange any terms directly. Use public campus spaces for physical sessions.
 
 ## Visual design and entry flow
 
@@ -179,6 +179,31 @@ and rate-limited; one account per address. Profiles then show **"University emai
 verified"** with the university name — never the address. It shows control of an address
 on that domain, not current enrolment. Without email configured the section explains that
 it's unavailable.
+
+## Sessions, notes and helper pages
+
+**Scheduling:** on an accepted request either person suggests up to three start times
+(10 minutes to 60 days ahead, 30–120 minutes long); the other picks one. Each pick is
+conditional on the same suggestions still standing, so only one choice can win, and a
+new suggestion clears the agreed time. Both get bell notifications. **Add to calendar**
+downloads an RFC 5545 `.ics` file (`/api/requests/[id]/ics`, participants only, UTC times
+converted by your calendar app; the event updates in place when rescheduled).
+
+**Video call:** online sessions get a one-click Jitsi Meet link
+(`https://meet.jit.si/peerly-<128-bit random>`), created once and shared by both
+participants; it appears only on their dashboards and calendar file. meet.jit.si is a
+free public service; its own terms apply and the first person joining may be asked to
+sign in to start the meeting.
+
+**Helpful votes:** members can mark resources helpful (one vote each, not your own,
+undoable, rate-limited) and sort the library by **Most helpful**.
+
+**Public helper page (opt-in):** Settings → Shareable helper page publishes `/h/<slug>`
+with name, university, verified-university badge, courses, topics and numbers derived
+from stored data: completed sessions, average rating and review count, and typical
+response time. It never shows email, contact details, review text or request content,
+asks search engines not to index it, has its own share image, and returns 404 when off or
+when the profile is hidden by moderation.
 
 ## Open Page identity
 

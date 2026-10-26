@@ -14,6 +14,14 @@ export default function ResourceFilters({ availableTopics }: ResourceFiltersProp
 
   const [q, setQ] = useState(searchParams.get("q") || "");
   const selectedTopic = searchParams.get("topic") || "";
+  const sort = searchParams.get("sort") === "helpful" ? "helpful" : "newest";
+
+  const setSort = (next: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (next === "helpful") params.set("sort", "helpful"); else params.delete("sort");
+    params.delete("page");
+    router.push(`/resources?${params.toString()}`);
+  };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,6 +77,11 @@ export default function ResourceFilters({ availableTopics }: ResourceFiltersProp
           Search
         </button>
       </form>
+
+      <div className="segmented" role="group" aria-label="Sort resources">
+        <button type="button" aria-pressed={sort === "newest"} onClick={() => setSort("newest")}>Newest</button>
+        <button type="button" aria-pressed={sort === "helpful"} onClick={() => setSort("helpful")}>Most helpful</button>
+      </div>
 
       {/* Available Topic Filter Pills */}
       {availableTopics.length > 0 && (

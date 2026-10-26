@@ -1,6 +1,7 @@
 "use server";
 
 import { Course } from "@/models/Course";
+import { setResourceVote } from "@/lib/resource-votes";
 
 import mongoose from "mongoose";
 import { revalidatePath } from "next/cache";
@@ -374,5 +375,28 @@ export async function deleteResource(rawInput: unknown): Promise<ResourceActionR
       success: false,
       message: "A database error occurred while deleting the resource. Please try again.",
     };
+  }
+}
+
+/** Marks a resource as helpful (or removes the mark). Signed-in members only; not your own. */
+export async function setResourceUpvote(rawInput: unknown): Promise<{ success: boolean; message?: string; upvoted?: boolean; count?: number }> {
+  let authContext;
+  try {
+    authContext = await requireAuth();
+  } catch {
+    return { success: false, message: "Sign in to mark resources as helpful." };
+  }
+  const body = (rawInput ?? {}) as Record<string, unknown>;
+  if (typeof body.upvote !== "boolean") return { success: false, message: "Invalid request." };
+  try {
+    const limited = await checkRateLimit(`resource_vote:${authContext.user._id}`, 30, 60_000);
+    if (!limited.allowed) return { success: false, message: "Please wait a moment before voting again." };
+    const result = await setResourceVote(authContext.user._id as mongoose.Types.ObjectId, body.resourceId, body.upvote);
+    if (!result.ok) return { success: false, message: result.message };
+    try { revalidatePath("/resources"); } catch { /* outside a request */ }
+    return { success: true, upvoted: result.upvoted, count: result.count };
+  } catch (error) {
+    console.error("[setResourceUpvote] failed:", error instanceof Error ? error.message : "unknown");
+    return { success: false, message: "We couldn't save your vote. Please try again." };
   }
 }
