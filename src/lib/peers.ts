@@ -1,4 +1,6 @@
+import mongoose from "mongoose";
 import { isDatabaseConfigured, connectToDatabase } from "@/lib/db";
+import { normalizeCourseCode } from "@/lib/course-rules";
 import { User, toPublicProfile } from "@/models/User";
 import { PublicUserProfile } from "@/types/user";
 import { escapeRegex, normalizeTags } from "@/lib/validations/user";
@@ -7,6 +9,8 @@ import { getPeerResponseStatsBatch } from "@/lib/peer-responses";
 import { calculatePeerMatchScore } from "@/lib/peer-matching";
 
 export interface PeerSearchParams {
+  /** Catalogue course id. */
+  course?: string;
   q?: string;
   topic?: string;
   subject?: string;
@@ -76,7 +80,9 @@ export async function queryPeers(params: PeerSearchParams = {}): Promise<PeersQu
     const currentPage = Math.max(1, Math.min(parsedPage, 10000));
 
     // Determine if topic-based match scoring is active
-    const isSearchActive = Boolean(safeQ || safeTopic || safeSubject);
+    const safeCourse = typeof params.course === "string" && /^[a-f\d]{24}$/i.test(params.course) ? params.course : "";
+    const queryCode = safeQ ? normalizeCourseCode(safeQ) : null;
+    const isSearchActive = Boolean(safeQ || safeTopic || safeSubject || safeCourse);
 
     // 3. Build the filter query
     const query: Record<string, unknown> = {
@@ -95,7 +101,13 @@ export async function queryPeers(params: PeerSearchParams = {}): Promise<PeersQu
         { bio: regex },
         { topics: regex },
         { subjects: regex },
+        { courseCodes: regex },
+        ...(queryCode ? [{ courseCodes: queryCode }] : []),
       ];
+    }
+
+    if (safeCourse) {
+      query.courses = new mongoose.Types.ObjectId(safeCourse);
     }
 
     // Topic filter
@@ -185,8 +197,11 @@ export async function queryPeers(params: PeerSearchParams = {}): Promise<PeersQu
             averageRating: stats.averageRating,
             reviewCount: stats.reviewCount,
             hasFastReplyBadge: respStats.hasFastReplyBadge,
+            courses: (u.courses ?? []).map(String),
+            courseCodes: profile.courseCodes,
           },
           {
+            course: safeCourse,
             q: safeQ,
             topic: safeTopic,
             subject: safeSubject,

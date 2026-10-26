@@ -1,6 +1,9 @@
 import { MatchScoreBreakdown } from "@/types/user";
+import { normalizeCourseCode } from "@/lib/course-rules";
 
 export interface MatchScoringOptions {
+  /** Catalogue course id selected in the course filter. */
+  course?: string;
   q?: string;
   topic?: string;
   subject?: string;
@@ -30,6 +33,9 @@ export function calculatePeerMatchScore(
     averageRating: number;
     reviewCount: number;
     hasFastReplyBadge: boolean;
+    /** Catalogue course ids and codes; absent for legacy profiles. */
+    courses?: string[];
+    courseCodes?: string[];
   },
   options: MatchScoringOptions
 ): { totalScore: number; breakdown: MatchScoreBreakdown } {
@@ -51,12 +57,22 @@ export function calculatePeerMatchScore(
     searchTargets.push(normalizeMatchTag(options.subject));
   }
 
+  // 0. Course match (selected course filter, or a query that is a course code): 50 points,
+  //    the same tier as an exact topic match. Free-text topics keep working unchanged.
+  const queryCode = options.q ? normalizeCourseCode(options.q) : null;
+  const courseMatched =
+    (options.course ? (peer.courses ?? []).includes(options.course) : false) ||
+    (queryCode ? (peer.courseCodes ?? []).includes(queryCode) : false);
+
   // 1. Exact normalized topic match: 50 points
   const hasExactTopicMatch = searchTargets.some((target) =>
     peerTopics.some((t) => t === target)
   );
 
-  if (hasExactTopicMatch) {
+  if (courseMatched) {
+    topicPoints = 50;
+    topicMatchReason = "Helps with this course";
+  } else if (hasExactTopicMatch) {
     topicPoints = 50;
     topicMatchReason = "Exact topic match";
   } else {
@@ -127,6 +143,7 @@ export function calculatePeerMatchScore(
   return {
     totalScore,
     breakdown: {
+      ...(options.course || queryCode ? { courseMatched } : {}),
       totalScore,
       topicPoints,
       topicMatchReason,

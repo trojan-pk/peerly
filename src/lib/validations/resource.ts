@@ -67,6 +67,8 @@ export const CreateResourceSchema = z
       .trim()
       .min(2, "Topic must be at least 2 characters")
       .max(50, "Topic cannot exceed 50 characters"),
+    /** Optional catalogue course id from the owner's own courses; "" clears it. */
+    course: z.union([z.string().regex(/^[a-f\d]{24}$/i, "Invalid course"), z.literal(""), z.null()]).optional().transform((v) => v || null),
     url: z
       .string()
       .trim()
@@ -96,6 +98,8 @@ export const UpdateResourceSchema = z
       .trim()
       .min(2, "Topic must be at least 2 characters")
       .max(50, "Topic cannot exceed 50 characters"),
+    /** Optional catalogue course id from the owner's own courses; "" clears it. */
+    course: z.union([z.string().regex(/^[a-f\d]{24}$/i, "Invalid course"), z.literal(""), z.null()]).optional().transform((v) => v || null),
     url: z
       .string()
       .trim()

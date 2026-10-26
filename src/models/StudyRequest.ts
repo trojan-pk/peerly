@@ -35,6 +35,8 @@ export interface IStudyRequestDocument extends Document {
   mode: RequestMode;
   status: RequestStatus;
   urgency: RequestUrgency;
+  course?: Types.ObjectId | null;
+  courseCode?: string;
   /** Optional learner deadline; never later than expiresAt. */
   neededBy?: Date | null;
   /** When a PENDING request stops accepting responses. Legacy records may lack it. */
@@ -122,6 +124,8 @@ const StudyRequestSchema = new Schema<IStudyRequestDocument>(
       index: true,
     },
     urgency: { type: String, enum: ["normal", "urgent"], default: "normal" },
+    course: { type: Schema.Types.ObjectId, ref: "Course", default: null },
+    courseCode: { type: String, default: "", maxlength: 12 },
     neededBy: { type: Date, default: null },
     expiresAt: { type: Date, default: null },
     priority: {

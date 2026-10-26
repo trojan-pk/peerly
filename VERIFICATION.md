@@ -428,3 +428,31 @@ palette keyboard search → Enter navigates to the request anchor, arrow selecti
 header trigger, `?` help, `?` typed in a field ignored. A 320px header overflow from the
 new search icon was fixed (icon moves into the mobile menu below 420px). Results: 324
 unit/integration tests and 18/18 browser scenarios on two consecutive runs.
+
+## Peerly v2 — Phase 5: courses and university email (26 October 2026)
+
+- Models: `University` (unique slug, ≤10 domains, hidden flag), `Course` (unique
+  university+code, hidden, `mergedInto`), `EmailVerification` (one per user, salted hash,
+  TTL). User gains `universityRef`, `courses`, `courseCodes`, private `universityEmail`
+  (partial unique index), `verifiedUniversityName`. Requests/resources gain optional
+  `course`/`courseCode`. Public DTOs add `courseCodes` and `verifiedUniversityName` only.
+- `/admin/universities` (admin-only on every action), Settings sections for university &
+  courses and university email, course filter and chips on peers, course select on the
+  request form and resource editor, course chip on dashboard and resource cards.
+
+Tests: 33 new — code normalisation (accept/reject cases), domain/subdomain/look-alike
+matching, course scoring and legacy topic scoring; de-duplication incl. concurrent adds
+and per-university codes, creation rate limit, saving only own-university visible courses,
+admin-only management, hide/merge moving users/requests/resources and redirecting merged
+codes; course filter, code queries, legacy topics; request/resource course ownership;
+verification unavailable without email, domain rejection, hashed storage, public badge
+without address (profile, search, reviews), replay refusal, 5-attempt lock under 8
+parallel guesses, expiry, one account per address, send rate limit, no code/hash in logs.
+Browser: admin adds a university → helper adds “cs 101” (shown as CS-101) and saves →
+learner filters by course and by “CS101” → requests with the course → admin sees one
+helper, hides the course and the filter disappears; non-admin blocked; seeded verified
+badge visible without the address; email-off explanation. Cross-suite pending requests
+exposed ambiguous locators in older tests (now scoped to the specific request card), and
+the palette shortcut test now waits for hydration. Results: 357 unit/integration tests and
+20/20 browser scenarios on two consecutive runs. Real verification email delivery was not
+tested (no provider key).

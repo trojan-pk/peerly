@@ -19,6 +19,8 @@ import {
 import { auth } from "@/auth";
 import { isDatabaseConfigured, connectToDatabase } from "@/lib/db";
 import { User, toPublicProfile } from "@/models/User";
+import { Course } from "@/models/Course";
+import { VerifiedBadge } from "@/components/VerifiedBadge";
 import { getPublicPeerReviews } from "@/lib/study-requests";
 import { getPeerRatingStats } from "@/lib/peer-reviews";
 import { getPeerPublishedResources } from "@/lib/resources";
@@ -111,6 +113,10 @@ export default async function PeerDetailPage(props: PeerDetailPageProps) {
 
   // 5. Strict public DTO transformation: NEVER contains email, googleId, or private contact details
   const peer = toPublicProfile(rawUser);
+  const peerCourseIds = ((rawUser as { courses?: unknown[] }).courses ?? []).map(String);
+  const peerCourses = peerCourseIds.length
+    ? (await Course.find({ _id: { $in: peerCourseIds }, isHidden: false, mergedInto: null }).select("code title").sort({ code: 1 }).lean()).map((c) => ({ id: String(c._id), code: c.code, title: c.title }))
+    : [];
 
   // 6. Paginated public reviews, authoritative rating stats, published resources, and response reliability stats
   const reviewPage = parseInt(searchParams.reviewPage || "1", 10) || 1;
@@ -179,6 +185,7 @@ export default async function PeerDetailPage(props: PeerDetailPageProps) {
                   <GraduationCap className="w-3.5 h-3.5 text-faint" aria-hidden="true" />
                   <span>{peer.university || "University Student"}</span>
                 </div>
+                {peer.verifiedUniversityName && <VerifiedBadge university={peer.verifiedUniversityName} className="!mt-0" />}
                 {peer.campus && (
                   <>
                     <span className="text-faint">•</span>
@@ -527,12 +534,20 @@ export default async function PeerDetailPage(props: PeerDetailPageProps) {
           )}
         </section>
 
+        {peer.courseCodes.length > 0 && (
+          <section aria-labelledby="peer-courses-title" className="space-y-2">
+            <h2 id="peer-courses-title" className="text-sm font-semibold text-ink">Courses they help with</h2>
+            <ul className="course-chips">{peer.courseCodes.map((code) => <li key={code} className="tabular">{code}</li>)}</ul>
+          </section>
+        )}
+
         {/* Request Form Section */}
         <section className="pt-2 border-t border-line">
           <StudyRequestForm
             peerId={peer.id}
             peerName={peer.name}
             peerTopics={peer.topics}
+            peerCourses={peerCourses}
             peerMode={peer.mode}
             isCurrentUser={isCurrentUser}
             isAuthenticated={isAuthenticated}

@@ -19,6 +19,7 @@ interface StudyRequestFormProps {
   peerId: string;
   peerName: string;
   peerTopics: string[];
+  peerCourses?: Array<{ id: string; code: string; title: string }>;
   peerMode: "online" | "campus" | "both";
   isCurrentUser: boolean;
   isAuthenticated: boolean;
@@ -28,6 +29,7 @@ export default function StudyRequestForm({
   peerId,
   peerName,
   peerTopics,
+  peerCourses = [],
   peerMode,
   isCurrentUser,
   isAuthenticated,
@@ -38,6 +40,7 @@ export default function StudyRequestForm({
   const [mode, setMode] = useState<RequestMode>(initialMode);
   const [problemDescription, setProblemDescription] = useState<string>("");
   const [urgency, setUrgency] = useState<RequestUrgency>("normal");
+  const [course, setCourse] = useState<string>("");
   const [neededBy, setNeededBy] = useState<string>("");
   const [bounds, setBounds] = useState<{ min: string; max: string } | null>(null);
   const [result, setResult] = useState<RequestActionResult | null>(null);
@@ -97,6 +100,7 @@ export default function StudyRequestForm({
         problemDescription,
         mode,
         urgency,
+        course: course || null,
         neededBy: deadline && !Number.isNaN(deadline.getTime()) ? deadline.toISOString() : null,
       }));
 
@@ -208,6 +212,16 @@ export default function StudyRequestForm({
           </div>
         )}
       </div>
+
+      {peerCourses.length > 0 && (
+        <div className="space-y-1.5">
+          <label htmlFor="request-course" className="block text-xs font-semibold text-ink">Course <span className="font-normal text-muted">(optional)</span></label>
+          <select id="request-course" value={course} onChange={(e) => setCourse(e.target.value)} className="w-full sm:w-auto px-3.5 py-2.5 rounded-xl border border-edge text-sm text-ink bg-panel/50 focus:bg-surface focus:outline-none focus:ring-2 focus:ring-accent">
+            <option value="">Not course-specific</option>
+            {peerCourses.map((c) => <option key={c.id} value={c.id}>{c.code}{c.title ? ` · ${c.title}` : ""}</option>)}
+          </select>
+        </div>
+      )}
 
       {/* Mode Selection */}
       <fieldset className="space-y-2">

@@ -3,6 +3,8 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import { isDatabaseConfigured } from "@/lib/db";
 import { getUserResources } from "@/lib/resources";
+import { User } from "@/models/User";
+import { Course } from "@/models/Course";
 import ManageResourcesView from "./ManageResourcesView";
 import { BookOpen, ArrowLeft, AlertTriangle } from "lucide-react";
 
@@ -42,8 +44,13 @@ export default async function ManageResourcesPage(props: ManageResourcesPageProp
   }
 
   let result;
+
+  let myCourses: Array<{ id: string; code: string; title: string }> = [];
   try {
     result = await getUserResources(page, 10);
+    const me = await User.findById(session.user.id).select("courses").lean();
+    const ids = (me?.courses ?? []).map(String);
+    myCourses = ids.length ? (await Course.find({ _id: { $in: ids }, isHidden: false, mergedInto: null }).select("code title").sort({ code: 1 }).lean()).map((c) => ({ id: String(c._id), code: c.code, title: c.title })) : [];
   } catch (err) {
     console.error("[ManageResourcesPage] Error loading resources:", err);
     result = {
@@ -121,6 +128,7 @@ export default async function ManageResourcesPage(props: ManageResourcesPageProp
       <ManageResourcesView
         initialResources={result.resources}
         pagination={result.pagination}
+        myCourses={myCourses}
       />
     </div>
   );

@@ -61,9 +61,12 @@ test("command palette searches with the keyboard and the shortcut help opens wit
   await page.goto("/settings");
   await expect(page.locator("main h1")).toBeVisible();
 
-  await page.keyboard.press("Control+k");
   const dialog = page.getByRole("dialog", { name: "Search Peerly" });
-  await expect(dialog).toBeVisible();
+  // The shortcut listener attaches on hydration; retry until it is live.
+  await expect(async () => {
+    await page.keyboard.press("Control+k");
+    await expect(dialog).toBeVisible({ timeout: 1000 });
+  }).toPass({ timeout: 15_000 });
   const input = dialog.getByRole("combobox", { name: /Search pages/ });
   await expect(input).toBeFocused();
   await input.fill("palette gr");

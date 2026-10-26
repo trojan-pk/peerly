@@ -37,7 +37,7 @@ function RouteNavbar({ user, isAdmin = false, loading = false, unreadCount = 0, 
   ] : [
     { label: "Discover peers", href: "/peers" },
     { label: "Resources", href: "/resources" },
-    ...(user && isAdmin ? [{ label: "Admin reports", href: "/admin/reports" }] : []),
+    ...(user && isAdmin ? [{ label: "Admin reports", href: "/admin/reports" }, { label: "Catalogue", href: "/admin/universities" }] : []),
   ];
   const isActive = (href: string) => !href.includes("#") && pathname.startsWith(href);
 

@@ -49,15 +49,16 @@ test("learner and helper complete a private request and publish one review", asy
     await studentPage.getByRole("button", { name: /Send.*Request/ }).click();
     await expect(studentPage.getByRole("main").getByRole("status")).toContainText(/sent successfully/i);
     await helperPage.goto("/dashboard?tab=incoming");
-    await helperPage.getByRole("button", { name: "Accept Request", exact: true }).click();
+    // Other suites may leave pending requests for this helper; act on this one.
+    await helperPage.getByRole("article").filter({ hasText: "quicksort partitioning" }).getByRole("button", { name: "Accept Request", exact: true }).click();
     await expect(helperPage.getByRole("status", { name: "Notifications" })).toContainText(/accepted/i);
     await studentPage.goto("/dashboard?tab=outgoing");
     await expect(studentPage.getByRole("link", { name: /WhatsApp/ })).toHaveAttribute("href", "https://wa.me/923001234567");
     await studentPage.screenshot({ path: testInfo.outputPath("dashboard-dark.png"), fullPage: true });
-    await studentPage.getByRole("button", { name: "Confirm Session Completed", exact: true }).click();
+    await studentPage.getByRole("article").filter({ hasText: "quicksort partitioning" }).getByRole("button", { name: "Confirm Session Completed", exact: true }).click();
     await expect(studentPage.getByRole("status", { name: "Notifications" })).toContainText(/Waiting for the other participant/i);
     await helperPage.reload();
-    await helperPage.getByRole("button", { name: "Confirm Session Completed", exact: true }).click();
+    await helperPage.getByRole("article").filter({ hasText: "quicksort partitioning" }).getByRole("button", { name: "Confirm Session Completed", exact: true }).click();
     await expect(helperPage.getByRole("status", { name: "Notifications" })).toContainText(/Both participants have confirmed/i);
     await studentPage.reload();
     await studentPage.getByRole("button", { name: /Write.*Review|Leave.*Review/ }).click();

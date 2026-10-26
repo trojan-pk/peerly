@@ -123,8 +123,11 @@ export default async function ResourcesPage(props: ResourcesPageProps) {
                 <div className="space-y-3">
                   {/* Topic & Contributor */}
                   <div className="flex items-start justify-between gap-2 border-b border-line pb-3">
-                    <span className="px-2.5 py-0.5 rounded-lg text-[11px] font-semibold bg-accent/10 text-accent border border-accent/25">
-                      {res.topic}
+                    <span className="flex flex-wrap gap-1.5">
+                      {res.courseCode && <span className="px-2 py-0.5 rounded-lg text-[11px] font-semibold border border-line bg-raised text-ink tabular">{res.courseCode}</span>}
+                      <span className="px-2.5 py-0.5 rounded-lg text-[11px] font-semibold bg-accent/10 text-accent border border-accent/25">
+                        {res.topic}
+                      </span>
                     </span>
 
                     <div className="flex items-center gap-1.5 text-right">

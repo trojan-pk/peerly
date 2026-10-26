@@ -3,12 +3,15 @@ import { connectToDatabase, isDatabaseConfigured } from "@/lib/db";
 import { Resource } from "@/models/Resource";
 import { escapeRegex, normalizeTags } from "@/lib/validations/user";
 import { requireAuth } from "@/lib/auth-guards";
+import { normalizeCourseCode } from "@/lib/course-rules";
 
 export interface PublicResourceDTO {
   id: string;
   title: string;
   description: string;
   topic: string;
+  /** Catalogue course code, when the owner tagged one. */
+  courseCode: string;
   url: string;
   createdAt: string;
   updatedAt: string;
@@ -83,6 +86,8 @@ interface RawPopulatedResource {
   title: string;
   description: string;
   topic: string;
+  courseCode?: string;
+  course?: mongoose.Types.ObjectId | string | null;
   url: string;
   moderation?: {
     isHidden?: boolean;
@@ -107,6 +112,7 @@ export function toPublicResourceDTO(raw: RawPopulatedResource, includeModeration
     title: raw.title,
     description: raw.description,
     topic: raw.topic,
+    courseCode: raw.courseCode ?? "",
     url: raw.url,
     createdAt: new Date(raw.createdAt).toISOString(),
     updatedAt: new Date(raw.updatedAt).toISOString(),
@@ -161,7 +167,8 @@ export async function queryResources(
     if (safeQ.length > 0) {
       const escaped = escapeRegex(safeQ);
       const regex = new RegExp(escaped, "i");
-      query.$or = [{ title: regex }, { description: regex }, { topic: regex }];
+      const code = normalizeCourseCode(safeQ);
+      query.$or = [{ title: regex }, { description: regex }, { topic: regex }, { courseCode: regex }, ...(code ? [{ courseCode: code }] : [])];
     }
 
     // Topic filter (exact match on normalized topic)

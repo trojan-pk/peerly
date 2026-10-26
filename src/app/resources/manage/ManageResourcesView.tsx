@@ -39,11 +39,14 @@ export interface ManagePaginationInfo {
 interface ManageResourcesViewProps {
   initialResources: PublicResourceDTO[];
   pagination?: ManagePaginationInfo;
+  /** The owner's own catalogue courses, for optional tagging. */
+  myCourses?: Array<{ id: string; code: string; title: string }>;
 }
 
 export default function ManageResourcesView({
   initialResources,
   pagination,
+  myCourses = [],
 }: ManageResourcesViewProps) {
   const router = useRouter();
   const resources = initialResources;
@@ -53,6 +56,8 @@ export default function ManageResourcesView({
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [title, setTitle] = useState("");
   const [topic, setTopic] = useState("");
+  const [course, setCourse] = useState("");
+  const [editCourse, setEditCourse] = useState("");
   const [url, setUrl] = useState("");
   const [description, setDescription] = useState("");
 
@@ -86,6 +91,7 @@ export default function ManageResourcesView({
     setEditingResource(res);
     setEditTitle(res.title);
     setEditTopic(res.topic);
+    setEditCourse(myCourses.find((c) => c.code === res.courseCode)?.id ?? "");
     setEditUrl(res.url);
     setEditDescription(res.description);
     setFieldErrors({});
@@ -108,6 +114,7 @@ export default function ManageResourcesView({
       const res: ResourceActionResult = await safeAction(() => createResource({
         title,
         topic,
+        course: course || null,
         url,
         description,
       }));
@@ -138,6 +145,7 @@ export default function ManageResourcesView({
         resourceId: editingResource.id,
         title: editTitle,
         topic: editTopic,
+        course: editCourse || null,
         url: editUrl,
         description: editDescription,
       }));
@@ -283,7 +291,7 @@ export default function ManageResourcesView({
             {/* Topic */}
             <div className="space-y-1">
               <label htmlFor="create-topic" className="block text-xs font-semibold text-body">
-                Topic / Course <span className="text-danger">*</span>
+                Topic <span className="text-danger">*</span>
               </label>
               <input
                 id="create-topic"
@@ -299,6 +307,16 @@ export default function ManageResourcesView({
                 <p className="text-[11px] text-danger">{fieldErrors.topic}</p>
               )}
             </div>
+            {myCourses.length > 0 && (
+              <div className="space-y-1">
+                <label htmlFor="create-course" className="block text-xs font-semibold text-body">Course <span className="font-normal text-muted">(optional)</span></label>
+                <select id="create-course" value={course} onChange={(e) => setCourse(e.target.value)} className="w-full text-xs rounded-xl border border-edge p-2.5 text-ink focus:outline-none focus:ring-2 focus:ring-accent">
+                  <option value="">Not course-specific</option>
+                  {myCourses.map((c) => <option key={c.id} value={c.id}>{c.code}{c.title ? ` · ${c.title}` : ""}</option>)}
+                </select>
+                {fieldErrors.course && <p className="text-[11px] text-danger">{fieldErrors.course}</p>}
+              </div>
+            )}
           </div>
 
           {/* URL */}
@@ -407,7 +425,7 @@ export default function ManageResourcesView({
 
             <div className="space-y-1">
               <label htmlFor="edit-topic" className="block text-xs font-semibold text-body">
-                Topic / Course <span className="text-danger">*</span>
+                Topic <span className="text-danger">*</span>
               </label>
               <input
                 id="edit-topic"
@@ -422,6 +440,16 @@ export default function ManageResourcesView({
                 <p className="text-[11px] text-danger">{fieldErrors.topic}</p>
               )}
             </div>
+            {myCourses.length > 0 && (
+              <div className="space-y-1">
+                <label htmlFor="edit-course" className="block text-xs font-semibold text-body">Course <span className="font-normal text-muted">(optional)</span></label>
+                <select id="edit-course" value={editCourse} onChange={(e) => setEditCourse(e.target.value)} className="w-full text-xs rounded-xl border border-edge p-2.5 text-ink focus:outline-none focus:ring-2 focus:ring-accent">
+                  <option value="">Not course-specific</option>
+                  {myCourses.map((c) => <option key={c.id} value={c.id}>{c.code}{c.title ? ` · ${c.title}` : ""}</option>)}
+                </select>
+                {fieldErrors.course && <p className="text-[11px] text-danger">{fieldErrors.course}</p>}
+              </div>
+            )}
           </div>
 
           <div className="space-y-1">

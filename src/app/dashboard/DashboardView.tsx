@@ -232,7 +232,7 @@ export default function DashboardView({
           </div>
         </div>
 
-        <div className="request-body"><h3 id={`request-${req.id}-title`}>{req.topic}</h3>{req.neededBy && req.status === "PENDING" && <p className="request-deadline">Needed by <time dateTime={req.neededBy}>{new Date(req.neededBy).toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit", month: "short", day: "numeric" })}</time></p>}<p className="request-description">{req.problemDescription}</p>{req.respondedAt && <span className="workspace-caption">{req.status === "REJECTED" ? "Declined" : "Accepted"} on {new Date(req.respondedAt).toLocaleDateString()}</span>}</div>
+        <div className="request-body">{req.courseCode && <ul className="course-chips mb-2" aria-label="Course"><li className="tabular">{req.courseCode}</li></ul>}<h3 id={`request-${req.id}-title`}>{req.topic}</h3>{req.neededBy && req.status === "PENDING" && <p className="request-deadline">Needed by <time dateTime={req.neededBy}>{new Date(req.neededBy).toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit", month: "short", day: "numeric" })}</time></p>}<p className="request-description">{req.problemDescription}</p>{req.respondedAt && <span className="workspace-caption">{req.status === "REJECTED" ? "Declined" : "Accepted"} on {new Date(req.respondedAt).toLocaleDateString()}</span>}</div>
 
         {req.status === "EXPIRED" && (
           <div className="request-expired" role="note">
