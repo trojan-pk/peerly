@@ -347,3 +347,34 @@ now scope status assertions to page content because the toast region is a global
 `status` landmark. Results: 285 unit/integration tests, typecheck, lint, build and
 11/11 browser scenarios passed. Desktop and mobile screenshots of both themes were
 reviewed.
+
+## Peerly v2 — Phase 2: urgent help and notifications (26 October 2026)
+
+- Requests carry `urgency` (normal/urgent), optional `neededBy` and `expiresAt`
+  (= min(deadline, 6h urgent / 72h normal)). New `EXPIRED` status, applied lazily with a
+  per-record conditional update; accept/decline also require an open window. A stored
+  `priority` key sorts urgent pending → normal pending → resolved; legacy rows are
+  backfilled on dashboard load.
+- `Notification` model (unique per recipient/event, TTL 90 days), `/notifications`
+  inbox, header bell with 60-second visible-tab polling and refresh on new items.
+- Optional Resend email via `fetch` (5 s timeout, HTML escaped), sent after the
+  response with `after()`, 10/hour per recipient, Settings opt-out switch.
+
+Tests: 34 new unit/integration checks — deadline validation edges, countdown formatting,
+expiry maths, priority ordering and legacy defaults, expired accept/decline refusal and
+honest message, re-requesting the same helper/topic, legacy 72h expiry, badge exclusion,
+concurrent accept/expiry (exactly one winner, one expiry notification), one notification
+per event across the full lifecycle, duplicate-delivery idempotency, no contact/email/
+problem text in stored or listed notifications, recipient-only read/mark, signed-out
+behaviour, notification failure not failing the action; email skipped when unconfigured,
+recipient/subject/link/deadline/escaping, accept/decline only, opt-out, hourly ceiling,
+provider timeout. Browser: urgent request with deadline → helper bell updates without
+reload → card first with Urgent badge, countdown and deadline → inbox → click-through →
+accept → learner bell; overdue request cannot be accepted, learner offered another
+helper and notified; email preference persists.
+
+Browser-run note: two full runs failed when headless Chrome's GPU process crashed and
+froze pages (`GPU process exited unexpectedly`). Tests now launch Chrome with
+`--disable-gpu`; two consecutive full runs then passed. Results: 319 unit/integration
+tests, typecheck, lint, build and 14/14 browser scenarios. Real email delivery was not
+tested (no provider key); the HTTP request shape is covered with a mocked `fetch`.

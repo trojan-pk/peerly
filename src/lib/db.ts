@@ -86,6 +86,7 @@ export async function ensureDatabaseIndexes(): Promise<void> {
   const { RateLimit } = await import("@/lib/rate-limit");
   const { Resource } = await import("@/models/Resource");
   const { Report } = await import("@/models/Report");
+  const { Notification } = await import("@/models/Notification");
 
   await Promise.all([
     User.init(),
@@ -93,6 +94,7 @@ export async function ensureDatabaseIndexes(): Promise<void> {
     RateLimit.init(),
     Resource.init(),
     Report.init(),
+    Notification.init(),
   ]);
 
   indexesEnsured = true;

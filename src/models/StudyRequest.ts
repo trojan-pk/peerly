@@ -6,9 +6,19 @@ export type RequestStatus =
   | "REJECTED"
   | "CANCELLED"
   | "COMPLETED"
-  | "REVIEWED";
+  | "REVIEWED"
+  | "EXPIRED";
+
+export const REQUEST_STATUSES: readonly RequestStatus[] = ["PENDING", "ACCEPTED", "REJECTED", "CANCELLED", "COMPLETED", "REVIEWED", "EXPIRED"];
 
 export type RequestMode = "online" | "campus";
+export type RequestUrgency = "normal" | "urgent";
+
+/** Pending requests sort first on dashboards, urgent ones above normal ones. */
+export function requestPriority(status: RequestStatus, urgency: RequestUrgency): number {
+  if (status !== "PENDING") return 0;
+  return urgency === "urgent" ? 2 : 1;
+}
 
 export interface IStudyRequestReview {
   rating: number;
@@ -24,6 +34,13 @@ export interface IStudyRequestDocument extends Document {
   problemDescription: string;
   mode: RequestMode;
   status: RequestStatus;
+  urgency: RequestUrgency;
+  /** Optional learner deadline; never later than expiresAt. */
+  neededBy?: Date | null;
+  /** When a PENDING request stops accepting responses. Legacy records may lack it. */
+  expiresAt?: Date | null;
+  /** Dashboard sort key: 2 urgent pending, 1 normal pending, 0 resolved. */
+  priority?: number;
   respondedAt?: Date | null;
   learnerConfirmedAt?: Date | null;
   peerConfirmedAt?: Date | null;
@@ -100,9 +117,18 @@ const StudyRequestSchema = new Schema<IStudyRequestDocument>(
     },
     status: {
       type: String,
-      enum: ["PENDING", "ACCEPTED", "REJECTED", "CANCELLED", "COMPLETED", "REVIEWED"],
+      enum: REQUEST_STATUSES,
       default: "PENDING",
       index: true,
+    },
+    urgency: { type: String, enum: ["normal", "urgent"], default: "normal" },
+    neededBy: { type: Date, default: null },
+    expiresAt: { type: Date, default: null },
+    priority: {
+      type: Number,
+      default: function (this: { status?: RequestStatus; urgency?: RequestUrgency }) {
+        return requestPriority(this.status ?? "PENDING", this.urgency ?? "normal");
+      },
     },
     archivedBy: { type: [Schema.Types.ObjectId], ref: "User", default: [], select: false },
     respondedAt: {
@@ -140,6 +166,11 @@ StudyRequestSchema.index(
     },
   }
 );
+
+// Expiry sweeps and dashboard ordering (urgent pending first).
+StudyRequestSchema.index({ status: 1, expiresAt: 1 });
+StudyRequestSchema.index({ peer: 1, priority: -1, createdAt: -1, _id: -1 });
+StudyRequestSchema.index({ learner: 1, priority: -1, createdAt: -1, _id: -1 });
 
 // Index for efficiently querying peer reviews & aggregates
 StudyRequestSchema.index({ peer: 1, status: 1 });

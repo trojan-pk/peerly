@@ -6,6 +6,8 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { getAuthConfigStatus } from "@/lib/auth-config";
 import { getCurrentDbUser } from "@/lib/auth-guards";
+import { countUnreadFor } from "@/lib/notifications";
+import type mongoose from "mongoose";
 import localFont from "next/font/local";
 import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import { MotionSafe } from "@/components/ui/MotionSafe";
@@ -72,12 +74,17 @@ async function DynamicNavbar() {
   const authStatus = getAuthConfigStatus();
   const dbContext = await getCurrentDbUser();
   const session = dbContext?.session ?? (await auth());
+  let unreadCount = 0;
+  if (dbContext) {
+    try { unreadCount = await countUnreadFor(dbContext.user._id as mongoose.Types.ObjectId); } catch { unreadCount = 0; }
+  }
 
   return (
     <Navbar
       user={session?.user ? { id: session.user.id } : undefined}
       isAdmin={dbContext?.isAdmin ?? false}
       isAuthConfigured={authStatus.isConfigured}
+      unreadCount={unreadCount}
     />
   );
 }

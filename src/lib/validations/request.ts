@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MAX_NEEDED_BY_MS, MIN_NEEDED_BY_LEAD_MS } from "@/lib/request-rules";
 
 export const CreateStudyRequestSchema = z
   .object({
@@ -16,6 +17,18 @@ export const CreateStudyRequestSchema = z
     mode: z.enum(["online", "campus"], {
       error: "Study mode must be online or campus",
     }),
+    urgency: z.enum(["normal", "urgent"], { error: "Urgency must be normal or urgent" }).default("normal"),
+    /** ISO-8601 instant. Must be at least 15 minutes ahead and within 14 days. */
+    neededBy: z
+      .union([z.iso.datetime({ offset: true, error: "Enter a valid date and time" }), z.literal(""), z.null()])
+      .optional()
+      .transform((value) => (value ? new Date(value) : null))
+      .refine((date) => !date || date.getTime() >= Date.now() + MIN_NEEDED_BY_LEAD_MS, {
+        error: "Choose a time at least 15 minutes from now",
+      })
+      .refine((date) => !date || date.getTime() <= Date.now() + MAX_NEEDED_BY_MS, {
+        error: "Deadlines can be at most 14 days away",
+      }),
   })
   .strict();
 
