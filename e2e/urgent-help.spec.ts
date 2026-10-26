@@ -64,7 +64,7 @@ test("urgent request with a deadline reaches the helper's bell, inbox and top of
     // Helper accepts; the learner is notified.
     const learnerBefore = await (async () => { await learner.goto("/dashboard?tab=outgoing"); return unread(learner); })();
     await helper.locator(".request-card").filter({ hasText: topic }).getByRole("button", { name: "Accept Request" }).click();
-    await expect(helper.getByRole("main").getByRole("status")).toContainText(/accepted/i);
+    await expect(helper.getByRole("status", { name: "Notifications" })).toContainText(/accepted/i);
     await returnToTab(learner);
     await expect.poll(() => unread(learner)).toBe(learnerBefore + 1);
     await learner.goto("/notifications");
