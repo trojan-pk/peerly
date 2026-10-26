@@ -25,6 +25,8 @@ import {
   Star,
 } from "lucide-react";
 import { StudyRequestDTO } from "@/lib/study-requests";
+import { Countdown } from "@/components/Countdown";
+import { Badge } from "@/components/ui";
 import {
   archiveStudyRequest,
   transitionStudyRequest,
@@ -256,7 +258,7 @@ export default function DashboardView({
         </button>
       </div>
 
-      <div className="request-filter-bar" aria-busy={isPending}><label htmlFor="request-status">Request status<select id="request-status" disabled={isPending} value={statusFilter} onChange={event => changeFilter("status", event.target.value)}><option value="all">All statuses</option>{[["PENDING","Pending"],["ACCEPTED","Accepted"],["REJECTED","Declined"],["CANCELLED","Cancelled"],["COMPLETED","Completed"],["REVIEWED","Reviewed"]].map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label><div className="history-toggle" aria-label="Request history view"><button type="button" disabled={isPending} aria-pressed={!archivedView} onClick={() => changeFilter("view", "")}>Current</button><button type="button" disabled={isPending} aria-pressed={archivedView} onClick={() => changeFilter("view", "archived")}><Archive size={15} />Archived</button></div></div>
+      <div className="request-filter-bar" aria-busy={isPending}><label htmlFor="request-status">Request status<select id="request-status" disabled={isPending} value={statusFilter} onChange={event => changeFilter("status", event.target.value)}><option value="all">All statuses</option>{[["PENDING","Pending"],["ACCEPTED","Accepted"],["REJECTED","Declined"],["CANCELLED","Cancelled"],["COMPLETED","Completed"],["REVIEWED","Reviewed"],["EXPIRED","Expired"]].map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label><div className="history-toggle" aria-label="Request history view"><button type="button" disabled={isPending} aria-pressed={!archivedView} onClick={() => changeFilter("view", "")}>Current</button><button type="button" disabled={isPending} aria-pressed={archivedView} onClick={() => changeFilter("view", "archived")}><Archive size={15} />Archived</button></div></div>
       {archivedView && <p className="text-sm text-muted">Archived requests are hidden from your current list. You can restore them at any time.</p>}
       {/* Request Cards List */}
       {currentList.items.length > 0 ? (
@@ -268,6 +270,9 @@ export default function DashboardView({
             return (
               <article
                 key={req.id}
+                id={`request-${req.id}`}
+                data-status={req.status}
+                data-urgency={req.urgency}
                 className="request-card rounded-2xl border border-line/90 bg-surface p-5 sm:p-6 space-y-4 shadow-xs"
               >
                 {/* Header: Participant & Status */}
@@ -291,6 +296,8 @@ export default function DashboardView({
 
                   {/* Status & Mode badges */}
                   <div className="flex items-center gap-2 flex-wrap">
+                    {req.status === "PENDING" && req.urgency === "urgent" && <Badge tone="danger" icon={<AlertCircle aria-hidden="true" />}>Urgent</Badge>}
+                    {req.status === "PENDING" && req.expiresAt && <Countdown until={req.expiresAt} label={isPeer ? "left to respond" : "until this request expires"} />}
                     <span className="px-2.5 py-0.5 rounded-md text-[11px] font-medium bg-raised text-body capitalize">
                       {req.mode === "online" ? "Online" : "Campus in-person"}
                     </span>
@@ -307,12 +314,20 @@ export default function DashboardView({
                           : "bg-raised text-body"
                       }`}
                     >
-                      {({ PENDING: "Pending", ACCEPTED: "Accepted", REJECTED: "Declined", CANCELLED: "Cancelled", COMPLETED: "Completed", REVIEWED: "Reviewed" })[req.status]}
+                      {({ PENDING: "Pending", ACCEPTED: "Accepted", REJECTED: "Declined", CANCELLED: "Cancelled", COMPLETED: "Completed", REVIEWED: "Reviewed", EXPIRED: "Expired" })[req.status]}
                     </span>
                   </div>
                 </div>
 
-                <div className="request-body"><h3>{req.topic}</h3><p className="request-description">{req.problemDescription}</p>{req.respondedAt && <span className="workspace-caption">{req.status === "REJECTED" ? "Declined" : "Accepted"} on {new Date(req.respondedAt).toLocaleDateString()}</span>}</div>
+                <div className="request-body"><h3>{req.topic}</h3>{req.neededBy && req.status === "PENDING" && <p className="request-deadline">Needed by <time dateTime={req.neededBy}>{new Date(req.neededBy).toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit", month: "short", day: "numeric" })}</time></p>}<p className="request-description">{req.problemDescription}</p>{req.respondedAt && <span className="workspace-caption">{req.status === "REJECTED" ? "Declined" : "Accepted"} on {new Date(req.respondedAt).toLocaleDateString()}</span>}</div>
+
+                {req.status === "EXPIRED" && (
+                  <div className="request-expired" role="note">
+                    <Clock className="w-4 h-4 shrink-0" aria-hidden="true" />
+                    <p>{isPeer ? "This request expired before you responded. It no longer counts toward your response time." : `${participant.name} didn't respond in time. Your request was closed so you can ask someone else.`}</p>
+                    {!isPeer && <Link className="ui-button is-primary is-sm" href={`/peers?topic=${encodeURIComponent(req.topic)}`}>Try another helper</Link>}
+                  </div>
+                )}
 
                 {/* Unlocked Contact Box: preserved for ACCEPTED, COMPLETED, and REVIEWED for learner */}
                 {!isPeer &&
@@ -595,7 +610,7 @@ export default function DashboardView({
 
                   {/* Permitted Actions */}
                   <div className="flex items-center gap-2 flex-wrap">
-                    {["REJECTED","CANCELLED","COMPLETED","REVIEWED"].includes(req.status) && <button type="button" disabled={isPending} onClick={() => handleArchive(req.id)} className="workspace-text-button">{archivedView ? <ArchiveRestore size={16} /> : <Archive size={16} />}{archivedView ? "Restore request" : "Archive request"}</button>}
+                    {["REJECTED","CANCELLED","COMPLETED","REVIEWED","EXPIRED"].includes(req.status) && <button type="button" disabled={isPending} onClick={() => handleArchive(req.id)} className="workspace-text-button">{archivedView ? <ArchiveRestore size={16} /> : <Archive size={16} />}{archivedView ? "Restore request" : "Archive request"}</button>}
                     {/* Incoming Actions: Peer accepts or declines PENDING request */}
                     {isPeer && req.status === "PENDING" && (
                       <>

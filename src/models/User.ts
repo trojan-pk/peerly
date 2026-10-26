@@ -36,6 +36,8 @@ export interface IUserDocument extends Document {
   pricingPreference: PricingPreference;
   contact: PrivateContactInfo;
   isProfileComplete: boolean;
+  /** Email alerts for request events (only sent when email is configured). */
+  emailAlerts: boolean;
   reviewCount: number;
   averageRating: number;
   responseCount: number;
@@ -167,6 +169,7 @@ const UserSchema = new Schema<IUserDocument>(
       default: false,
       index: true,
     },
+    emailAlerts: { type: Boolean, default: true },
     reviewCount: {
       type: Number,
       default: 0,

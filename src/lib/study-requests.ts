@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import { connectToDatabase, isDatabaseConfigured } from "@/lib/db";
-import { StudyRequest, RequestStatus, RequestMode } from "@/models/StudyRequest";
+import { StudyRequest, RequestStatus, RequestMode, RequestUrgency, REQUEST_STATUSES } from "@/models/StudyRequest";
+import { backfillRequestPriority, expireAndNotify } from "@/lib/request-expiry";
+import { NORMAL_WINDOW_MS } from "@/lib/request-rules";
 import { User } from "@/models/User";
 import { buildSafeUnlockedContact, SafeUnlockedContact } from "@/lib/contact-unlock";
 import { requireAuth } from "@/lib/auth-guards";
@@ -20,6 +22,9 @@ interface RawPopulatedStudyRequest {
   problemDescription: string;
   mode: RequestMode;
   status: RequestStatus;
+  urgency?: RequestUrgency;
+  neededBy?: Date | null;
+  expiresAt?: Date | null;
   respondedAt?: Date | null;
   learnerConfirmedAt?: Date | null;
   peerConfirmedAt?: Date | null;
@@ -53,6 +58,11 @@ export interface StudyRequestDTO {
   problemDescription: string;
   mode: RequestMode;
   status: RequestStatus;
+  urgency: RequestUrgency;
+  /** Learner's own deadline, if they gave one. */
+  neededBy: string | null;
+  /** When a pending request stops accepting responses. */
+  expiresAt: string | null;
   respondedAt?: string | null;
   learnerConfirmedAt?: string | null;
   peerConfirmedAt?: string | null;
@@ -90,6 +100,18 @@ export interface PublicPeerReviewsResult {
   total: number;
   page: number;
   totalPages: number;
+}
+
+function timingFields(req: RawPopulatedStudyRequest) {
+  // Legacy records have no expiresAt; they follow the normal 72h window from creation.
+  const expires = req.expiresAt
+    ? new Date(req.expiresAt)
+    : req.createdAt ? new Date(new Date(req.createdAt).getTime() + NORMAL_WINDOW_MS) : null;
+  return {
+    urgency: (req.urgency ?? "normal") as RequestUrgency,
+    neededBy: req.neededBy ? new Date(req.neededBy).toISOString() : null,
+    expiresAt: expires ? expires.toISOString() : null,
+  };
 }
 
 /** Statuses in which an accepted helper's contact is available to the learner. */
@@ -181,13 +203,17 @@ export async function getDashboardRequests(
 
   await connectToDatabase();
 
+  // Lazy, atomic expiry and legacy sort-key backfill for this user's requests.
+  await expireAndNotify({ userId: userObjectId });
+  await backfillRequestPriority(userObjectId);
+
   const boundedPageSize = Math.max(1, Math.min(pageSize, 50));
   const parsedIncoming = typeof incomingPage === "number" ? incomingPage : parseInt(String(incomingPage || "1"), 10);
   const safeIncoming = Math.max(1, Math.min(isNaN(parsedIncoming) ? 1 : parsedIncoming, 10000));
   const parsedOutgoing = typeof outgoingPage === "number" ? outgoingPage : parseInt(String(outgoingPage || "1"), 10);
   const safeOutgoing = Math.max(1, Math.min(isNaN(parsedOutgoing) ? 1 : parsedOutgoing, 10000));
 
-  const allowedStatuses = ["PENDING", "ACCEPTED", "REJECTED", "CANCELLED", "COMPLETED", "REVIEWED"];
+  const allowedStatuses: readonly string[] = REQUEST_STATUSES;
   const filters = {
     archivedBy: options.archived ? userObjectId : { $ne: userObjectId },
     ...(options.status && allowedStatuses.includes(options.status) ? { status: options.status } : {}),
@@ -200,7 +226,7 @@ export async function getDashboardRequests(
 
   const rawIncoming = await StudyRequest.find({ peer: userObjectId, ...filters })
     .populate("learner", "name image university")
-    .sort({ createdAt: -1, _id: -1 })
+    .sort({ priority: -1, createdAt: -1, _id: -1 })
     .skip(incomingSkip)
     .limit(boundedPageSize)
     .lean();
@@ -213,7 +239,7 @@ export async function getDashboardRequests(
 
   const rawOutgoing = await StudyRequest.find({ learner: userObjectId, ...filters })
     .populate("peer", "name image university")
-    .sort({ createdAt: -1, _id: -1 })
+    .sort({ priority: -1, createdAt: -1, _id: -1 })
     .skip(outgoingSkip)
     .limit(boundedPageSize)
     .lean();
@@ -235,6 +261,7 @@ export async function getDashboardRequests(
     problemDescription: req.problemDescription,
     mode: req.mode,
     status: req.status,
+    ...timingFields(req),
     respondedAt: req.respondedAt ? new Date(req.respondedAt).toISOString() : null,
     learnerConfirmedAt: req.learnerConfirmedAt ? new Date(req.learnerConfirmedAt).toISOString() : null,
     peerConfirmedAt: req.peerConfirmedAt ? new Date(req.peerConfirmedAt).toISOString() : null,
@@ -291,6 +318,7 @@ export async function getDashboardRequests(
         problemDescription: req.problemDescription,
         mode: req.mode,
         status: req.status,
+        ...timingFields(req),
         respondedAt: req.respondedAt ? new Date(req.respondedAt).toISOString() : null,
         learnerConfirmedAt: req.learnerConfirmedAt ? new Date(req.learnerConfirmedAt).toISOString() : null,
         peerConfirmedAt: req.peerConfirmedAt ? new Date(req.peerConfirmedAt).toISOString() : null,

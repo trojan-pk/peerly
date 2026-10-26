@@ -6,7 +6,14 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { createStudyRequest, RequestActionResult } from "@/app/dashboard/actions";
 import { Send, CheckCircle2, AlertCircle, Loader2, ArrowRight, UserCheck, Lock } from "lucide-react";
-import { RequestMode } from "@/models/StudyRequest";
+import type { RequestMode, RequestUrgency } from "@/models/StudyRequest";
+import { MAX_NEEDED_BY_MS, MIN_NEEDED_BY_LEAD_MS } from "@/lib/request-rules";
+
+/** Formats a Date as a value for <input type="datetime-local"> in local time. */
+function toLocalInput(date: Date): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
 
 interface StudyRequestFormProps {
   peerId: string;
@@ -30,6 +37,9 @@ export default function StudyRequestForm({
   const [topic, setTopic] = useState<string>(peerTopics[0] || "");
   const [mode, setMode] = useState<RequestMode>(initialMode);
   const [problemDescription, setProblemDescription] = useState<string>("");
+  const [urgency, setUrgency] = useState<RequestUrgency>("normal");
+  const [neededBy, setNeededBy] = useState<string>("");
+  const [bounds, setBounds] = useState<{ min: string; max: string } | null>(null);
   const [result, setResult] = useState<RequestActionResult | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -79,16 +89,22 @@ export default function StudyRequestForm({
     setResult(null);
 
     startTransition(async () => {
+      // datetime-local is local wall time; send an unambiguous UTC instant.
+      const deadline = neededBy ? new Date(neededBy) : null;
       const res = await safeAction(() => createStudyRequest({
         peerId,
         topic,
         problemDescription,
         mode,
+        urgency,
+        neededBy: deadline && !Number.isNaN(deadline.getTime()) ? deadline.toISOString() : null,
       }));
 
       setResult(res);
       if (res.success) {
         setProblemDescription("");
+        setNeededBy("");
+        setUrgency("normal");
       }
     });
   };
@@ -228,6 +244,40 @@ export default function StudyRequestForm({
           )}
         </div>
       </fieldset>
+
+      {/* Urgency and optional deadline */}
+      <fieldset className="space-y-2">
+        <legend className="text-xs font-semibold text-ink">How soon do you need help?</legend>
+        <div className="urgency-options">
+          <label className={urgency === "normal" ? "is-selected" : ""}>
+            <input type="radio" name="urgency" value="normal" checked={urgency === "normal"} onChange={() => setUrgency("normal")} />
+            <span><strong>Normal</strong><small>{peerName.split(" ")[0]} has up to 3 days to respond.</small></span>
+          </label>
+          <label className={urgency === "urgent" ? "is-selected is-urgent" : ""}>
+            <input type="radio" name="urgency" value="urgent" checked={urgency === "urgent"} onChange={() => setUrgency("urgent")} />
+            <span><strong>Urgent</strong><small>Shown first. Closes after 6 hours if there&apos;s no response.</small></span>
+          </label>
+        </div>
+      </fieldset>
+
+      <div className="space-y-1.5">
+        <label htmlFor="request-needed-by" className="block text-xs font-semibold text-ink">
+          Needed by <span className="font-normal text-muted">(optional)</span>
+        </label>
+        <input
+          type="datetime-local"
+          id="request-needed-by"
+          name="neededBy"
+          value={neededBy}
+          min={bounds?.min}
+          max={bounds?.max}
+          onFocus={() => { const now = Date.now(); setBounds({ min: toLocalInput(new Date(now + MIN_NEEDED_BY_LEAD_MS)), max: toLocalInput(new Date(now + MAX_NEEDED_BY_MS)) }); }}
+          onChange={(e) => setNeededBy(e.target.value)}
+          aria-describedby="request-needed-by-hint"
+          className="w-full sm:w-auto px-3.5 py-2.5 rounded-xl border border-edge text-sm text-ink bg-panel/50 focus:bg-surface focus:outline-none focus:ring-2 focus:ring-accent transition-colors"
+        />
+        <p id="request-needed-by-hint" className="text-[11px] text-muted">Your deadline, e.g. when the assignment is due. The request closes at this time if nobody has responded.</p>
+      </div>
 
       {/* Problem Description */}
       <div className="space-y-1.5">

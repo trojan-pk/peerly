@@ -1,6 +1,8 @@
 import { InitialsAvatar } from "@/components/InitialsAvatar";
 import { LogoutButton } from "@/components/LogoutButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { EmailAlertsToggle } from "@/components/EmailAlertsToggle";
+import { isEmailConfigured } from "@/lib/email";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/auth";
@@ -125,6 +127,11 @@ export default async function ProfilePage() {
       <section className="settings-account" aria-labelledby="appearance-title">
         <div className="settings-section-heading"><div><h2 id="appearance-title">Appearance</h2><p>Paper is the light theme and Ink is the dark one. System follows your device setting. Your choice is saved in this browser.</p></div></div>
         <ThemeToggle />
+      </section>
+
+      <section className="settings-account" aria-labelledby="notifications-title">
+        <div className="settings-section-heading"><div><h2 id="notifications-title">Notifications</h2><p>Request updates always appear under the bell in the header.</p></div></div>
+        <EmailAlertsToggle initialEnabled={dbUser?.emailAlerts !== false} emailConfigured={isEmailConfigured()} />
       </section>
 
       {/* Profile Form */}

@@ -13,6 +13,9 @@ import {
   ConfirmCompletionSchema,
   SubmitReviewSchema,
 } from "@/lib/validations/request";
+import { computeExpiresAt } from "@/lib/request-rules";
+import { expireAndNotify, expiredPendingFilter, stillOpenFilter } from "@/lib/request-expiry";
+import { notify } from "@/lib/notifications";
 
 export interface RequestActionResult {
   success: boolean;
@@ -130,7 +133,11 @@ export async function createStudyRequest(rawInput: unknown): Promise<RequestActi
 
     const normalizedTopic = data.topic.toLowerCase().trim();
 
+    // An overdue pending request to this helper must not block a fresh one.
+    await expireAndNotify({ learner: authContext.user._id, peer: peerUser._id });
+
     // 6. Persist request into MongoDB with partial unique constraint
+    const createdAt = new Date();
     const newRequest = await StudyRequest.create({
       learner: authContext.user._id,
       peer: peerUser._id,
@@ -139,7 +146,21 @@ export async function createStudyRequest(rawInput: unknown): Promise<RequestActi
       problemDescription: data.problemDescription.trim(),
       mode: data.mode,
       status: "PENDING",
+      urgency: data.urgency,
+      neededBy: data.neededBy,
+      expiresAt: computeExpiresAt(createdAt, data.urgency, data.neededBy),
+      createdAt,
     });
+
+    await notify([{
+      type: "REQUEST_RECEIVED",
+      recipientId: peerUser._id,
+      requestId: newRequest._id,
+      actorName: authContext.user.name,
+      topic: newRequest.topic,
+      urgent: data.urgency === "urgent",
+      neededBy: data.neededBy,
+    }]);
 
     try {
       revalidatePath("/dashboard");
@@ -238,25 +259,36 @@ export async function transitionStudyRequest(rawInput: unknown): Promise<Request
     const userObjectId = authContext.user._id;
     let updated = null;
 
-    if (action === "accept") {
-      // ONLY the peer can accept a PENDING request
+    const now = new Date();
+    if (action === "accept" || action === "reject") {
+      // ONLY the peer can respond, and only while the request's response window is open.
       updated = await StudyRequest.findOneAndUpdate(
-        { _id: requestId, peer: userObjectId, status: "PENDING" },
-        { $set: { status: "ACCEPTED", respondedAt: new Date() } },
+        { _id: requestId, peer: userObjectId, status: "PENDING", ...stillOpenFilter(now) },
+        { $set: { status: action === "accept" ? "ACCEPTED" : "REJECTED", respondedAt: now, priority: 0 } },
         { returnDocument: "after" }
       );
-    } else if (action === "reject") {
-      // ONLY the peer can reject a PENDING request
-      updated = await StudyRequest.findOneAndUpdate(
-        { _id: requestId, peer: userObjectId, status: "PENDING" },
-        { $set: { status: "REJECTED", respondedAt: new Date() } },
-        { returnDocument: "after" }
-      );
+      if (!updated) {
+        // Distinguish an overdue request so the helper gets an honest message.
+        const overdue = await StudyRequest.exists({ _id: requestId, peer: userObjectId, ...expiredPendingFilter(now) });
+        if (overdue) {
+          await expireAndNotify({ peer: userObjectId });
+          try { revalidatePath("/dashboard"); } catch { /* no-op in tests */ }
+          return { success: false, conflict: true, message: "This request expired before you responded, so it can no longer be accepted or declined." };
+        }
+      } else {
+        await notify([{
+          type: action === "accept" ? "REQUEST_ACCEPTED" : "REQUEST_DECLINED",
+          recipientId: updated.learner,
+          requestId: updated._id,
+          actorName: authContext.user.name,
+          topic: updated.topic,
+        }]);
+      }
     } else if (action === "cancel") {
       // ONLY the learner can cancel a PENDING request (does NOT set respondedAt)
       updated = await StudyRequest.findOneAndUpdate(
         { _id: requestId, learner: userObjectId, status: "PENDING" },
-        { $set: { status: "CANCELLED" } },
+        { $set: { status: "CANCELLED", priority: 0 } },
         { returnDocument: "after" }
       );
     }
@@ -472,6 +504,16 @@ export async function confirmStudyRequestCompletion(rawInput: unknown): Promise<
       ? Boolean(reqDoc.learnerConfirmedAt)
       : Boolean(reqDoc.peerConfirmedAt);
 
+    if (!wasAlreadyConfirmed) {
+      await notify([{
+        type: isFullyCompleted ? "SESSION_COMPLETED" : "COMPLETION_CONFIRMED",
+        recipientId: isLearner ? updatedDoc.peer : updatedDoc.learner,
+        requestId: updatedDoc._id,
+        actorName: authContext.user.name,
+        topic: updatedDoc.topic,
+      }]);
+    }
+
     let responseMessage: string;
     if (isFullyCompleted) {
       responseMessage = wasAlreadyConfirmed
@@ -637,6 +679,8 @@ export async function submitStudyRequestReview(rawInput: unknown): Promise<Reque
       };
     }
 
+    await notify([{ type: "REVIEW_RECEIVED", recipientId: updated.peer, requestId: updated._id, actorName: authContext.user.name, topic: updated.topic }]);
+
     // Secondary cache update (best-effort, non-fatal: committed review must not fail)
     try {
       const { updateCachedPeerAggregates } = await import("@/lib/peer-reviews");
@@ -680,7 +724,7 @@ export async function archiveStudyRequest(rawInput: unknown): Promise<RequestAct
     const updated = await StudyRequest.findOneAndUpdate({
       _id: requestId,
       $or: [{ learner: context.user._id }, { peer: context.user._id }],
-      status: { $in: ["REJECTED", "CANCELLED", "COMPLETED", "REVIEWED"] },
+      status: { $in: ["REJECTED", "CANCELLED", "COMPLETED", "REVIEWED", "EXPIRED"] },
     }, archive ? { $addToSet: { archivedBy: context.user._id } } : { $pull: { archivedBy: context.user._id } }, { returnDocument: "after" });
     if (!updated) return { success: false, message: "Only participants can archive finished requests. Cancel a pending request or complete the session first." };
     try { revalidatePath("/dashboard"); } catch { /* outside Next request */ }

@@ -8,12 +8,14 @@ import { LogoutButton } from "@/components/LogoutButton";
 import { BrandMark, BrandWordmark } from "@/components/BrandMark";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { BottomNav } from "@/components/layout/BottomNav";
+import { NotificationBell } from "@/components/layout/NotificationBell";
 
 interface NavbarProps {
   user?: { id?: string } | null;
   isAdmin?: boolean;
   isAuthConfigured?: boolean;
   loading?: boolean;
+  unreadCount?: number;
 }
 
 export function Navbar(props: NavbarProps) {
@@ -21,7 +23,7 @@ export function Navbar(props: NavbarProps) {
   return <RouteNavbar key={pathname} {...props} pathname={pathname} />;
 }
 
-function RouteNavbar({ user, isAdmin = false, loading = false, pathname }: NavbarProps & { pathname: string }) {
+function RouteNavbar({ user, isAdmin = false, loading = false, unreadCount = 0, pathname }: NavbarProps & { pathname: string }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const marketing = pathname === "/" || pathname === "/login";
   const settings = pathname === "/settings" || pathname === "/profile";
@@ -45,7 +47,7 @@ function RouteNavbar({ user, isAdmin = false, loading = false, pathname }: Navba
         <nav aria-label="Main Navigation" className="hidden xl:flex items-center gap-1">{links.map(link => <Link key={link.href} href={link.href} aria-current={isActive(link.href) ? "page" : undefined} className={`nav-link ${isActive(link.href) ? "active" : ""}`}>{link.label}</Link>)}</nav>
         <div className="header-account-actions">
           {!marketing && <div className="hidden xl:block"><ThemeToggle compact /></div>}
-          {marketing ? <div className="hidden xl:flex items-center gap-4"><Link href={startHref} className="nav-link">{user ? "Your workspace" : "Log in"}</Link><Link href={startHref} className="nav-join">{user ? "Open platform" : "Get started"}<ArrowUpRight size={15} /></Link></div> : user ? !settings && <Link href="/settings" aria-label="Open account settings" title="Account settings" className="settings-link"><Settings size={19} aria-hidden="true" /></Link> : <Link href="/login" className="nav-join hidden xl:flex">Sign in</Link>}
+          {marketing ? <div className="hidden xl:flex items-center gap-4"><Link href={startHref} className="nav-link">{user ? "Your workspace" : "Log in"}</Link><Link href={startHref} className="nav-join">{user ? "Open platform" : "Get started"}<ArrowUpRight size={15} /></Link></div> : user ? <>{!loading && <NotificationBell initialCount={unreadCount} current={pathname === "/notifications"} />}{!settings && <Link href="/settings" aria-label="Open account settings" title="Account settings" className="settings-link"><Settings size={19} aria-hidden="true" /></Link>}</> : <Link href="/login" className="nav-join hidden xl:flex">Sign in</Link>}
           <button type="button" id="mobile-menu-toggle" className="mobile-menu-button xl:hidden" disabled={loading} aria-busy={loading || undefined} aria-controls="mobile-navigation" aria-expanded={isMobileMenuOpen} aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"} onClick={() => setIsMobileMenuOpen(open => !open)}>{isMobileMenuOpen ? <X size={23} /> : <Menu size={23} />}</button>
         </div>
       </div>

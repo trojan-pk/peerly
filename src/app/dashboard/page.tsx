@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { auth } from "@/auth";
 import { getCurrentDbUser } from "@/lib/auth-guards";
-import type { RequestStatus } from "@/models/StudyRequest";
+import { REQUEST_STATUSES, type RequestStatus } from "@/models/StudyRequest";
 import { isDatabaseConfigured } from "@/lib/db";
 import { getDashboardRequests } from "@/lib/study-requests";
 import DashboardView from "./DashboardView";
@@ -50,7 +50,7 @@ export default async function DashboardPage(props: DashboardPageProps) {
   const incomingPage = parseInt(searchParams.incomingPage || "1", 10) || 1;
   const outgoingPage = parseInt(searchParams.outgoingPage || "1", 10) || 1;
 
-  const validStatuses = ["PENDING", "ACCEPTED", "REJECTED", "CANCELLED", "COMPLETED", "REVIEWED"];
+  const validStatuses: readonly string[] = REQUEST_STATUSES;
   const status = validStatuses.includes(searchParams.status || "") ? searchParams.status as RequestStatus : undefined;
   const archivedView = searchParams.view === "archived";
   const context = await getCurrentDbUser();

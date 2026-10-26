@@ -76,7 +76,7 @@ This is a **Next.js Node application**, not a static export. It requires a serve
 - Reports and `/admin/reports` with reversible moderation.
 - Server validation, private/public DTO separation and database-backed write throttling.
 
-No payment processing, hosted calls, resource file uploads, email delivery or AI answers. A paid preference is informational; users arrange any terms directly. Use public campus spaces for physical sessions. Dashboard updates appear after actions or refresh; there are no email/push notifications.
+No payment processing, hosted calls, resource file uploads or AI answers. A paid preference is informational; users arrange any terms directly. Use public campus spaces for physical sessions.
 
 ## Visual design and entry flow
 
@@ -128,6 +128,32 @@ at `/dev/ui` during development and returns 404 in production builds. Below the
 desktop breakpoint, signed-in pages show a bottom navigation bar.
 The marketing landing keeps its previous palette until its Paper & Ink redesign.
 
+## Urgent help, expiry and notifications
+
+Learners mark a request **Normal** or **Urgent** and may add a **Needed by** deadline
+(15 minutes to 14 days ahead). A pending request closes at the earliest of the deadline
+or 6 hours (urgent) / 72 hours (normal) after sending. Legacy requests without these
+fields use the 72-hour window. Expiry is applied atomically when dashboards load, before
+a new request is created and when a helper responds; there is no background job. An
+expired request can't be accepted or declined, frees the same helper and topic for a new
+request, and is excluded from response-time badges. Helpers see pending urgent requests
+first with a live countdown; learners see **Try another helper**.
+
+The header bell shows unread notifications for: request received, accepted, declined,
+the other participant confirming completion, session completed, review received and
+request expired. It checks every 60 seconds while the tab is visible (and on returning to
+the tab), refreshing the page when something new arrives. `/notifications` lists them;
+they are deleted after 90 days. Notifications store only the actor's first name and the
+topic — never contact details, emails or the problem text.
+
+**Optional email:** set `RESEND_API_KEY` and `EMAIL_FROM` (a sender on a domain verified
+in [Resend](https://resend.com/docs)) to email helpers about new requests and learners
+about accepted/declined ones. Emails contain the topic, urgency, deadline and a dashboard
+link only, are sent after the response, are limited to 10 per recipient per hour and can
+be turned off in Settings → Notifications. Without both variables, email is skipped and
+everything else works. Check your provider's current free-tier limits. `pnpm check:env`
+reports these as optional. Real delivery has not been verified without a key.
+
 ## Open Page identity
 
 The approved Open Page symbol and outlined `peerly` wordmark appear in the header,
@@ -148,7 +174,7 @@ through its file conventions. Absolute share-image URLs use the origin of
 
 ## Important rules
 
-Requests move `PENDING → ACCEPTED → COMPLETED → REVIEWED`, or `PENDING → REJECTED / CANCELLED`. Only the helper accepts/rejects; the learner may cancel while pending. Both participants confirm completion; this is not independent attendance verification. Only that learner may submit one review.
+Requests move `PENDING → ACCEPTED → COMPLETED → REVIEWED`, or `PENDING → REJECTED / CANCELLED / EXPIRED`. Only the helper accepts/rejects; the learner may cancel while pending. Both participants confirm completion; this is not independent attendance verification. Only that learner may submit one review.
 
 Contact is absent from public profiles and unlocks to the request's learner after acceptance, remaining available after completion/review. Google email is shared as contact only when explicitly selected by the helper. Helpers may view their own contact. Reporter identities and moderation audit details stay out of public responses.
 

@@ -9,9 +9,12 @@ export default defineConfig({
   use: {
     baseURL: "http://127.0.0.1:3101",
     headless: true,
-    launchOptions: process.env.PEERLY_CHROME_PATH
-      ? { executablePath: process.env.PEERLY_CHROME_PATH }
-      : { channel: "chrome" },
+    // Headless Chrome's GPU process intermittently crashed on the test machine,
+    // freezing pages mid-render. Tests do not need GPU compositing.
+    launchOptions: {
+      args: ["--disable-gpu"],
+      ...(process.env.PEERLY_CHROME_PATH ? { executablePath: process.env.PEERLY_CHROME_PATH } : { channel: "chrome" }),
+    },
     screenshot: "only-on-failure",
     trace: "retain-on-failure",
   },
