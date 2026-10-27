@@ -2,6 +2,12 @@
   "name": "student-helper-platform",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
+  "author": "Abdul Rahman",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/abdulrdeveloper/peerly.git"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
