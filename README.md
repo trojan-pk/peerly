@@ -288,7 +288,7 @@ This opt-in command loads your ignored environment file and runs the configured 
 
 ## Remaining limits
 
-- Atlas connectivity, public pages with the configured database, and the Google account-selection redirect were checked locally. Full Google consent/token exchange and external deployment remain unverified. See [verification notes](VERIFICATION.md) for the tested scope.
+- Atlas connectivity, public pages with the configured database, and the Google account-selection redirect were checked locally. Full Google consent/token exchange and external deployment remain unverified.
 - Search ranking runs inside MongoDB (aggregation with a per-candidate `$lookup` of request stats), so only one page is loaded into the app. It is tested with 5,000 profiles; for much larger directories consider caching per-helper stats.
 - Real email delivery (alerts, university codes), importing `.ics` files into calendar apps and live Jitsi calls were not tested end to end.
 - Notifications already in other members' inboxes keep a deleted user's first name until they expire (90 days).
@@ -313,4 +313,18 @@ Dashboard status filters apply before pagination. Cancel a pending sent request;
 archive a finished request to remove it from your current list. Archiving is
 personal and reversible, and does not remove the other participant's record.
 
-See `DASHBOARD_DESIGN_REVIEW.md` for the visual audit and its implemented corrections.
+## Contributing
+
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for
+the setup, workflow and pull request checklist, and follow our
+[Code of Conduct](CODE_OF_CONDUCT.md). Nobody pushes directly to `main`; every
+change goes through a pull request.
+
+## Security
+
+Please report vulnerabilities privately as described in
+[SECURITY.md](SECURITY.md). Do not open public issues for security problems.
+
+## License
+
+Released under the [MIT License](LICENSE). Copyright (c) 2026 Abdul Rahman.
