@@ -21,7 +21,7 @@ For anything security related, do **not** open a public issue. See
 Requirements: Node.js `>=22.18.0` and pnpm `>=11`.
 
 ```bash
-git clone https://github.com/<owner>/peerly.git
+git clone https://github.com/trojan-pk/peerly.git
 cd peerly
 pnpm install
 cp .env.example .env.local   # then fill in the values, see README.md
