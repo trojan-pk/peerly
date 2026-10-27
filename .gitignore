@@ -44,3 +44,21 @@ next-env.d.ts
 # Browser verification artifacts
 /test-results/
 /playwright-report/
+
+# local-only working notes (kept on the maintainer's machine, not part of the public repo)
+/BUILD_BRIEF.md
+/AGENTS.md
+/DASHBOARD_DESIGN_REVIEW.md
+/LANDING_DESIGN_REVIEW.md
+/VERIFICATION.md
+
+# local AI-tool / editor state
+/.claude/
+/.kiro/
+/.cursor/
+/.codex/
+/.gemini/
+/.agents/
+/.vscode/
+/.idea/
+*.local.md
