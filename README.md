@@ -1,329 +1,215 @@
-# Peerly
+<p align="center">
+  <img src="public/brand/peerly-logo.svg" alt="Peerly" height="64" />
+</p>
 
-Find a classmate who can explain the topic you're stuck on, request a short study session, and share useful notes. One account can both learn and help.
+<h3 align="center">Stuck on a topic? Find a classmate who can explain it.</h3>
 
-## Run locally
+<p align="center">
+  Peerly is a free, open-source study-help platform where university students ask
+  each other for short sessions, share useful resources, and build a reputation
+  for helping. One account can both learn and help.
+</p>
 
-Requires **Node.js 22.18+**, **pnpm 11** (`corepack enable` activates the pinned version) and a reachable MongoDB database.
+<p align="center">
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg" /></a>
+  <img alt="Next.js 16" src="https://img.shields.io/badge/Next.js-16-black.svg" />
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-3178c6.svg" />
+  <a href="CONTRIBUTING.md"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" /></a>
+</p>
+
+---
+
+## What is Peerly?
+
+Every course has someone who already understood the topic you are stuck on.
+Peerly helps you find that person, ask for a short session, and say thanks
+properly with a rating that helps the next student.
+
+- **Learners** describe what they are stuck on, pick a helper, and get contact
+  details only after the helper accepts.
+- **Helpers** list the topics and courses they can teach, choose who to help,
+  and earn real reviews and response badges.
+- **Everyone** can share and upvote study resources.
+
+Peerly is deliberately small: no payments, no AI-generated answers, no file
+uploads and no hosted video service. It connects people and gets out of the way.
+
+## What you can do
+
+### Find the right helper
+- Search by topic, subject, course code (for example `CS101`), mode (online or
+  in person) and whether the helper charges.
+- See an explainable match score, real review averages and a fast-reply badge.
+- Browse public helper profiles and, if a helper opts in, a shareable page at
+  `/h/<name>`.
+
+### Ask for help, fast
+- Send a request marked **Normal** or **Urgent**, with an optional "needed by"
+  deadline. Urgent requests show first to helpers, with a live countdown.
+- If a helper does not answer in time the request expires and you can try
+  another helper in one click.
+- Get a notification bell, plus optional email alerts.
+
+### Plan the session
+- Suggest up to three times; the other person picks one.
+- Download a calendar file (`.ics`) for the agreed time.
+- Online sessions get a one-click video link (Jitsi Meet).
+- Both people confirm completion, then the learner leaves one review.
+
+### Share what helped
+- Add links to useful resources, tagged by topic and course.
+- Mark resources as helpful and sort the library by **Most helpful**.
+
+### Stay in control of your data
+- Contact details are never public; they unlock only for the learner after the
+  helper accepts.
+- **Download my data** (JSON) and **Delete account** are built in.
+- Report anything inappropriate; admins can hide and restore content.
+
+### Built for speed
+- Press **Ctrl K** (or **⌘K**) for a command palette to jump to pages, peers,
+  topics and your own requests. Press **?** for keyboard shortcuts.
+- Light, dark or system theme, designed to meet WCAG AA contrast.
+- Mobile-friendly with a bottom navigation bar.
+
+## How it works
+
+1. **Sign in** with Google.
+2. **Set up your profile**: your university, courses and topics you can help with.
+3. **Find a helper** or **send a request** describing what you are stuck on.
+4. **The helper accepts**, and your contact details unlock for the session.
+5. **Agree a time**, meet online or on campus, and mark the session complete.
+6. **Leave a review** so other students know who explains things well.
+
+## Run it yourself
+
+Peerly is a Next.js application that you host yourself. There is no hosted
+version yet.
+
+### You need
+
+- **Node.js 22.18+** and **pnpm 11** (`corepack enable` sets up the right pnpm)
+- A **MongoDB** database ([Atlas free tier](https://www.mongodb.com/cloud/atlas/register)
+  or a local `mongodb://127.0.0.1:27017/peerly`)
+- A **Google OAuth client** for sign-in (free)
+
+### Quick start
 
 ```bash
+git clone https://github.com/trojan-pk/peerly.git
+cd peerly
 pnpm install --frozen-lockfile
-pnpm setup:env
-# Fill the three provider values in .env.local using the instructions below.
+pnpm setup:env          # creates .env.local with a random AUTH_SECRET
+# Add MONGODB_URI, AUTH_GOOGLE_ID and AUTH_GOOGLE_SECRET to .env.local
 pnpm check:env --connect
 pnpm dev
 ```
 
-Open **http://localhost:3000**. `pnpm setup:env` creates an ignored `.env.local` with restrictive permissions and a cryptographically random `AUTH_SECRET`; it never overwrites an existing `.env.local` or `.env` file or prints the secret. The app builds and displays safe unavailable states without credentials. Sign-in and saved data require real configuration.
+Open **http://localhost:3000**.
 
-## Environment: what to get and where
+Without credentials the app still builds and shows safe "unavailable" states;
+sign-in and saved data need real configuration. Step-by-step instructions for
+MongoDB Atlas and Google sign-in are in
+[docs/configuration.md](docs/configuration.md).
 
-| Variable | Source | Purpose |
+### Configuration at a glance
+
+| Variable | Required | What it is |
 | --- | --- | --- |
-| `MONGODB_URI` | Atlas → your cluster → Connect → Drivers | Database connection. Include the database name `peerly` in the URI. |
-| `AUTH_GOOGLE_ID` | Google Cloud → Google Auth Platform → Clients → Web application | Google OAuth client ID, usually ending in `.apps.googleusercontent.com`. |
-| `AUTH_GOOGLE_SECRET` | The same Google OAuth client's credentials | OAuth secret, not a Gemini API key. |
-| `AUTH_SECRET` | Generated locally by `pnpm setup:env` | Encrypts session cookies. Different per environment; rotating it signs existing users out. |
-| `AUTH_URL` | Your app's base URL | `http://localhost:3000` locally; the exact HTTPS origin after deployment. |
-| `ADMIN_EMAILS` | Your chosen administrator Google email(s) | Optional comma-separated allowlist. |
+| `MONGODB_URI` | Yes | Database connection string (include the `/peerly` database name) |
+| `AUTH_GOOGLE_ID` | Yes | Google OAuth client ID |
+| `AUTH_GOOGLE_SECRET` | Yes | Google OAuth client secret |
+| `AUTH_SECRET` | Yes | Session encryption key (generated by `pnpm setup:env`) |
+| `AUTH_URL` | Yes | Your app's base URL, `http://localhost:3000` locally |
+| `ADMIN_EMAILS` | No | Comma-separated admin Google emails (moderation, university catalogue) |
+| `RESEND_API_KEY`, `EMAIL_FROM` | No | Enables email alerts and university-email verification |
 
-Put these in **`.env.local`** (an existing `.env` also works), never client code or `NEXT_PUBLIC_` variables. When deploying, set the same names in the host's environment settings. Restart after changes. `pnpm check:env` prints only validation status; `--connect` additionally pings MongoDB. It does not validate your credentials against Google or prove login works.
+Never commit `.env` or `.env.local`. The `.env.example` file lists every
+variable with comments.
 
-### MongoDB Atlas
+### Deploy
 
-1. Register at [MongoDB Atlas](https://www.mongodb.com/cloud/atlas/register). Choose a **Free / M0** cluster, skip sample datasets and paid upgrades.
-2. In **Database Access**, create a database user. Its password is different from your Atlas account password.
-3. In **Network Access**, allow your current development IP. For hosting, configure access for the deployment's outbound network; do not blindly open the database to all addresses.
-4. Choose **Connect → Drivers**. Substitute the database username/password in the URI and add `/peerly` before its query string. URL-encode special characters. Save as `MONGODB_URI`.
-5. Run `pnpm check:env --connect`.
-
-Atlas offers a free tier with **512 MB** of shared storage. Capacity, connection and feature limits apply; automatic backups are not included in the free tier. See [current pricing](https://www.mongodb.com/pricing) and the [free cluster guide](https://www.mongodb.com/docs/atlas/tutorial/deploy-free-tier-cluster/).
-
-A local MongoDB also works: `mongodb://127.0.0.1:27017/peerly`. The app creates collections and required indexes on demand before writes. The database user needs permission to create those indexes. Automated tests must use isolated databases. The optional Atlas browser check below creates and removes a random temporary database on your cluster; it never seeds or drops your application database.
-
-### Google login
-
-1. Open [Google Cloud Console](https://console.cloud.google.com/), create/select a project and open **Google Auth Platform** (or **APIs & Services → OAuth consent screen**).
-2. Configure Branding: app name, your support email and developer contact. Choose the appropriate audience. Start in testing; add your two test accounts where required by the console.
-3. Under **Clients**, create an **OAuth client ID → Web application**.
-4. Add authorized JavaScript origin **`http://localhost:3000`**.
-5. Add this exact authorized redirect URI:
-
-   ```text
-   http://localhost:3000/api/auth/callback/google
-   ```
-
-6. Save client ID and secret in `.env.local`. Only basic `openid`, `email`, and `profile` scopes are needed. Do not enable Gemini, Maps, SMS or other paid APIs for this app.
-7. Restart and use **Continue with Google**. University affiliation is self-described, not university-verified. Google Workspace administrators may restrict apps.
-
-When deploying, add the actual HTTPS origin and `https://YOUR-HOST/api/auth/callback/google`, update `AUTH_URL`, and review Google's audience/branding requirements. Callbacks must match exactly. See [Google setup](https://developers.google.com/identity/protocols/oauth2/web-server#creatingcred) and [audience guidance](https://support.google.com/cloud/answer/15549945).
-
-### Cost and hosting
-
-There is no paid AI, payment, file-upload or video service. Email is optional (Resend's free tier is enough to start); video calls use the free public meet.jit.si. Local development and Atlas Free can be used without a hosting subscription. Basic Google OAuth uses the credentials above; no paid identity platform or cloud-compute product is required for this setup.
-
-[Vercel Hobby](https://vercel.com/docs/plans/hobby) is free within its limits for personal, non-commercial projects. Its terms restrict commercial use; choose a suitable paid/alternative host for a commercial service. A custom domain is optional. Provider prices and quotas can change.
-
-This is a **Next.js Node application**, not a static export. It requires a server runtime with MongoDB connectivity. Build with `pnpm build`, run with `pnpm start`. The repository has not been published or deployed by this setup.
-
-## Features and boundaries
-
-- Google sign-in, profile editing, public profiles and topic/subject/mode/pricing search.
-- Explainable matching scores, real review averages and response badges.
-- Requests with accept/reject/cancel, contact unlocking and two-participant completion.
-- One learner review per completed session, enforced atomically.
-- Public resource links, personal management and ownership checks.
-- Reports and `/admin/reports` with reversible moderation.
-- Server validation, private/public DTO separation and database-backed write throttling.
-
-No payment processing, hosted video service, resource file uploads or AI answers. A paid preference is informational; users arrange any terms directly. Use public campus spaces for physical sessions.
-
-## Visual design and entry flow
-
-Visitors see one Paper & Ink marketing page that follows the chosen theme. Its
-navigation (How it works, Privacy, Resources, Questions) scrolls within the page.
-Calls to action go to the dashboard (signed-out visitors are sent to Google sign-in,
-which returns them there). The landing never queries member profiles or resources,
-and does not wait for the session check, so it renders without a loading skeleton.
-
-The hero plays one illustrative sequence — an urgent request, a helper accepting and
-contact unlocking — once, with a Replay button; reduced-motion visitors see the final
-state. "How it works" uses a sticky preview driven by normal scrolling (no scroll
-hijacking) and keyboard-selectable steps. Every example person, course and resource
-is labelled as illustrative; there are no testimonials, counters or invented ratings.
-The marketing footer appears only on the landing and login pages.
-
-Peerly uses Manrope (interface), Instrument Serif (display headlines) and Geist Mono
-(numbers, timers and course codes). All three are self-hosted Latin WOFF2 subsets
-in `src/app/fonts/` with their OFL licences; no external font request is made.
-
-Illustrative profiles and resources are labelled examples, not real activity,
-testimonials or fabricated ratings. Resource examples show link types, not uploads.
-Motion (`motion`, pinned) is the only animation library. It loads through
-`LazyMotion` with the DOM feature set and `reducedMotion="user"`; no external font
-request is made.
-
-## Paper & Ink design system
-
-The workspace uses two themes: **Paper** (warm off-white, ink-navy text) and
-**Ink** (deep ink, paper-coloured text), with one fountain-pen blue accent and a
-highlighter yellow reserved for emphasis. Choose Light, Dark or System from the
-header or Settings → Appearance; the choice is stored in the browser and applied by
-a small inline script before first paint, so there is no theme flash. System
-follows live OS changes.
-
-Tokens live in `src/app/styles/tokens.css` in three layers: primitives, semantic
-`--pi-*` roles per theme, and Tailwind colour utilities mapped to those roles.
-`src/tests/design-tokens.test.ts` checks every text/background pair against WCAG AA.
-Shared primitives (Button, Card, Badge, Field/Input/Textarea/Select, Dialog, Toast,
-Skeleton, EmptyState) are in `src/components/ui/`. A reference page is available
-at `/dev/ui` during development and returns 404 in production builds. Below the
-desktop breakpoint, signed-in pages show a bottom navigation bar.
-
-## Urgent help, expiry and notifications
-
-Learners mark a request **Normal** or **Urgent** and may add a **Needed by** deadline
-(15 minutes to 14 days ahead). A pending request closes at the earliest of the deadline
-or 6 hours (urgent) / 72 hours (normal) after sending. Legacy requests without these
-fields use the 72-hour window. Expiry is applied atomically when dashboards load, before
-a new request is created and when a helper responds; there is no background job. An
-expired request can't be accepted or declined, frees the same helper and topic for a new
-request, and is excluded from response-time badges. Helpers see pending urgent requests
-first with a live countdown; learners see **Try another helper**.
-
-The header bell shows unread notifications for: request received, accepted, declined,
-the other participant confirming completion, session completed, review received and
-request expired. It checks every 60 seconds while the tab is visible (and on returning to
-the tab), refreshing the page when something new arrives. `/notifications` lists them;
-they are deleted after 90 days. Notifications store only the actor's first name and the
-topic — never contact details, emails or the problem text.
-
-**Optional email:** set `RESEND_API_KEY` and `EMAIL_FROM` (a sender on a domain verified
-in [Resend](https://resend.com/docs)) to email helpers about new requests and learners
-about accepted/declined ones. Emails contain the topic, urgency, deadline and a dashboard
-link only, are sent after the response, are limited to 10 per recipient per hour and can
-be turned off in Settings → Notifications. Without both variables, email is skipped and
-everything else works. Check your provider's current free-tier limits. `pnpm check:env`
-reports these as optional. Real delivery has not been verified without a key.
-
-## Workspace speed and keyboard use
-
-Dashboard actions (accept, decline, cancel, confirm completion, review) update the card
-immediately with React's `useOptimistic`; if the server rejects the change or can't be
-reached, the card returns to its previous state and an error toast explains why. Results
-are announced through the toast live regions. With the "All statuses" filter, requests are
-grouped into **Needs your response / Waiting for a reply**, **Active sessions** and
-**History**, urgent requests first.
-
-Press **Ctrl K / ⌘K** (or the header Search button) for the command palette: pages,
-discoverable peers, topics and your own requests. It returns public peer fields only and
-is rate-limited. Press **?** for shortcut help. Tab to a pending request sent to you and
-press **A** to accept or **R** to decline.
-
-## Universities, courses and university email
-
-Admins (`ADMIN_EMAILS`) manage universities and their email domains at
-`/admin/universities` (Catalogue). In Settings, members choose their university and the
-courses they can help with, or add a missing course: codes are normalised (`cs 101` →
-`CS-101`), unique per university and rate-limited. Admins can hide courses or merge a
-duplicate into another; helpers, requests and resources move to the target. Peer search
-has a Course filter, and a query that is a course code (e.g. `CS101`) matches it. A course
-match earns the same 50 points as an exact topic match. Requests and resources can
-optionally carry a course, which must be one the helper/owner lists. Free-text topics,
-subjects and existing profiles keep working.
-
-**University email verification** (needs the optional email settings): a member enters an
-address on an allowlisted domain (or subdomain) and receives a 6-digit code. Codes are
-stored as salted SHA-256 hashes, expire after 10 minutes, allow 5 attempts, are single-use
-and rate-limited; one account per address. Profiles then show **"University email
-verified"** with the university name — never the address. It shows control of an address
-on that domain, not current enrolment. Without email configured the section explains that
-it's unavailable.
-
-## Sessions, notes and helper pages
-
-**Scheduling:** on an accepted request either person suggests up to three start times
-(10 minutes to 60 days ahead, 30–120 minutes long); the other picks one. Each pick is
-conditional on the same suggestions still standing, so only one choice can win, and a
-new suggestion clears the agreed time. Both get bell notifications. **Add to calendar**
-downloads an RFC 5545 `.ics` file (`/api/requests/[id]/ics`, participants only, UTC times
-converted by your calendar app; the event updates in place when rescheduled).
-
-**Video call:** online sessions get a one-click Jitsi Meet link
-(`https://meet.jit.si/peerly-<128-bit random>`), created once and shared by both
-participants; it appears only on their dashboards and calendar file. meet.jit.si is a
-free public service; its own terms apply and the first person joining may be asked to
-sign in to start the meeting.
-
-**Helpful votes:** members can mark resources helpful (one vote each, not your own,
-undoable, rate-limited) and sort the library by **Most helpful**.
-
-**Public helper page (opt-in):** Settings → Shareable helper page publishes `/h/<slug>`
-with name, university, verified-university badge, courses, topics and numbers derived
-from stored data: completed sessions, average rating and review count, and typical
-response time. It never shows email, contact details, review text or request content,
-asks search engines not to index it, has its own share image, and returns 404 when off or
-when the profile is hidden by moderation.
-
-## Open Page identity
-
-The approved Open Page symbol and outlined `peerly` wordmark appear in the header,
-footer, sign-in screen and product illustrations. UI components and exported
-artwork share the geometry in `src/lib/brand.ts`; the logo needs no font download.
-
-Reusable SVG and transparent PNG exports are in `public/brand/` (colour and white
-lockups, standalone symbol and wordmark). Regenerate them with:
+Peerly needs a Node.js server runtime (not a static export):
 
 ```bash
-node scripts/build-brand.mjs
-```
-
-The same script builds the SVG favicon, 16/32/48px ICO, 180px Apple touch icon and
-1200×630 Open Graph/Twitter images in `src/app/`. Next.js adds the metadata tags
-through its file conventions. Absolute share-image URLs use the origin of
-`AUTH_URL` (or `NEXTAUTH_URL`), with localhost as the development fallback.
-
-## Important rules
-
-Requests move `PENDING → ACCEPTED → COMPLETED → REVIEWED`, or `PENDING → REJECTED / CANCELLED / EXPIRED`. Only the helper accepts/rejects; the learner may cancel while pending. Both participants confirm completion; this is not independent attendance verification. Only that learner may submit one review.
-
-Contact is absent from public profiles and unlocks to the request's learner after acceptance, remaining available after completion/review. Google email is shared as contact only when explicitly selected by the helper. Helpers may view their own contact. Reporter identities and moderation audit details stay out of public responses.
-
-The fast-reply badge requires **at least three responses** averaging **≤ 2 hours**. Cancellations and legacy records without response timestamps do not count. Matching gives up to 50 topic points (or 25 subject), 20 mode, 20 rating and 10 badge: a score, not a success probability.
-
-`ADMIN_EMAILS` is checked server-side for admin reads/writes. Hiding a profile prevents discovery and new requests; existing participants retain authorized historical access. Owners cannot restore moderated resources by editing. Report resolution and hide/restore are independent.
-
-## Account data and security
-
-Settings → Your data offers **Download my data** (`/api/account/export`, JSON of your
-profile including private fields, requests, resources, votes, notifications and reports
-you filed; other people's private data is never included) and **Delete account** (type
-DELETE to confirm). Deletion removes your profile, resources and votes on them, your votes,
-notifications, reports you filed and pending verification codes; cancels your open
-requests; erases problem descriptions and review comments you wrote while keeping star
-ratings so helpers' averages don't change. Other participants keep their history, shown
-with "Deleted user". Signing in again later creates a new, empty account.
-
-Every HTML response carries a per-request nonce Content-Security-Policy from
-`src/proxy.ts` (`src/lib/csp.ts`): scripts only from this origin or with the nonce
-(`'strict-dynamic'`), no `unsafe-eval` in production, `frame-ancestors 'none'`,
-`object-src 'none'`, `base-uri 'self'`. All responses send `X-Content-Type-Options`,
-`X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy` and
-`Cross-Origin-Opener-Policy`; HSTS and `upgrade-insecure-requests` are added when
-`AUTH_URL` is HTTPS. The inline theme script carries the nonce. Styles allow inline
-attributes because React and Motion render `style` props. See [DEPLOYMENT.md](DEPLOYMENT.md)
-for a production checklist.
-
-## Checks
-
-```bash
-pnpm typecheck
-pnpm test
-pnpm lint
 pnpm build
-pnpm test:e2e
+pnpm start
 ```
 
-Integration tests use isolated `mongodb-memory-server` databases and synthetic users. The first run downloads a MongoDB executable. Browser tests require Google Chrome; alternatively set `PEERLY_CHROME_PATH` to a Chromium executable. They start production servers at `127.0.0.1:3101` and `127.0.0.1:3102`, so build first and keep those ports free.
+Follow the [deployment checklist](DEPLOYMENT.md) before inviting real users.
 
-Browser tests use encrypted, test-only Auth.js sessions and a temporary database to exercise the real UI, session decoding, authorization and writes. They **do not perform Google's external consent flow** and add no login bypass to the product. Test databases/servers stop after the run. Failure artifacts are ignored in `test-results/`.
+### First-time admin setup
 
-To verify writes on your configured cluster as well, run:
+Sign in with an account listed in `ADMIN_EMAILS`, open `/admin/universities`
+and add your university with its student email domains. Members can then pick
+their university and courses in Settings.
 
-```bash
-pnpm test:e2e:atlas
+## Tech stack
+
+| Area | Tools |
+| --- | --- |
+| Framework | Next.js 16 (App Router), React 19, TypeScript |
+| Data | MongoDB with Mongoose |
+| Auth | Auth.js (NextAuth v5) with Google |
+| UI | Tailwind CSS 4, Motion, Lucide icons, self-hosted fonts |
+| Quality | Vitest, Playwright, ESLint, GitHub Actions |
+| Tooling | pnpm |
+
+## Useful commands
+
+| Command | What it does |
+| --- | --- |
+| `pnpm dev` | Start the dev server |
+| `pnpm build` / `pnpm start` | Production build and server |
+| `pnpm lint` | ESLint |
+| `pnpm typecheck` | TypeScript check |
+| `pnpm test` | Unit and integration tests (Vitest) |
+| `pnpm test:e2e` | Browser tests (Playwright) |
+| `pnpm check` | Typecheck, test and build |
+| `pnpm check:env` | Validate your environment variables |
+
+## Project layout
+
+```text
+src/app/          Routes, pages and API handlers (Next.js App Router)
+src/components/   UI components and the shared design system
+src/lib/          Server logic: matching, expiry, notifications, validation
+src/models/       Mongoose models
+src/tests/        Unit and integration tests
+e2e/              Playwright browser tests
+scripts/          Setup and verification scripts
+public/brand/     Logo and brand assets
 ```
 
-This opt-in command loads your ignored environment file and runs the configured browser workflows against a fresh `peerly_e2e_<random>` database. The database is dropped after the run. Your database user needs permission to create/drop that temporary database and its indexes. Keep ports 3101/3102 free. This still uses test-only sessions, not Google's consent flow. A forcibly terminated run can leave a temporary database behind.
+## Documentation
 
-### Real-account acceptance (after configuration)
+- [Configuration and hosting](docs/configuration.md): MongoDB, Google sign-in, email, costs
+- [How Peerly works](docs/how-it-works.md): request lifecycle, urgency, scheduling, universities, rules
+- [Security and privacy](docs/security-and-privacy.md): data export and deletion, security headers
+- [Design and branding](docs/design.md): Paper & Ink design system and brand assets
+- [Testing](docs/testing.md): automated checks and the manual acceptance checklist
+- [Known limitations](docs/known-limitations.md): what has and has not been verified
+- [Deployment checklist](DEPLOYMENT.md)
 
-1. Use separate browser profiles and actual Google accounts A/B. Verify profiles persist after reload and sign-out/sign-in.
-2. B publishes a complete helper profile with topics, availability and contact. A finds B.
-3. A sends a request. Contact must be absent before acceptance. B accepts; only A gains the configured contact.
-4. A confirms completion; status waits. B confirms; session completes. A submits one review; B's rating updates and a second review is rejected.
-5. B creates, edits and deletes a resource. A reads it without a request and cannot modify it.
-6. A reports a peer/resource. An allowlisted admin reviews it and hides/restores the target. Hidden content disappears publicly; existing sessions preserve authorized access.
-7. Remove an admin from the allowlist and restart: existing sessions must lose admin access. Repeat the core paths on mobile and check modal keyboard focus.
+## Project status
 
-## Remaining limits
-
-- Atlas connectivity, public pages with the configured database, and the Google account-selection redirect were checked locally. Full Google consent/token exchange and external deployment remain unverified.
-- Search ranking runs inside MongoDB (aggregation with a per-candidate `$lookup` of request stats), so only one page is loaded into the app. It is tested with 5,000 profiles; for much larger directories consider caching per-helper stats.
-- Real email delivery (alerts, university codes), importing `.ics` files into calendar apps and live Jitsi calls were not tested end to end.
-- Notifications already in other members' inboxes keep a deleted user's first name until they expire (90 days).
-- Free services have quotas/shared capacity and backup limitations. Establish backups and support before relying on the app for real users.
-- Dependency auditing flags an unpatched `braces` advisory through development-only ESLint glob tooling. User input never reaches that tooling. See [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm). Do not downgrade Next.js or force incompatible packages to silence it.
-
-
-## Account settings and request history
-
-The header gear links directly to `/settings`, which contains the profile editor,
-private account information and confirmed logout. There is no account dropdown or
-repeated activity navigation in settings; `/profile` remains compatible. The
-workspace logo returns to the dashboard, replacing the extra Dashboard header link.
-
-Avatars use name initials throughout the workspace and update after a saved name
-change. Profile photo upload and the avatar-serving endpoint have been removed;
-Google photos are no longer imported into user records. Existing stored image data
-is left untouched and is not displayed or served by the app. No avatar storage
-service or environment key is needed.
-
-Dashboard status filters apply before pagination. Cancel a pending sent request;
-archive a finished request to remove it from your current list. Archiving is
-personal and reversible, and does not remove the other participant's record.
+Peerly is early-stage software. The core flows are implemented and tested
+automatically, but the full Google consent flow, real email delivery and a live
+production deployment have not yet been verified end to end. Read
+[known limitations](docs/known-limitations.md) before relying on it for real
+users, and set up backups, because free database tiers do not include them.
 
 ## Contributing
 
-Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for
-the setup, workflow and pull request checklist, and follow our
-[Code of Conduct](CODE_OF_CONDUCT.md). Nobody pushes directly to `main`; every
-change goes through a pull request.
+Contributions are welcome, from typo fixes to new features. Please read
+[CONTRIBUTING.md](CONTRIBUTING.md) for setup, workflow and the pull request
+checklist, and follow our [Code of Conduct](CODE_OF_CONDUCT.md). Nobody pushes
+directly to `main`; every change goes through a pull request.
 
 ## Security
 
-Please report vulnerabilities privately as described in
-[SECURITY.md](SECURITY.md). Do not open public issues for security problems.
+Found a vulnerability? Please report it privately as described in
+[SECURITY.md](SECURITY.md) instead of opening a public issue.
 
 ## License
 
